@@ -62,25 +62,17 @@ CREATE TABLE trip  as
 (
 		trip_id		sys_id		not null
 	,	trip_pid	sys_id		-- -- if trip_pid is null, the row is an offer, otherwise it is a booking
+	,	usr_id		sys_id		not null
 	,	role_cd		char(1)		-- Driver Rider
-	,	usr_id		sys_id not null
+	,	trip_date	date		
+	,	trip_time	time		
 	,	p1			location
 	,	p2			location
-	,	dir			real
+	,	dir			decimal (6,2)
 	,	price		ridemoney
-	,	cost		ridemoney
 	,	distance	decimal(8,2)	not null default 0
 	,	seats		smallint
-	,	penalty		ridemoney
-	--,	rating		smallint
-	--,	review		text
-	,	book_ts		sys_ts
-	,	confirm_ts	sys_ts
-	,	cancel_ts	sys_ts
-	,	finish_ts	sys_ts
 	,	status_cd	text 	-- for offer, Active, Expired, No more Booking
-							-- for booking, Pending confirmation, Booked, trip Started,
-							-- Cancelled by Offerer, Cancelled by Booker, Finished, Rejected by offerer
 	,	description text
 	,	c_ts		sys_ts not null
 	,	m_ts		sys_ts not null
@@ -89,12 +81,52 @@ CREATE TABLE trip  as
 	,	constraint fk_trip2trip 	foreign key (trip_pid)	REFERENCES	trip 	( trip_id)
 	,	constraint fk_trip2usr 	foreign key (usr_id)	REFERENCES	usr 	( usr_id)
 );
-
 create index ix_trip_usr_id on trip(usr_id);
 create index ix_trip_dir_distance on trip(dir, distance) where status_cd = 'A' and seats > 0;
 alter table trip add constraint ck_trip_role_cd check (role_cd in ('D','R' ) );
-alter table trip add constraint ck_trip_status_cd 
-	check (status_cd in ('A','E', 'NB', 'P', 'B', 'CO', 'CB', 'R' ) );
+alter table trip add constraint ck_trip_status_cd check (status_cd in ('A','E', 'NB' ) );
+
+CREATE TABLE book  as
+(
+		book_id		sys_id		not null
+	,	trip_id		sys_id		-- -- if trip_pid is null, the row is an offer, otherwise it is a booking
+	,	usr_id		sys_id		not null
+	,	role_cd		char(1)		-- Driver Rider
+	--,	trip_date	date		
+	--,	trip_time	time		
+	,	p1			location
+	,	p2			location
+	,	dir			decimal (6,2)
+	,	distance	decimal(8,2)	not null default 0
+	,	seats		smallint
+	,	price_offer		ridemoney
+	,	price_book		ridemoney
+	,	cost_offer		ridemoney
+	,	cost_book		ridemoney
+	,	penalty_on_booker		ridemoney
+	,	penalty_on_offerer		ridemoney
+	--,	rating		smallint
+	--,	review		text
+	,	book_ts		sys_ts
+	,	confirm_ts	sys_ts
+	,	cancel_ts	sys_ts
+	,	finish_ts	sys_ts
+	,	status_cd	text 	-- for booking, Pending confirmation, Booked, trip Started,
+							-- Cancelled by Offerer, Cancelled by Booker, Finished, Rejected by offerer
+	,	description text
+	,	c_ts		sys_ts not null
+	,	m_ts		sys_ts not null
+	,	c_usr 		text
+	,	constraint pk_book		PRIMARY KEY (book_id)
+	,	constraint fk_book2trip foreign key (trip_id)	REFERENCES	trip 	( trip_id)
+	,	constraint fk_book2usr 	foreign key (usr_id)	REFERENCES	usr 	( usr_id)
+);
+
+create index ix_book_usr_id on book(usr_id);
+--create index ix_trip_dir_distance on trip(dir, distance) where status_cd = 'A' and seats > 0;
+alter table book add constraint ck_book_role_cd check (role_cd in ('D','R' ) );
+alter table book add constraint ck_book_status_cd 
+	check (status_cd in ('P', 'B', 'CO', 'CB', 'RO', 'RB', 'F' ) );
 
 CREATE TABLE review  as
 (
