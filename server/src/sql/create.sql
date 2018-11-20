@@ -63,13 +63,14 @@ CREATE TABLE trip  as
 		trip_id		sys_id		not null
 	,	trip_pid	sys_id		-- -- if trip_pid is null, the row is an offer, otherwise it is a booking
 	,	usr_id		sys_id		not null
-	,	role_cd		char(1)		-- Driver Rider
+	,	is_rider	boolean		-- Driver Rider
 	,	trip_date	date		
 	,	trip_time	time		
-	,	p1			location
-	,	p2			location
+	,	p1			location	not null
+	,	p2			location	not null
 	,	dir			decimal (6,2)
 	,	price		ridemoney
+	,	cost		ridemoney
 	,	distance	decimal(8,2)	not null default 0
 	,	seats		smallint
 	,	status_cd	text 	-- for offer, Active, Expired, No more Booking
@@ -91,11 +92,11 @@ CREATE TABLE book  as
 		book_id		sys_id		not null
 	,	trip_id		sys_id		-- -- if trip_pid is null, the row is an offer, otherwise it is a booking
 	,	usr_id		sys_id		not null
-	,	role_cd		char(1)		-- Driver Rider
+	,	is_rider	boolean		-- Driver Rider
 	--,	trip_date	date		
 	--,	trip_time	time		
-	,	p1			location
-	,	p2			location
+	,	p1			location	not null
+	,	p2			location		-- can be null if booker is driver
 	,	dir			decimal (6,2)
 	,	distance	decimal(8,2)	not null default 0
 	,	seats		smallint
@@ -108,12 +109,11 @@ CREATE TABLE book  as
 	--,	rating		smallint
 	--,	review		text
 	,	book_ts		sys_ts
-	,	confirm_ts	sys_ts
-	,	cancel_ts	sys_ts
-	,	finish_ts	sys_ts
-	,	status_cd	text 	-- for booking, Pending confirmation, Booked, trip Started,
+	,	confirm_ts	timestamp with time zone
+	,	cancel_ts	timestamp with time zone
+	,	finish_ts	timestamp with time zone
+	,	status_cd	text not null default 'P' 	-- for booking, booked Pending confirmation, Confirmed, trip Started,
 							-- Cancelled by Offerer, Cancelled by Booker, Finished, Rejected by offerer
-	,	description text
 	,	c_ts		sys_ts not null
 	,	m_ts		sys_ts not null
 	,	c_usr 		text
@@ -124,9 +124,8 @@ CREATE TABLE book  as
 
 create index ix_book_usr_id on book(usr_id);
 --create index ix_trip_dir_distance on trip(dir, distance) where status_cd = 'A' and seats > 0;
-alter table book add constraint ck_book_role_cd check (role_cd in ('D','R' ) );
 alter table book add constraint ck_book_status_cd 
-	check (status_cd in ('P', 'B', 'CO', 'CB', 'RO', 'RB', 'F' ) );
+	check (status_cd in ('P', 'C', 'RD', 'RR', 'CPD', 'CPR', 'CD', 'CR',  'F' ) );
 
 CREATE TABLE review  as
 (
@@ -187,12 +186,15 @@ create table code (
 
 insert into code values
   ('BK'		, 'P'	, 'Pending confirmation')
-, ('BK'		, 'B'	, 'Confirmed')
+, ('BK'		, 'C'	, 'Confirmed')
 , ('BK'		, 'S'	, 'trip started')
-, ('BK'		, 'CO'	, 'cancelled by offerer')
-, ('BK'		, 'CB'	, 'cancelled by booker')
+, ('BK'		, 'CR'	, 'cancelled by rider')
+, ('BK'		, 'CD'	, 'cancelled by driver')
+, ('BK'		, 'CPR'	, 'cancelled by rider')	-- cancel while pending by rider
+, ('BK'		, 'CPD'	, 'cancelled by driver')	-- cancel while pending by driver
 , ('BK'		, 'F'	, 'Finished')
-, ('BK'		, 'J'	, 'Rejected by Offerer')
+, ('BK'		, 'RD'	, 'Rejected by driver')
+, ('BK'		, 'RR'	, 'Rejected by rider')
 , ('TRAN'	, 'D'	, 'Deposit')
 , ('TRAN'	, 'W'	, 'Withdraw')
 , ('TRAN'	, 'P'	, 'Penalty')
@@ -206,8 +208,6 @@ insert into code values
 --, ('JN'	, 'E'	, 'Expired')
 , ('TRAN_STATUS'	, 'K', 'OK, Success')
 , ('TRAN_STATUS'	, 'F', 'Failed')
-, ('ROLE'	, 'D'	, 'Driver')
-, ('ROLE'	, 'R'	, 'Rider')
 ;
 
 
@@ -219,9 +219,6 @@ insert into code values
 --alter table book add FOREIGN KEY (status_cd) REFERENCES book_status (status_cd);
 --alter table msg add FOREIGN KEY (book_id) REFERENCES book (book_id);
 --alter table msg add FOREIGN KEY (usr_id) REFERENCES usr (usr_id);
-
-create view trip_role as select cd status_cd, description 
-from code where code_type ='ROLE';
 
 create view trip_status as select cd status_cd, description 
 from code where code_type ='TRIP';
