@@ -26,8 +26,8 @@ CREATE DOMAIN ridemoney decimal(10,4) ;
 CREATE TYPE location AS
 (
 	  loc			text 	-- user input address
-	, lat			decimal(18,14)
-	, lon			decimal(18,14)
+	, lat			decimal(9,6)
+	, lon			decimal(9,6)
 	, display_name	text		-- reverse geocoded
 );
 
@@ -41,8 +41,10 @@ create table usr
 	, email 			email 
 	, bank_email 		email
 	, member_since 		sys_ts not null
-	, trips_posted 		integer not null default 0
-	, trips_completed 	integer not null default 0
+	, trips_published 		integer not null default 0	-- for driver
+	, rides_published 	integer not null default 0		-- for rider
+	, trips_completed 	integer not null default 0     -- for driver
+	, rides_completed 	integer not null default 0		-- for rider
 	, rating			decimal (5,2) not null default 0
 	, balance			ridemoney not null default 0
 	, oauth_id			text not null
@@ -58,17 +60,16 @@ create table usr
 
 create index ix_usr_oauth_id on usr(oauth_id);
 
-CREATE TABLE trip  as
+CREATE TABLE trip 
 (
 		trip_id		sys_id		not null
-	,	trip_pid	sys_id		-- -- if trip_pid is null, the row is an offer, otherwise it is a booking
 	,	usr_id		sys_id		not null
-	,	is_rider	boolean		-- Driver Rider
+	,	rider_ind	boolean		-- Driver Rider
 	,	trip_date	date		
 	,	trip_time	time		
 	,	p1			location	not null
 	,	p2			location	not null
-	,	dir			decimal (6,2)
+	,	dir			real
 	,	price		ridemoney
 	,	cost		ridemoney
 	,	distance	decimal(8,2)	not null default 0
@@ -78,21 +79,19 @@ CREATE TABLE trip  as
 	,	c_ts		sys_ts not null
 	,	m_ts		sys_ts not null
 	,	c_usr 		text
-	,	constraint pk_trip		PRIMARY KEY (trip_id)
-	,	constraint fk_trip2trip 	foreign key (trip_pid)	REFERENCES	trip 	( trip_id)
-	,	constraint fk_trip2usr 	foreign key (usr_id)	REFERENCES	usr 	( usr_id)
+	,	constraint 	pk_trip		PRIMARY KEY (trip_id)
+	,	constraint 	fk_trip2usr 	foreign key (usr_id)	REFERENCES	usr 	( usr_id)
 );
 create index ix_trip_usr_id on trip(usr_id);
 create index ix_trip_dir_distance on trip(dir, distance) where status_cd = 'A' and seats > 0;
-alter table trip add constraint ck_trip_role_cd check (role_cd in ('D','R' ) );
 alter table trip add constraint ck_trip_status_cd check (status_cd in ('A','E', 'NB' ) );
 
-CREATE TABLE book  as
+CREATE TABLE book
 (
 		book_id		sys_id		not null
-	,	trip_id		sys_id		-- -- if trip_pid is null, the row is an offer, otherwise it is a booking
+	,	trip_id		sys_id		not null	
 	,	usr_id		sys_id		not null
-	,	is_rider	boolean		-- Driver Rider
+	,	rider_ind	boolean		-- Driver Rider
 	--,	trip_date	date		
 	--,	trip_time	time		
 	,	p1			location	not null
@@ -123,25 +122,28 @@ CREATE TABLE book  as
 );
 
 create index ix_book_usr_id on book(usr_id);
---create index ix_trip_dir_distance on trip(dir, distance) where status_cd = 'A' and seats > 0;
 alter table book add constraint ck_book_status_cd 
 	check (status_cd in ('P', 'C', 'RD', 'RR', 'CPD', 'CPR', 'CD', 'CR',  'F' ) );
 
-CREATE TABLE review  as
+CREATE TABLE review
 (
 		review_id	sys_id		not null
-	,	trip_id		sys_id		not null
+	,	book_id		sys_id		not null
+	,	usr_id		sys_id		not null	-- reviewee usr_id
 	,	rating		smallint
 	,	review		text
 	,	c_ts		sys_ts 		not null
 	,	m_ts		sys_ts 		not null
 	,	c_usr 		text
 	,	constraint pk_review		PRIMARY KEY (review_id)
-	,	constraint uk_review		unique KEY 	(trip_id)
-	,	constraint fk_review2trip 	foreign key (trip_pid)	REFERENCES	trip 	( trip_id)
+	,	constraint uk_review		unique (book_id, usr_id)
+	,	constraint fk_review2book 	foreign key (book_id)	REFERENCES	book 	( book_id)
 );
+create index ix_review_book_id on review(book_id);
+create index ix_review_usr_id on review(usr_id);
 
-create table money_tran (
+create table money_tran 
+(
 	  money_tran_id		sys_id not null
 	, usr_id			sys_id not null
 	, tran_cd			text not null -- Deposit, Withdraw, Penalty, trip Finished, Booking
@@ -152,7 +154,7 @@ create table money_tran (
 	, request_ts		timestamp with time zone
 	, actual_ts			timestamp with time zone
 	, bank_email		email
-	, reference_no		text
+	, ref_no			text
 	, cmnt 				text
 	, c_ts				sys_ts not null
 	, m_ts				sys_ts not null
@@ -168,13 +170,15 @@ alter table money_tran add constraint ck_money_tran_status_cd
 
 create table msg (
 		msg_id 	sys_id 	not null
-	, 	trip_id sys_id 	not null
+	, 	book_id sys_id 	not null
+	, 	usr_id 	sys_id 	not null
 	, 	c_ts	sys_ts 	not null
 	, 	msg		text 	not null
 	, 	constraint fk_msg2usr 	foreign key ( usr_id)	REFERENCES	usr		( usr_id)
-	, 	constraint fk_msg2trip 	foreign key ( book_id)	REFERENCES	trip	( trip_id)
+	, 	constraint fk_msg2book 	foreign key ( book_id)	REFERENCES	book	( book_id)
 );
 create index ix_msg_book_id on msg(book_id);
+create index ix_msg_usr_id on msg(usr_id);
 
 create table code (
 	  code_type		text not null
@@ -200,7 +204,7 @@ insert into code values
 , ('TRAN'	, 'P'	, 'Penalty')
 , ('TRAN'	, 'B'	, 'Booking')
 , ('TRAN'	, 'R'	, 'Return')
-, ('TRAN'	, 'F'	, 'Trip Finished')
+, ('TRAN'	, 'E'	, 'Earning')		-- earning from completed Trip
 , ('TRIP'	, 'A'	, 'Active')
 , ('TRIP'	, 'E'	, 'Expired')
 , ('TRIP'	, 'NB'	, 'No more booking allowed')
@@ -226,7 +230,7 @@ from code where code_type ='TRIP';
 create view book_status as select cd status_cd, description 
 from code where code_type ='BK';
 
-create view money_tran_tran_cd as select cd , description 
+create view money_tran_tran_cd as select cd tran_cd , description 
 from code where code_type='TRAN';
 
 --grant all on public.criteria to ride;
