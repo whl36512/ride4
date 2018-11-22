@@ -90,12 +90,12 @@ pub fn upd_user(req: &mut Request) -> IronResult<Response> {
 pub fn ins_trip(req: &mut Request) -> IronResult<Response> {
 	request_sql(req, constants::SQL_INS_TRIP, 1)
 }
-pub fn search(req: &mut Request) -> IronResult<Response> {
-	request_sql(req, constants::SQL_SEARCH, 2)
-}
-pub fn search_all(req: &mut Request) -> IronResult<Response> {
-	request_sql(req, constants::SQL_SEARCH_ALL, 2)
-}
+//pub fn search(req: &mut Request) -> IronResult<Response> {
+	//request_sql(req, constants::SQL_SEARCH, 2)
+//}
+//pub fn search_all(req: &mut Request) -> IronResult<Response> {
+	//request_sql(req, constants::SQL_SEARCH_ALL, 2)
+//}
 pub fn search_region(req: &mut Request) -> IronResult<Response> {
 	request_sql(req, constants::SQL_SEARCH_REGION, 2)
 }

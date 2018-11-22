@@ -65,6 +65,7 @@ export class Constants{
 	static MAX_PRICE_RIDER 		= 0.54* 1.2 				;
 	static MAX_SEATS 			= 6					;
 	static MAX_SEARCH_TIGHTNESS = 5					;
+	static BOOKING_FEE 			= 0.2				;
 
 	static FORM_DEBOUNCE_TIME 	= 500				;
 

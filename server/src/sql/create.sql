@@ -26,10 +26,24 @@ CREATE DOMAIN ridemoney decimal(10,4) ;
 CREATE TYPE location AS
 (
 	  loc			text 	-- user input address
-	, lat			decimal(9,6)
-	, lon			decimal(9,6)
+	, lat			decimal(10,7)
+	, lon			decimal(10,7)
 	, display_name	text		-- reverse geocoded
 );
+
+create type cost as
+(
+      booking_fee   ridemoney
+    , margin_factor numeric (3,2)
+    , price_driver  ridemoney
+    , price_rider   ridemoney
+    , cost_driver   ridemoney
+    , cost_rider    ridemoney
+    , max_price_driver  ridemoney
+    , max_price_rider   ridemoney
+    , max_seats     integer
+);
+
 
 
 create table usr
@@ -71,7 +85,6 @@ CREATE TABLE trip
 	,	p2			location	not null
 	,	dir			real
 	,	price		ridemoney
-	,	cost		ridemoney
 	,	distance	decimal(8,2)	not null default 0
 	,	seats		smallint
 	,	status_cd	text 	-- for offer, Active, Expired, No more Booking
@@ -99,10 +112,7 @@ CREATE TABLE book
 	,	dir			decimal (6,2)
 	,	distance	decimal(8,2)	not null default 0
 	,	seats		smallint
-	,	price_offer		ridemoney
-	,	price_book		ridemoney
-	,	cost_offer		ridemoney
-	,	cost_book		ridemoney
+	, 	cost		cost
 	,	penalty_on_booker		ridemoney
 	,	penalty_on_offerer		ridemoney
 	--,	rating		smallint
@@ -237,8 +247,7 @@ from code where code_type='TRAN';
 grant all on public.usr to ride;
 grant all on public.trip to ride;
 --grant all on public.journey to ride;
---grant all on public.book to ride;
---grant all on public.book_status to ride;
+grant all on public.book to ride;
 grant all on public.money_tran to ride;
 grant all on public.msg to ride;
 grant all on public.code to ride;

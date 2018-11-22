@@ -72,6 +72,65 @@ export class Util {
 		}
 	}
 
+    static TODAY() { // TODAY is browser local time and is in the form of 2018-09-11
+        let utc = new Date();
+        let d = new Date(utc.getTime() - utc.getTimezoneOffset() * 60000)
+        let s = d.toJSON() ;
+        console.debug ( '201810142022 Util.TODAY()=', s    );
+
+        return s.slice(0,10) ;
+    } ;
+
+	static current_time() {
+		return Util.current_time_and_minutes(0);
+	}
+
+	static current_time_and_minutes(minutes: number) {
+        let utc = new Date();
+        let d = new Date(utc.getTime() - utc.getTimezoneOffset() * 60000 + minutes*60000);
+        let s = d.toJSON() ;
+
+        return [s.slice(0,10), s.slice(11,16)] ;
+	}
+
+	static now_ts ()
+	{
+		let utc = new Date();
+        return utc.getTime() ;
+	}
+
+    static to_local_time(date : string) : string {
+        let since_epoch = Date.parse(date);
+        let utc = new Date();
+
+        let d = new Date(since_epoch - utc.getTimezoneOffset() * 60000);
+        let s = d.toJSON() ;
+        return s;
+    }
+
+    static up_to_minutes( date: string) : string {
+        let local_time = Util.to_local_time(date);
+        return local_time.slice(0,10) + ' ' + local_time.slice(11,16);
+    }
+
+    static elapsed_time ( date: string) : string {
+        let since_epoch = Date.parse(date);
+        let utc = new Date();
+        let minutes = Math.floor(( utc.getTime() -since_epoch + 10000)/60000);
+
+        let days = Math.floor(minutes/60/24) ;
+        let hours = Math.floor(minutes % (60*24)/60);
+        let minutes2 = minutes % (60);
+        let elapsed_time='';
+        if (days!=0) { elapsed_time = elapsed_time+ days + ' days ago' ; }
+        else if (hours!=0) { elapsed_time = elapsed_time+ hours + ' hr ago'; }
+        else if (minutes2!=0) { elapsed_time = elapsed_time+ minutes2 + ' min ago';}
+        else { elapsed_time= 'now'; }
+        return elapsed_time;
+    }
+
+
+
 /*	not working. error TS2339: Property 'chrome' does not exist on type 'Window'.
 	get_browser_vender() {
 	// https://stackoverflow.com/questions/4565112/javascript-how-to-find-out-if-the-user-browser-is-chrome
@@ -188,10 +247,13 @@ export class Util {
 	}
 
 	static create_empty_trip () : any{
+			let [today, current_time ] = Util.current_time();
 
 			return	{
 			  version 				: 1
-			, departure_time		: ''
+			, rider_ind 			: 'false'
+			, trip_date	 			: today
+			, trip_time				: current_time
 			, distance				: C.ERROR_NO_ROUTE
 			, seats		 			: 1
 			, price		 			: C.MAX_PRICE
@@ -205,26 +267,10 @@ export class Util {
 					, 	lon			: null
 					, 	display_name: null
 				}
-			, date1		 			: C.TODAY()
-			, date2		 			: C.TODAY()
-			, recur_ind				: false
-			, day0_ind				: false
-			, day1_ind				: false
-			, day2_ind				: false
-			, day3_ind				: false
-			, day4_ind				: false
-			, day5_ind				: false
-			, day6_ind				: false
 			, description			: ''
 			}
 	}
 	
-	static now_ts ()
-	{
-		let utc = new Date();
-        return utc.getTime() ;
-	}
-
 
 	static onError(error) {
 			console.log(`Error: ${error}`);

@@ -23,8 +23,6 @@ export class MapService {
 	private marker_arr: any =[];
 	private lines: any =[];
 
-	//current_loc = {lat:null, lon:null};
-
 	geo_watcher : any;
 
 	current_loc = {lat:null,lon:null};
@@ -110,8 +108,8 @@ export class MapService {
             position => {
                 console.debug('201811171337 GeoService.subscribe_geo_watcher'
                     , `Next: ${position.coords.latitude}, ${position.coords.longitude}`);
-                this.current_loc.lat = position.coords.latitude;
-                this.current_loc.lon = position.coords.longitude;
+                this.current_loc.lat = Math.round(position.coords.latitude*10000000)/10000000.0;
+                this.current_loc.lon = Math.round(position.coords.longitude*10000000)/10000000.0;
                 },
 
             err => {

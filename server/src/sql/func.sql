@@ -50,51 +50,45 @@ $body$
 language sql;
 
 create or replace function funcs.calc_cost(
-	  price 			numeric 
-	, distance			numeric
-	, seats 			integer
-	, OUT booking_fee	numeric
-	, OUT margin_factor	numeric
-	, OUT price_driver	numeric
-	, OUT price_rider 	numeric
-	, OUT cost_driver	numeric	
-	, OUT cost_rider	numeric
-	, OUT max_price_driver	numeric
-	, OUT max_price_rider	numeric
-	, OUT max_seats		smallint
+	  p 		numeric 	-- price
+	, d			numeric		-- distance
+	, s 		integer	-- seats
+	, OUT cost 	cost
 	)
 as
 $body$
 DECLARE
 BEGIN
-	booking_fee		:=	0.2					;
-	margin_factor	:=	1.2					;
-	max_price_driver:=	0.54				;
-	max_price_rider	:=	0.54 * booking_fee	;
-	max_seats		:=	6					;
+	cost.booking_fee		:=	0.2					;
+	cost.margin_factor		:=	1.2					;
+	cost.max_price_driver	:=	0.54				;
+	cost.max_price_rider	:=	0.54 * cost.margin_factor	;
+	cost.max_seats			:=	6					;
 
-	price_driver	:=	price				;
-	price_rider		:=	price * margin_factor;
-	cost_driver		:=	round(price			* distance * seats  , 2) ;
-	cost_rider		:=	round(price_rider	* distance * seats  + booking_fee * seats , 2);
+	cost.price_driver		:=	p				;
+	cost.price_rider		:=	p * cost.margin_factor	;
+	cost.cost_driver		:=	round(p			* d * s  , 2) ;
+	cost.cost_rider			:=	round(cost.price_rider	* d * s  + cost.booking_fee * s , 2);
 END
 $body$
 language plpgsql;
 
 create or replace function funcs.calc_cost_driver(
 -- calculate costs when driver is booker
-	  in_price_rider	numeric 
-	, in_seats 			integer
-	, OUT cost_driver	numeric	
-	, OUT cost_rider	numeric)
+	  p 		numeric 
+	, d			numeric
+	, s 		integer
+	, OUT cost	cost
+	)
 as
 $body$
 DECLARE
-	const RECORD;
 BEGIN
-	const				:=	funcs.calc_cost(0,0,0)		;
-	cost_rider			:=	(const.booking_fee + in_price_rider ) * in_seats ;
-	cost_driver			:=	round( (in_price_rider * in_seats)/const.margin_factor  , 2) ;
+	cost				:=	funcs.calc_cost(0,0,0)		;
+	cost.price_rider	:=	p							;
+	cost.price_driver	:=	p/cost.margin_factor	;
+	cost.cost_rider		:=	round((cost.booking_fee + p * d) * s,2) ;
+	cost.cost_driver	:=	round( p * s/cost.margin_factor  , 2) ;
 END
 $body$
 language plpgsql;
@@ -197,7 +191,7 @@ language plpgsql;
 
 
 create or replace function funcs.validate_trip( t0 trip)
-	returns boolean
+	returns json
 as
 $body$
 DECLARE
@@ -207,22 +201,22 @@ DECLARE
 BEGIN
 	c	:=	funcs.calc_cost(0,0,0)	;
 	
-	if 		t0.rider_ind			is null					then return false;
-	elsif t0.distance				<=	0					then return false;
-	elsif (t0.p1).lat				is null					then return false;
-	elsif (t0.p1).lon				is null					then return false;
-	elsif (t0.p1).display_name	is null					then return false;
-	elsif (t0.p2).lat				is null					then return false;
-	elsif (t0.p2).lon				is null					then return false;
-	elsif (t0.p2).display_name	is null					then return false;
-	elsif t0.trip_date			is null					then return false;
-	elsif t0.trip_date 			< now()::date -1		then return false;
-	elsif t0.trip_time			is null					then return false;
-	elsif t0.price				is null					then return false;
-	elsif t0.price				<	0 					then return false;
-	elsif t0.seats				is null					then return false;
-	elsif t0.seats				<	1 					then return false;
-	elsif t0.seats				>	c.max_seats 		then return false;
+	if 		t0.rider_ind	is null	then return funcs.gen_error('201111211932','rider_ind is null');
+	elsif t0.distance		<=	0	then return funcs.gen_error('201111211933','no route');
+	elsif (t0.p1).lat		is null	then return funcs.gen_error('201111211933','no p1.lat');
+	elsif (t0.p1).lon			is null	then return funcs.gen_error('201111211933','no p1.lon');
+	elsif (t0.p1).display_name	is null	then return funcs.gen_error('201111211933','no p1.display_name');
+	elsif (t0.p2).lat			is null	then return funcs.gen_error('201111211933','no p2.lat');
+	elsif (t0.p2).lon			is null	then return funcs.gen_error('201111211933','no p2.lon');
+	elsif (t0.p2).display_name	is null	then return funcs.gen_error('201111211933','no p1.display_name');
+	elsif t0.trip_date			is null	then return funcs.gen_error('201111211933','no trip_date');
+	elsif t0.trip_date 		< now()::date -1 then return funcs.gen_error('201111211933','trip_date is stale');
+	elsif t0.trip_time		is null	then return funcs.gen_error('201111211933','no trip_time');
+	elsif t0.price			is null	then return funcs.gen_error('201111211933','no price');
+	elsif t0.price			<	0 	then return funcs.gen_error('201111211933','price <0');
+	elsif t0.seats			is null	then return funcs.gen_error('201111211933','no seats');
+	elsif t0.seats			<	1 	then return funcs.gen_error('201111211933','seats<1');
+	elsif t0.seats			>	c.max_seats then return funcs.gen_error('201111211933','seats> max_seats');
 	--elsif c0.date1 				is null					then return false;
 	--elsif c0.date1 				< now()::date -1		then return false;
 	--elsif t0.recur_ind 			is null					then return false;
@@ -240,9 +234,12 @@ BEGIN
 					--and not t0.day3_ind and not t0.day4_ind and not t0.day5_ind 
 					--and not t0.day6_ind 
 	--then return false;
-	elsif 		t0.rider_ind and t0.price	>	c.max_price_ride	then	return false;
-	elsif	not	t0.rider_ind and t0.price	>	c.max_price_driver	then	return false;
-	else 																	return true;
+	elsif 		t0.rider_ind and t0.price	>	c.max_price_rider	then 
+		return funcs.gen_error('201111211933','price> max_price_rider');
+	elsif	not	t0.rider_ind and t0.price	>	c.max_price_driver	then	
+		return funcs.gen_error('201111211933','price> max_price_driver');
+
+	else	return null;
 	end if;
 END
 $body$
@@ -256,25 +253,25 @@ DECLARE
 	t0 trip ;
 	u0 usr ;
 	t1 trip ;
-	is_valid boolean;
+	validation_error json;
 	dummy RECORD;
 	cost RECORD;
 BEGIN
 	t0	:=	funcs.json_populate_record(NULL::trip, in_trip) ;
-	select u.* into u0 from usr u, funcs.json_populate_record(NULL::usr , in_user)  u0
-	where u.usr_id = u0.usr_id;
+	select u.* into u0 from usr u, funcs.json_populate_record(NULL::usr , in_user) uu 
+	where u.usr_id = uu.usr_id;
 
-	if u0.usr_id = t0.usr_id then
-		NULL ;
-	else
+	if u0.usr_id is null then
 		return funcs.gen_error('201811190902', 'user not signed in');
 	end if;
 
-	is_valid			:=	funcs.validate_trip(t0) ;
-	if not is_valid	then return funcs.gen_error('201811201714', 'validate_trip failed'); end if;
+	validation_error			:=	funcs.validate_trip(t0) ;
+	if validation_error is not null then 
+		return validation_error;
+	end if;
 
 	if t0.rider_ind then
-		cost	:= funcs.calc_cost_driver(t0.price, t0.seats)	;
+		cost	:= funcs.calc_cost_driver(t0.price, t0.distance, t0.seats)	;
 		if cost.cost_rider > u0.balance then
 			return funcs.gen_error('201811202326'
 				, 'Insufficient balance. Estimated cost for the trip is $'|| cost.cost_rider);
@@ -308,9 +305,7 @@ BEGIN
 	u0	:=	funcs.json_populate_record(NULL::usr	, in_usr) ;
 	c	:=	funcs.calc_cost(0,0,0)	;	
 
-	if u0.usr_id = t0.usr_id then
-		NULL ;
-	else
+	if u0.usr_id is null then
 		return funcs.gen_error('201811190902', 'user not signed in');
 	end if;
 
@@ -510,9 +505,7 @@ BEGIN
 	b0 := funcs.json_populate_record(NULL::book 	, in_book) ;
 	u0 := funcs.json_populate_record(NULL::usr 		, in_user) ;
 
-	if b0.usr_id = u0.usr_id then
-		NULL;
-	else
+	if u0.usr_id is null then
 		return funcs.gen_error('201811191940', 'user not signed in');
 	end if;
 
@@ -551,9 +544,7 @@ BEGIN
 	b0 := funcs.json_populate_record(NULL::book , in_book) ;
 	u0 := funcs.json_populate_record(NULL::usr  , in_user) ;
 
-	if b0.usr_id = u0.usr_id then
-		NULL;
-	else
+	if u0.usr_id is null then
 		return funcs.gen_error('201811191940', 'user not signed in');
 	end if;
 
@@ -646,7 +637,7 @@ $body$
 			, 1.0/60*(0.1+0.05*search_tightness)		axes_move
 			, c.margin_factor
 		FROM funcs.json_populate_record(NULL::funcs.criteria , in_criteria) t 
-				, funcs.calc_cost(0,0,0)	c	
+				, funcs.calc_cost(0.0,0.0,0)	c	
 	)
 	, a as (
 		select 
@@ -668,8 +659,8 @@ $body$
 				end sufficient_balance
 			, case when ud.profile_ind then ud.sm_link else null end sm_link
 			, ud.headline
-			, c0.p1 p1_booker
-			, c0.p2 p2_booker
+			, c0.p1 p1_book
+			, c0.p2 p2_book
 		from trip t
 		join user0 on (1=1)	-- usr0 may not ba available because of not signed in
 		join c0 on (1=1)
@@ -713,6 +704,83 @@ $body$
 $body$
 language sql;
 
+create or replace function funcs.search_region_no_p2( in_criteria text, in_user text)
+-- search by driver. drive does not provide p2
+	returns setof json
+as
+$body$
+DECLARE
+	u0	RECORD;
+	c0	RECORD;
+BEGIN
+	-- if usr_id is null, populated it with random uuid
+	SELECT coalesce(u.usr_id, uuid_generate_v4()) usr_id 
+	into u0
+    FROM funcs.json_populate_record(NULL::usr , in_user) u ; 
+
+	SELECT		
+			-- bounding box
+			  least		((t.bp1).lat, (t.bp2).lat) bp1_lat	
+			, greatest	((t.bp1).lat, (t.bp2).lat) bp2_lat	
+			, least		((t.bp1).lon, (t.bp2).lon) bp1_lon
+			, greatest	((t.bp1).lon, (t.bp2).lon) bp2_lon	
+			-- center box
+			, ((t.bp1).lat + (t.bp2).lat)/2 - ((t.bp2).lat-(t.bp1).lat)/6 p1_lat_cb
+			, ((t.bp1).lat + (t.bp2).lat)/2 + ((t.bp2).lat-(t.bp1).lat)/6 p2_lat_cb
+			, ((t.bp1).lon + (t.bp2).lon)/2 - ((t.bp2).lon-(t.bp1).lon)/6 p2_lon_cb
+			, ((t.bp1).lon + (t.bp2).lon)/2 + ((t.bp2).lon-(t.bp1).lon)/6 p2_lon_cb
+			, coalesce(t.seats		, 1)				 seats
+			, coalesce(t.price*c.margin_factor , 0)	min_price_rider
+			, t.p1
+			, t.p2
+			, t.date1
+			, t.date2
+			, trip_time
+	into c0
+	FROM funcs.json_populate_record(NULL::funcs.criteria , in_criteria) t 
+	, funcs.calc_cost(0,0,0)	c	
+	;
+
+	RETURN QUERY
+	with a as (
+		select 
+			  t.p1
+			, t.p2
+			--, t.distance 
+			, t.description
+			, t.usr_id				
+ 			, t.trip_id				 
+ 			, t.trip_date		
+ 			, t.trip_time	
+			, t.seats
+			, funcs.calc_cost_driver(t.price, t.distance , t.seats ) as cost
+			, ur.headline
+			, c0.p1 p1_book
+			, null p2_book
+		from trip t
+		join usr ur on (ur.usr_id = t.usr_id) -- to get riders headline and balance
+		where t.usr_id	!= 	u0.usr_id
+		and t.status_cd = 'A'
+		and t.seats <= c0.seats
+		and t.price >= c0.min_rice_rider
+		and t.trip_date between c0.date1 and c0.date2
+		and t.trip_time between c0.trip_time - t.distance *600 * interval '1 second' 
+				and c0.trip_time +  t.distance *600 * interval '1 second'
+		-- trip start and end must inside the bounding box
+		and (t.p1).lat between c0.bp1_lat and c0.bp2_lat
+		and (t.p1).lon between c0.bp1_lon and c0.bp2_lon
+		--and (t.p2).lat between c0.bp1_lat and c0.bp2_lat
+		--and (t.p2).lon between c0.bp1_lon and c0.bp2_lon
+		and ur.balance >= (funcs.calc_cost_driver(t.price, t.distance , t.seats )).cost_rider
+		order by t.trip_date, t.trip_time
+		limit 100
+	)
+	select row_to_json(a) 
+	from a
+	;
+END
+$body$
+language plpgsql;
 
 --select * from funcs.search('{"departure_time": null, "distance": 30.7, "end_date": null, "end_display_name": "Millennium Centre, 33, West Ontario Street, Magnificent Mile, Chicago, Cook County, Illinois, 60654, USA", "end_lat": "41.89285925", "end_loc": "33 w ontario st, chicago", "end_lon": "-87.6292175246499", "price": 0.2, "seats": 1, "start_date": null, "start_display_name": "2916, Colton Court, Lisle, DuPage County, Illinois, 60532, USA", "start_lat": "41.7944060204082", "start_loc": "2916 colton ct", "start_lon": "-88.1075615306122"}');
 
@@ -729,9 +797,7 @@ BEGIN
 	b0 := funcs.json_populate_record(NULL::book , in_book) ;
 	SELECT * into t0 FROM trip where t0.trip_id = b0.trip_id;
 
-	if u0.usr_id = b0.usr_id then
-		NULL;
-	else
+	if u0.usr_id is null then
 		return funcs.gen_error('201811190902', 'user not signed in');
 	end if;
 
@@ -1057,55 +1123,64 @@ BEGIN
 		where	t.usr_id=u0.usr_id 
 		and		t.trip_date between coalesce(c0.date1	, '1970-01-01') 
 		and 	coalesce(c0.date2	, '3000-01-01')
+		and		t.status_cd='A'
+		and		not t.rider_ind
+		union 
+		select	t.trip_id, null book_id, u0.usr_id my_usr_id, null other_usr_id
+		from 	trip 	t 	
+		where	t.usr_id=u0.usr_id 
+		and		t.trip_date between coalesce(c0.date1	, '1970-01-01') 
+		and 	coalesce(c0.date2	, '3000-01-01')
+		and		t.status_cd='A'
+		and 	t.seats>0			-- only show unbooked trip
+		and		t.rider_ind		
+	
 	)
 	, a as (
 		select 
 			  ids.trip_id
 			, t.usr_id
 			, ids.book_id
+			, ids.my_usr_id
 			, ids.other_usr_id
-			, ids.journey_id
 			, t.p1
 			, t.p2
 			, t.description
-			, b.p1 b_p1
-			, b.p2 b_p2
+			, b.p1 p1b
+			, b.p2 p2b
 			-- , t.distance
 			, t.trip_date
 			, t.trip_time
 			, b.status_cd
-			, case 
-				when t.usr_id = ids.my_usr_id and not t.rider_ind and b.book_id is null	
-					then t.price	-- only need to show driver's published price 
-				else null
-				end price
+			, case when b.book_id is null	then t.price	else null end price
 			, case 
 				when t.usr_id	= ids.my_usr_id and t.rider_ind 		and b.book_id is not null 
-					then b.cost_rider
+					then (b.cost).cost_rider
 				when t.usr_id	= ids.my_usr_id and not t.rider_ind 	and b.book_id is not null 	
-					then b.cost_driver
-				when t.usr_id	= ids.my_usr_id and t.rider_ind 		and b.book_id is null		
-					then t.cost 
-				--when t.usr_id	= ids.my_usr_id and t.rider_ind 		and b.book_id is null then
+					then (b.cost).cost_driver
 				else null
 			  end unified_cost -- either driver's cost or rider's cost
 			, coalesce(b.seats , t.seats) seats	-- either seats available or seats booked
-			, b.status_cd 
 			, coalesce( bs.description, ts.description) status_description
-			, case when t.usr_id = ids.my_usr_id then t.is_rider 	else not t.is_rider end rider_ind
+			, case when t.usr_id = ids.my_usr_id then t.rider_ind 	else not t.rider_ind end rider_ind
 			, case when b.usr_id = ids.my_usr_id then true 			else false 			end booker_ind
 			, uo.headline
 			, uo.sm_link	
+			, case when ids.my_usr_id=t.usr_id and t.rider_ind	then true
+					when ids.my_usr_id= b.usr_id	and not t.rider_ind then true
+					else false
+					end  is_rider
+			, coalesce(bs.description , 'Published') book_status_description
 		from ids 
 		join trip 				t 	on ( t.trip_id=ids.trip_id )
-		join usr				uo 	on ( ud.usr_id=ids.other_usr_id)
 		join trip_status		ts 	on ( ts.status_cd=t.status_cd)
+		left outer join usr				uo 	on ( uo.usr_id=ids.other_usr_id)
 		left outer join book 	b 	on (b.book_id= ids.book_id )
 		left outer join book_status bs 	on (bs.status_cd= b.status_cd)
 	)
 	select row_to_json(a) 
 	from a
-	order by a.trip_date , a.trip_time, b.status_cd nulls last
+	order by a.trip_date , a.trip_time, a.status_cd nulls last
 	;
 END
 $body$

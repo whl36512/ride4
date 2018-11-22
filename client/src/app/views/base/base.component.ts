@@ -61,6 +61,8 @@ export abstract class BaseComponent implements OnInit, OnDestroy {
 	current_loc 			= 			{lat:null, lon:null};
 	form_values_old			: any = {}			;
 	form_values_new			: any = {}			;
+	today					: string			;	// browser local date
+	current_time			: string			;	// browser local time
 
 	class_name = this.constructor.name;
 
@@ -97,6 +99,8 @@ export abstract class BaseComponent implements OnInit, OnDestroy {
 		console.debug('201811041002', this.class_name, '.constructor() enter.');
 		//this.subscribe_geo_watcher();
 		//this.subscribe_websocket();
+
+		[this.today, this.current_time] = Util.current_time();
 		console.debug('201811041002', this.class_name, '.constructor() exit.');
 	}
 

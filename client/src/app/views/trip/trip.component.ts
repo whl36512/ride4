@@ -48,10 +48,11 @@ export class TripComponent extends BaseComponent {
 
 	trip:any;
 	step=1;
-	today = C.TODAY();
-	button_label = 'Publish';
+	button_label = 'Publish Trip';
 	user_from_db: any = {};
-	show_form	=C.BODY_NOSHOW;
+	show_form	= C.BODY_SHOW;
+	max_price	=C.MAX_PRICE;
+	form_is_valid	=false;
 
 	constructor( public changeDetectorRef   : ChangeDetectorRef
 				, public mapService			 : MapService
@@ -75,19 +76,6 @@ export class TripComponent extends BaseComponent {
 				console.debug("201808201201 TripComponent.ngoninit() user_from_db =" 
 					, C.stringify(user_from_db));
 				this.user_from_db =user_from_db;
-				if (this.user_from_db.balance==undefined || this.user_from_db.balance < 0 ) {
-					this.error_msg
-						='You cannnot publish any trip when your account balance is negative.<br/>'
-							+ 'Please bring your account balance to 0 or positive by deposit money<br/>'
-							+ 'into your account.';
-					this.changeDetectorRef.detectChanges() ;
-				}
-				else {
-					console.debug("201808201201 TripComponent.ngoninit() show form " );
-					this.reset_msg() ;
-					this.show_form=C.BODY_SHOW;
-					this.changeDetectorRef.detectChanges() ;
-				}
 			},
 			error => {
 				this.error_msg=error;
@@ -107,9 +95,7 @@ export class TripComponent extends BaseComponent {
 		console.debug("201810291814", this.class_name, ".ngOnInit() trip=",
 			C.stringify(trip));
 	
-		trip.date1 =  this.today > trip.date1 ? this.today: trip.date1 ;
-	
-		trip.date2 = trip.date1 > trip.date2 ? trip.date1: trip.date2 ;
+		trip.trip_date =  this.today > trip.trip_date ? this.today: trip.trip_date ;
 	
 		this.trip=trip;
 		StorageService.storeForm(C.KEY_FORM_TRIP, trip);
@@ -117,6 +103,7 @@ export class TripComponent extends BaseComponent {
 		this.form= this.form_builder.group(
 			{
 				//sync validators must be in an array
+				rider_ind			: [trip.rider_ind, [Validators.required]], 
 				p1_loc				: [trip.p1.loc, [Validators.required]], 
 				//start_lat	: ['', []],	 
 				//start_lon	: ['', []],	 
@@ -125,23 +112,14 @@ export class TripComponent extends BaseComponent {
 				//end_lat			: ['', []], 
 				//end_lon			: ['', []],
 				//end_display_name	: ['', []],
-				date1				: [trip.date1, [Validators.required, Validators.min]], 
-				departure_time		: [trip.departure_time, [Validators.required]], 
+				trip_date			: [trip.trip_date, [Validators.required, Validators.min]], 
+				trip_time			: [trip.trip_time, [Validators.required]], 
 				seats				: [trip.seats, [Validators.required]], 
 				price				: [trip.price, [Validators.required]], 
-				recur_ind			: [trip.recur_ind, []], 
-				date2				: [trip.date2,[Validators.min] ], 
-				day0_ind			: [trip.day0_ind, ], 
-				day1_ind			: [trip.day1_ind, ], 
-				day2_ind			: [trip.day2_ind, ], 
-				day3_ind			: [trip.day3_ind, ], 
-				day4_ind			: [trip.day4_ind, ], 
-				day5_ind			: [trip.day5_ind, ], 
-				day6_ind			: [trip.day6_ind, ], 
 				description			: [trip.description, ], 
 			},	 
 			{ 
-				validator		: this.validate_trip
+				//validator		: this.validate_trip
 			}
 		);
 	
@@ -149,8 +127,11 @@ export class TripComponent extends BaseComponent {
   	}
 
 	form_change_action(){
+		this.reset_msg() ;
 		let changed_field=this.form_loc_change_detect();
 		if ( changed_field) this.geocode(changed_field, this.trip, this.form) ;
+		this.validate_trip();
+		this.changeDetectorRef.detectChanges() ;
 	}
 
 	onSubmit() {
@@ -179,11 +160,16 @@ export class TripComponent extends BaseComponent {
 						this.form_saved_to_db=true;
 						this.info_msg
 							='The trip is published. Other users can start to book the trip.';
-						this.button_label='Publish Another';
+						if (trip_from_db.rider_ind) 
+							this.warning_msg = ' You MUST maintain your balance over Estimated Cost. Otherwise othes cannot find your trip.'
+						this.button_label='Publish Another Trip';
 						this.changeDetectorRef.detectChanges() ;
 					}
 					else {
-						this.error_msg ='Invalid data. Request to publish rejected.';
+						if (trip_from_db.error_desc)
+							this.error_msg = trip_from_db.error_desc + '. Request to publish rejected.' ;
+						else
+							this.error_msg ='Invalid data. Request to publish rejected.';
 						this.changeDetectorRef.detectChanges() ;
 					}
 			},
@@ -203,51 +189,61 @@ export class TripComponent extends BaseComponent {
 		this.communicationService.send_msg(C.MSG_KEY_MARKER_FIT, pair);
 	};
 
-
-	validate_trip(fg: FormGroup): ValidationErrors | null {
-		console.debug('DEBUG 2018009080943 TripComponent.validate_trip() fg.value=\n' ) ; 
-		console.debug(fg.value ) ; 
-		//	console.debug("INFO 2018009080943 validate_trip this.trip=" + this.trip ) ;  
-		/*
-		if( isNaN( this.trip.distance )	|| this.trip.distance <=0 ) {
-			console.log("ERROR 201807142049 validate_trip() distance unset, not routable") ; 
-			return {"distance":"not routable"} ;
-		}
-		*/
-		if (fg.value.recur_ind ===true && fg.value.date2==null ) 
-		{
-			console.log("ERROR 201807142049 validate_trip() recurring but end_date unset") ; 
-			return {"date2":"is not set"} ;
-		}
-		else if (fg.value.recur_ind ===true && (fg.value.date2 <= fg.value.date1)	) 
-		{
-			console.log("ERROR 201807142020 validate_trip() date2 <= date1 " );
-			return {"date2":"is before date1"} ;
-		}
-		/*
-		else if (fg.value.recur_ind ===true && fg.value.date2 > this.next_n_days(fg.value.date1, 92) ) 
-		{
-			console.log("ERROR 201807142301  date2 - date1 = " + (fg.value.date2 - fg.value.date1) + " > 92" );
-			return {"end_date":"is 92 days after start_date"} ;
-		}
-		*/
-		else if (fg.value.recur_ind ===true && fg.value.day0_ind !== true && fg.value.day1_ind !== true 
-			&& fg.value.day2_ind !== true && fg.value.day3_ind !== true && fg.value.day4_ind !== true 
-			&& fg.value.day5_ind !== true && fg.value.day6_ind !== true ) {
-			console.log("ERROR 201807142027  recurring but no day of week is selected" );
-			return {"day of week":"is not set"} ;
-		}
-		return null;
+	estimate_cost(){
+		if (this.trip.distance == C.ERROR_NO_ROUTE) return '';
+		return Math.round((this.form.value.price*this.trip.distance + C.BOOKING_FEE) 
+			* this.form.value.seats*100)/100;
 	}
 
-	next_n_days(date: string, next: number) : string{
-		let one_day=1000*60*60*24;
-		let since_epoch= Date.parse(date);
-		let next_n_day_since_epoch= since_epoch+ next*one_day;
-		let next_n_day= new Date(next_n_day_since_epoch).toJSON().slice(0,10)	
-		console.log("2018009081220 next_day =" + next_n_day);
-		return next_n_day;
+
+	//validate_trip(fg: FormGroup): ValidationErrors | null {
+	validate_trip() {
+		//console.debug('DEBUG 2018009080943 TripComponent.validate_trip() fg.value=\n' ) ; 
+		//console.debug(fg.value ) ; 
+
+		 if ( this.user_from_db.balance == null ) {
+			this.error_msg = 'You must sign in to post a trip' ;
+			this.form_is_valid= false;
+		}
+		else if ( this.form.value.rider_ind =='true' 
+				&& this.trip.distance != C.ERROR_NO_ROUTE
+				&& this.user_from_db.balance < this.estimate_cost()
+				) {
+			this.error_msg = 'Your balance is under Estimated Cost. You MUST maintain a balance above Estimated Cost to publish a trip as rider';
+			this.form_is_valid= false;
+			//return {balance: this.error_msg};
+		}
+		else if ( this.user_from_db.balance < 0)
+		{ 
+			this.error_msg = 'Your account balance is negative. You cannot publish trip with a negative balance';
+			this.form_is_valid= false;
+			//return {balance: this.error_msg};
+		}
+		else 
+			this.form_is_valid= true;
 	}
+
+	current_location()
+	{
+		let cl = this.mapService.current_loc
+		if (! cl.lat) this.error_msg='Location service is not enabled';
+		else {
+			this.form.patchValue ({
+			p1_loc: cl.lat +',' + cl.lon
+		});
+		}
+	}
+
+	set_time(minutes: number)
+	{
+		let [trip_date, trip_time] = Util.current_time_and_minutes(minutes);
+		this.form.patchValue ({
+			trip_date: trip_date,
+			trip_time:	trip_time
+		});
+		this.changeDetectorRef.detectChanges() ;
+	}
+
 
 /*
   	mouseDown(event) {

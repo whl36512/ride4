@@ -22,8 +22,8 @@
 		<tbody>
 			<tr>
 				<td>{{i+1}}<br/>
-				<td>{{bookings_from_db[i].journey_date}}<br/>
-					{{bookings_from_db[i].departure_time}}</td>
+				<td>{{bookings_from_db[i].trip_date}}<br/>
+					{{bookings_from_db[i].trip_time}}</td>
 				<td *ngIf='bookings_from_db[i].book_id == null' > 
 					{{booking.value.seats}}<br/>
 	<input class=zoom type="range" formControlName="seats" min="0" max="{{C.MAX_SEATS}}" step=1 />

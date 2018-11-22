@@ -64,7 +64,7 @@ export class ActivityComponent extends BaseComponent {
 			,	date2					:	''
 			,	show_driver				:	true
 			,	show_rider				: 	true
-			,	show_seats_available	: 	true
+			,	show_published	: 	true
 			,	show_pending			: 	true
 			,	show_confirmed			: 	true
 			,	show_rejected			: 	false
@@ -82,7 +82,7 @@ export class ActivityComponent extends BaseComponent {
 		,	date2					: [f.date2, [Validators.min] ]
 		,	show_driver				: [f.show_driver, [] ]
 		,	show_rider				: [f.show_rider, [] ]
-		,	show_seats_available	: [f.show_seats_available, [] ]
+		,	show_published			: [f.show_published, [] ]
 		,	show_pending			: [f.show_pending, [] ]
 		,	show_confirmed			: [f.show_confirmed, [] ]
 		,	show_rejected			: [f.show_rejected, [] ]
@@ -152,17 +152,19 @@ export class ActivityComponent extends BaseComponent {
 			, this.filter)	;
 		let status	=false;
 		if		(booking.status_cd =='P' && this.filter.show_pending			) status=true;
-		else if (booking.status_cd =='B' && this.filter.show_confirmed			) status=true;
-		else if (booking.status_cd =='J' && this.filter.show_rejected			) status=true;
-		else if (booking.status_cd =='D' && this.filter.show_cancelled_by_driver) status=true;
-		else if (booking.status_cd =='R' && this.filter.show_cancelled_by_rider ) status=true;
+		else if (booking.status_cd =='C' && this.filter.show_confirmed			) status=true;
+		else if (booking.status_cd =='RD' && this.filter.show_rejected			) status=true;
+		else if (booking.status_cd =='RR' && this.filter.show_rejected			) status=true;
+		else if (booking.status_cd =='CD' && this.filter.show_cancelled_by_driver) status=true;
+		else if (booking.status_cd =='CPD' && this.filter.show_cancelled_by_driver) status=true;
+		else if (booking.status_cd =='CR' && this.filter.show_cancelled_by_rider ) status=true;
+		else if (booking.status_cd =='CPR' && this.filter.show_cancelled_by_rider ) status=true;
 		else if (booking.status_cd =='F' && this.filter.show_finished			) status=true;
-		else if (booking.status_cd =='S' && this.filter.show_seats_available	) status=true;
-		else if (booking.status_cd ==null && this.filter.show_seats_available	) status=true;
+		else if (!booking.status_cd  && this.filter.show_published	) status=true;
 
 		let ret=false;
 		if ( booking.is_rider && this.filter.show_rider && status) ret= true;
-		else if ( booking.is_driver && this.filter.show_driver && status) ret= true;
+		else if ( ! booking.is_rider && this.filter.show_driver && status) ret= true;
 
 		console.debug("201810131045 BookingsComponent.show_this() ret="+ ret)	;
 
