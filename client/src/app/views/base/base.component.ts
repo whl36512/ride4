@@ -67,7 +67,6 @@ export abstract class BaseComponent implements OnInit, OnDestroy {
 	current_time			: string			;	// browser local time
 
 	static timer = timer(C.TIMER_INTERVAL, C.TIMER_INTERVAL);
-	nav_end_observable		:	Observable<NavigationEnd>;
 
 	class_name = this.constructor.name;
 
@@ -144,20 +143,6 @@ export abstract class BaseComponent implements OnInit, OnDestroy {
 		this.form_status_sub = this.form.statusChanges
 			.subscribe(data => console.log('Form status changes', data));
 	}
-
-	subscribe_nav_end()
-	{
-		// causing form_change subscrition not to trigger. don't know why
-		this.nav_end_observable = this.router.events.pipe(
-      			filter(evt => evt instanceof NavigationEnd)
-    	) as Observable<NavigationEnd>;
-
-		this.nav_end_sub = this.nav_end_observable.subscribe(
-            evt => this.nav_end_action()
-        );
-	}
-
-	nav_end_action(){};
 
 	form_change_action() {};
 
@@ -252,7 +237,7 @@ export abstract class BaseComponent implements OnInit, OnDestroy {
 		if( this.timer_sub		!= null)	this.timer_sub.unsubscribe();
 		if( this.ws_sub			!= null)	this.ws_sub.unsubscribe();
 		if( this.geo_watcher_sub!= null)	this.geo_watcher_sub.unsubscribe();
-		if( this.nav_end_sub!= null) 		this.nav_end_sub.unsubscribe();
+		//if( this.nav_end_sub!= null) 		this.nav_end_sub.unsubscribe();
 		this.communicationService.send_msg(C.MSG_KEY_MAP_BODY_NOSHOW, {});
 		this.onngdestroy();
 		console.debug ('201810290932 ', this.class_name,'.ngOnDestroy() exit.');
@@ -325,7 +310,12 @@ export abstract class BaseComponent implements OnInit, OnDestroy {
 		}
 
 		else {
-			let loc_response = this.geoService.geocode(p.loc) ;
+			let loc='';
+			if ( p.loc==C.LOC_CURRENT )
+				loc = this.mapService.current_loc.lat + ',' + this.mapService.current_loc.lon ;
+			else loc = p.loc;
+
+			let loc_response = this.geoService.geocode(loc) ;
 			loc_response.subscribe(
 				body =>	 {
 					console.debug('201809111347 SearchSettingComponent.geocode()	body=' );

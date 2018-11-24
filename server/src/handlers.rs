@@ -93,11 +93,11 @@ pub fn ins_trip(req: &mut Request) -> IronResult<Response> {
 pub fn upd_trip(req: &mut Request) -> IronResult<Response> {
 	request_sql(req, constants::SQL_UPD_TRIP, 1)
 }
-//pub fn search(req: &mut Request) -> IronResult<Response> { request_sql(req, constants::SQL_SEARCH, 2) } 
+pub fn search(req: &mut Request) -> IronResult<Response> { request_sql(req, constants::SQL_SEARCH, 2) } 
 //pub fn search_all(req: &mut Request) -> IronResult<Response> { request_sql(req, constants::SQL_SEARCH_ALL, 2) }
-pub fn search_region(req: &mut Request) -> IronResult<Response> {
-	request_sql(req, constants::SQL_SEARCH_REGION, 2)
-}
+//pub fn search_region(req: &mut Request) -> IronResult<Response> {
+	//request_sql(req, constants::SQL_SEARCH_REGION, 2)
+//}
 pub fn activity(req: &mut Request) -> IronResult<Response> {
 	request_sql(req, constants::SQL_ACTIVITY, 2)
 }

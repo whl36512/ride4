@@ -1,0 +1,74 @@
+<div class=hide-unhide>
+	<button (click)='show_body=C.BODY_NOSHOW' *ngIf='show_body==C.BODY_SHOW'> {{C.ICON_ARROW_UP}}  </button>
+	<button (click)='show_body=C.BODY_SHOW'   *ngIf='show_body==C.BODY_NOSHOW'> {{C.ICON_ARROW_DOWN}}</button>
+</div>
+<div class='center f12'>Available Trips</div>
+<div class={{show_body}} >
+	<div *ngIf='error_msg!=null' 	class=error [innerHTML]='error_msg'></div>
+	<div *ngIf='warning_msg!=null' 	class=warning [innerHTML]='warning_msg'></div>
+	<div *ngIf='info_msg!=null' 	class=info [innerHTML]='info_msg'></div>
+
+
+	<div *ngFor="let trip of trips_from_db ;let i=index;
+		let even=even;let odd=odd; let first = first; let last = last; trackBy:trackByFunc"
+		[ngClass]="{ odd: odd, even: even }">
+      	<table>
+			<thead>
+				<tr >
+					<th>#</th>
+					<th>Date/Time</th>
+					<th>Seats</th>
+					<th>Price($)</th>
+					<th *ngIf='is_signed_in'>Booked</th>
+					<th *ngIf='trip.status_msg' class=warning [innerHTML]='trip.status_msg'>
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>{{i+1}}</td>
+					<td>{{trip.trip_date}}<br/>
+					{{trip.trip_time}}</td>
+					<td>{{trip.seats}}</td>
+					<td *ngIf='trip.rider_ind'>{{trip.cost.driver_cost}} </td>
+					<td *ngIf='!trip.rider_ind'>{{trip.cost.roder_cost}} </td>
+					<td *ngIf='is_signed_in'>{{trip.seats_booked}}</td>
+					<td>
+						<button #j (click)="book(trip)"
+							[disabled]='!trip.show_book_button'
+						>Book it</button>
+					</td>
+					<td *ngIf='trip.error_msg' class=error 	[innerHTML]='trip.error_msg'></td>
+					<td *ngIf='trip.info_msg'  class=info 	[innerHTML]='trip.info_msg'></td>
+				</tr>
+			</tbody>
+		</table>
+		<div *ngIf='!trip.rider_ind'>
+			<div ><span (click)='false'  
+				class='driver clickable-text' >Driver:</span>{{trip.headline}}</div>
+			<div ><span (click)='show_map(i)' 
+				class='from clickable-text' >Driver from:</span>{{trip.p1d.display_name}}</div>
+			<div><span (click)='show_map(i)' 
+				class='to clickable-text' >Driver to:</span>{{trip.p2d.display_name}}</div>
+			<div ><span (click)='show_map(i)' 
+				class='from clickable-text' >Passenger(me) Pickup</span>{{trip.p1r.display_name}}</div>
+			<div ><span (click)='show_map(i)' 
+				class='to clickable-text' >Passenger(me) Dropoff:</span>{{trip.p2r.display_name}}</div>
+		</div>
+		<div *ngIf='trip.rider_ind'>
+			<div ><span (click)='show_map(i)' 
+				class='from clickable-text' >Driver(me) from:</span>{{trip.p1d.display_name}}</div>
+			<div *ngIf='trip.p2d.display_name'><span (click)='show_map(i)' 
+				class='to clickable-text' >Driver(me) to:</span>{{trip.p2d.display_name}}</div>
+			<div ><span (click)='false'  
+				class='driver clickable-text' >Passenger:</span>{{trip.headline}}</div>
+			<div ><span (click)='show_map(i)' 
+				class='from clickable-text' >Passenger Pickup:</span>{{trip.p1r.display_name}}</div>
+			<div ><span (click)='show_map(i)' 
+				class='to clickable-text' >Passenger Dropoff:</span>{{trip.p2r.display_name}}</div>
+		</div>
+		<span class='f08 button clickable-text' [innerHTML]="trip.google_map_url"></span>
+		<div class=f08 >Description: {{trip.description}}</div>
+		<p>
+	</div>
+</div>

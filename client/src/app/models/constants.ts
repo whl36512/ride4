@@ -140,6 +140,10 @@ export class Constants{
  	static MAP_Z_INDEX_HIDE		= 100 				;	
  	static MAX_SEARCH_RESULT	= 100 				;	
 
+ 	static LOC_CURRENT	= 'Current Location'		;	
+
+	
+
 	constructor (){} 
 	static TODAY() { // TODAY is browser local time and is in the form of 2018-09-11
 		let utc = new Date();

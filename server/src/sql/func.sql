@@ -8,19 +8,20 @@ grant all on schema funcs to ride;
 
 create type funcs.criteria as
 (
-			date1				date
+			rider_ind			boolean
+		,	date1				date
 		,	date2				date
 		,	p1					location
 		,	p2					location
 		,	box_p1					location				-- bounding box
 		,	box_p2					location				-- bounding box
-		,	distance			decimal(8,2)
-		,	trip_date			time
+		,	trip_date			date
 		,	trip_time			time
 		,	usr_id				uuid
 		,	trip_id				uuid
 		,	book_id				uuid
 		,	oauth_id			text
+		,	distance			decimal(8,2)
 		,	price				ridemoney
 		,	seats				integer
 		,	deposit_id			uuid
@@ -28,6 +29,54 @@ create type funcs.criteria as
 		,	ref_no				text
 		,	search_tightness	integer
 );
+
+create type funcs.extended_criteria as
+(		
+		
+		box_p1_lat	 			double precision
+		, box_p2_lat			double precision
+		, box_p1_lon			double precision
+		, box_p2_lon			double precision
+		-- box center
+		, center_lat 			double precision
+		, center_lon			double precision
+		-- center box
+		, p1_lat_cb				double precision
+		, p2_lat_cb				double precision
+		, p1_lon_cb				double precision
+		, p2_lon_cb				double precision
+		, diag_degree			double precision
+		, seats					integer
+		, max_price_driver		ridemoney
+		, min_price_rider		ridemoney
+		, min_dir				double precision
+		, max_dir				double precision
+		, min_dir_360			double precision
+		, max_dir_360			double precision
+		, min_dir_360_1			double precision
+		, max_dir_360_1			double precision
+		-- bigger the angle, narrower the sector
+		, sin_dir_1 			double precision
+		, cos_dir_1				double precision
+		, sin_dir_2				double precision
+		, cos_dir_2				double precision
+		, rider_ind				boolean
+		, trip_rider_ind		boolean
+		, p1					location
+		, p2					location
+		, trip_date				date
+		, trip_time				time
+		, date1					date
+		, date2					date
+		, time1					time
+		, time2					time
+		, distance 				double precision
+		, min_distance			double precision
+		, max_distance			double precision
+		, axes_move				double precision
+		, margin_factor			ridemoney
+)
+;
 
 create or replace function funcs.json_populate_record(base anyelement, in_text text )
 	returns anyelement
@@ -110,6 +159,8 @@ DECLARE
 	--s0 RECORD ;
 BEGIN
 	--	SELECT * into s0 from funcs.json_populate_record(NULL::funcs.criteria, in_trip ) ;
+	if p1.lat is null or p2.lat is null then bearing=null; end if;
+
 	lat1	:=	p1.lat/360*2*pi();
 	lat2	:=	p2.lat/360*2*pi();
 	lon1	:=	p1.lon/360*2*pi();
@@ -591,7 +642,99 @@ END
 $body$
 language plpgsql;
 
-create or replace function funcs.search_region( in_criteria text, in_user text)
+create or replace function funcs.search( in_criteria text, in_user text)
+	returns setof json
+-- mark the booking is complete to the satisfaction of rider
+-- only ride can finish
+as
+$body$
+DECLARE
+	cr funcs.extended_criteria ;
+	u0 usr ;
+	b0 RECORD ;
+	b1 RECORD ;
+	t1 RECORD ;
+	m1 RECORD ;
+	driver_id	uuid;
+	driver_earning	ridemoney;
+BEGIN
+	SELECT		
+		-- bounding box
+		least		((t.box_p1).lat, (t.box_p2).lat) box_p1_lat	
+		, greatest	((t.box_p1).lat, (t.box_p2).lat) box_p2_lat	
+		, least		((t.box_p1).lon, (t.box_p2).lon) box_p1_lon
+		, greatest	((t.box_p1).lon, (t.box_p2).lon) box_p2_lon	
+		-- box center
+		, ((t.box_p1).lat + (t.box_p2).lat)/2	center_lat 
+		, ((t.box_p1).lon + (t.box_p2).lon)/2  	center_lon
+		-- center box
+		, ((t.box_p1).lat + (t.box_p2).lat)/2 - ((t.box_p2).lat-(t.box_p1).lat)/6 p1_lat_cb
+		, ((t.box_p1).lat + (t.box_p2).lat)/2 + ((t.box_p2).lat-(t.box_p1).lat)/6 p2_lat_cb
+		, ((t.box_p1).lon + (t.box_p2).lon)/2 - ((t.box_p2).lon-(t.box_p1).lon)/6 p2_lon_cb
+		, ((t.box_p1).lon + (t.box_p2).lon)/2 + ((t.box_p2).lon-(t.box_p1).lon)/6 p2_lon_cb
+		, sqrt(power( (t.box_p2).lat-(t.box_p1).lat,2) + power((t.box_p2).lon-(t.box_p1).lon, 2)) 
+				diag_degree
+
+		, coalesce(t.seats		, 1)				 				seats
+		, coalesce(t.price/c.margin_factor , c.max_price_driver)	max_price_driver
+		, coalesce(t.price*c.margin_factor , 0)						min_price_rider
+		, funcs.bearing(t.p1, t.p2)- 43+4*search_tightness			min_dir
+		, funcs.bearing(t.p1, t.p2)+ 43-4*search_tightness 			max_dir
+		, funcs.bearing(t.p1, t.p2)- 43+4*search_tightness + 360	min_dir_360
+		, funcs.bearing(t.p1, t.p2)+ 43-4*search_tightness + 360	max_dir_360
+		, funcs.bearing(t.p1, t.p2)- 43+4*search_tightness - 360	min_dir_360_1
+		, funcs.bearing(t.p1, t.p2)+ 43-4*search_tightness - 360	max_dir_360_1
+		-- bigger the angle, narrower the sector
+		, sin((funcs.bearing(t.p1, t.p2)-39-4*search_tightness)/360*2*pi())		sin_dir_1 
+		, cos((funcs.bearing(t.p1, t.p2)-39-4*search_tightness)/360*2*pi())		cos_dir_1
+		, sin((funcs.bearing(t.p1, t.p2)+39+4*search_tightness)/360*2*pi())		sin_dir_2
+		, cos((funcs.bearing(t.p1, t.p2)+39+4*search_tightness)/360*2*pi())		cos_dir_2
+		, t.rider_ind 
+		, not t.rider_ind trip_rider_ind
+		, t.p1
+		, t.p2
+		, t.trip_date
+		, t.trip_time
+		, t.date1
+		, t.date2
+		, time '0:0' 
+			+ greatest (0		, extract (epoch from	coalesce(t.trip_time, time '00:00' ))
+				- t.distance/60*3600+3600) * interval '1 second' time1
+		, time '0:0' 
+			+ least (3600*24-1 	, extract (epoch from	coalesce(t.trip_time, time '23:59' ))
+				+ t.distance/60*3600+3600) * interval '1 second' time2
+		, t.distance 								-- can be 0
+		, t.distance /(3-0.2*search_tightness)		min_distance
+		, t.distance *(4-0.2*search_tightness)		max_distance
+		, t.distance* 1.0/60*(0.1+0.05*search_tightness)		axes_move
+		, c.margin_factor
+	FROM funcs.json_populate_record(NULL::funcs.criteria , in_criteria) t 
+				, funcs.calc_cost(0.0,0.0,0)	c	
+	into cr
+	;
+
+	SELECT u.* 
+	INTO	u0
+	FROM funcs.json_populate_record(NULL::usr , in_user) t 
+		,	usr u
+	where u.usr_id=t.usr_id
+	;
+	u0.usr_id := coalesce(u0.usr_id, uuid_generate_v4()) ;
+
+	if not cr.rider_ind and (cr.p1).lat is not null and (cr.p2).lat is null then
+		return query select * from funcs.search_region_no_p2(cr, u0);
+	elsif cr.rider_ind and (cr.p1).lat is not null and (cr.p2).lat is not null then
+		return query select * from funcs.search_region(cr, u0);
+	elsif not cr.rider_ind and (cr.p1).lat is not null and (cr.p2).lat is not null then
+		return query select * from funcs.search_region(cr, u0);
+	else
+		return query select * from funcs.gen_error('201811240942','Search criteria is ill formed');
+	end if;
+END
+$body$
+language plpgsql;
+
+create or replace function funcs.search_region( in_criteria funcs.extended_criteria, in_user usr)
 -- search by rider
 	returns setof json
 as
@@ -662,7 +805,7 @@ $body$
 			, c0.p1 p1_book
 			, c0.p2 p2_book
 		from trip t
-		join user0 on (1=1)	-- usr0 may not ba available because of not signed in
+		join user0 on (1=1)	-- usr0 may not be available because of not signed in
 		join c0 on (1=1)
 		join usr 	ud on (ud.usr_id=t.usr_id) -- to get driver's headline 
 		left outer join usr ur on (ur.usr_id = user0.usr_id) -- to get bookings
@@ -704,48 +847,18 @@ $body$
 $body$
 language sql;
 
-create or replace function funcs.search_region_no_p2( in_criteria text, in_user text)
--- search by driver. drive does not provide p2
+create or replace function funcs.search_region_no_p2( c0 funcs.extended_criteria , u0 usr)
+-- search by driver. and drive does not provide p2
 	returns setof json
 as
 $body$
 DECLARE
-	u0	RECORD;
-	c0	RECORD;
 BEGIN
-	-- if usr_id is null, populated it with random uuid
-	SELECT coalesce(u.usr_id, uuid_generate_v4()) usr_id 
-	into u0
-    FROM funcs.json_populate_record(NULL::usr , in_user) u ; 
-
-	SELECT		
-			-- bounding box
-			  least		((t.box_p1).lat, (t.box_p2).lat) box_p1_lat	
-			, greatest	((t.box_p1).lat, (t.box_p2).lat) box_p2_lat	
-			, least		((t.box_p1).lon, (t.box_p2).lon) box_p1_lon
-			, greatest	((t.box_p1).lon, (t.box_p2).lon) box_p2_lon	
-			-- center box
-			, ((t.box_p1).lat + (t.box_p2).lat)/2 - ((t.box_p2).lat-(t.box_p1).lat)/6 p1_lat_cb
-			, ((t.box_p1).lat + (t.box_p2).lat)/2 + ((t.box_p2).lat-(t.box_p1).lat)/6 p2_lat_cb
-			, ((t.box_p1).lon + (t.box_p2).lon)/2 - ((t.box_p2).lon-(t.box_p1).lon)/6 p2_lon_cb
-			, ((t.box_p1).lon + (t.box_p2).lon)/2 + ((t.box_p2).lon-(t.box_p1).lon)/6 p2_lon_cb
-			, coalesce(t.seats		, 1)				 seats
-			, coalesce(t.price*c.margin_factor , 0)	min_price_rider
-			, t.p1
-			, t.p2
-			, t.date1
-			, t.date2
-			, trip_time
-	into c0
-	FROM funcs.json_populate_record(NULL::funcs.criteria , in_criteria) t 
-	, funcs.calc_cost(0,0,0)	c	
-	;
-
 	RETURN QUERY
 	with a as (
 		select 
-			  t.p1
-			, t.p2
+			  t.p1	p1r
+			, t.p2	p2r
 			--, t.distance 
 			, t.description
 			, t.usr_id				
@@ -755,22 +868,25 @@ BEGIN
 			, t.seats
 			, funcs.calc_cost_driver(t.price, t.distance , t.seats ) as cost
 			, ur.headline
-			, c0.p1 p1_book
-			, null p2_book
+			, c0.p1 p1d
+			, c0.p2 p2d
+			, t.rider_ind
 		from trip t
 		join usr ur on (ur.usr_id = t.usr_id) -- to get riders headline and balance
-		where t.usr_id	!= 	u0.usr_id
-		and t.status_cd = 'A'
+		where t.status_cd = 'A'
+		--and t.usr_id	!= 	u0.usr_id
 		and t.seats <= c0.seats
-		and t.price >= c0.min_rice_rider
+		and	t.rider_ind = c0.trip_rider_ind
+		and t.price >= c0.min_price_rider
 		and t.trip_date between c0.date1 and c0.date2
-		and t.trip_time between c0.trip_time - t.distance *600 * interval '1 second' 
-				and c0.trip_time +  t.distance *600 * interval '1 second'
-		-- trip start and end must inside the bounding box
-		and (t.p1).lat between c0.box_p1_lat and c0.box_p2_lat
-		and (t.p1).lon between c0.box_p1_lon and c0.box_p2_lon
-		--and (t.p2).lat between c0.box_p1_lat and c0.box_p2_lat
-		--and (t.p2).lon between c0.box_p1_lon and c0.box_p2_lon
+		and t.trip_time between c0.trip_time - sqrt(t.distance) *600 * interval '1 second' 
+				and c0.trip_time +  sqrt(t.distance) *600 * interval '1 second'
+		-- trip start must be near by and 
+		-- end must be inside the bounding box
+		and (t.p1).lat between (c0.p1).lat - t.distance/60/6 and (c0.p1).lat + t.distance/60/6
+		and (t.p1).lon between (c0.p1).lon - t.distance/60/6 and (c0.p1).lon + t.distance/60/6
+		and (t.p2).lat between c0.box_p1_lat and c0.box_p2_lat
+		and (t.p2).lon between c0.box_p1_lon and c0.box_p2_lon
 		and ur.balance >= (funcs.calc_cost_driver(t.price, t.distance , t.seats )).cost_rider
 		order by t.trip_date, t.trip_time
 		limit 100

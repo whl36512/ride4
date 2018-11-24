@@ -14,7 +14,7 @@ import { TripComponent } 	from './views/trip/trip.component';
 //import { LinkedinComponent } 	from './views/linkedin/linkedin.component';
 import { Map2Component } 	from './views/map2/map2.component';
 
-import { JourneyComponent } 	from './views/journey/journey.component';
+import { TriplistComponent } 	from './views/triplist/triplist.component';
 //import { TouComponent } from './views/tou/tou.component';
 //import { TosComponent } from './views/tos/tos.component';
 //import { PrivacyComponent } from './views/privacy/privacy.component';
@@ -65,7 +65,7 @@ const appRoutes: Routes = [
 	},
 	{
 		  path: 'show_search_result'
-		, component: JourneyComponent
+		, component: TriplistComponent
 		, data: { title: 'Search Result' }
 	},
 	{

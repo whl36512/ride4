@@ -284,7 +284,7 @@ export class TripComponent extends BaseComponent {
 		if (! cl.lat) this.error_msg='Location service is not enabled';
 		else {
 			this.form.patchValue ({
-			p1_loc: cl.lat +',' + cl.lon
+			p1_loc: C.LOC_CURRENT
 		});
 		}
 	}

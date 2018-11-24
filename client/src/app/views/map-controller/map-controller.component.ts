@@ -136,7 +136,7 @@ export class MapControllerComponent extends BaseComponent {
 		console.debug ('201810270146 MapControllerComponent.search() search_criteria_combined=\n'
 					, search_criteria_combined);
 		let data_from_db_observable     
-			= this.dbService.call_db(C.URL_SEARCH_REGION, search_criteria_combined);
+			= this.dbService.call_db(C.URL_SEARCH, search_criteria_combined);
 		
 		data_from_db_observable.subscribe(
 			trips_from_db => {

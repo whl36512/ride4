@@ -239,7 +239,7 @@ export class MapService {
 		if (!google_map_url) google_map_url= MapService.google_map_string(book);
 
 		//Util.convert_book_to_pairs(book);
-		let popup = `<div>${book.journey_date} ${book.departure_time} ${google_map_url}</div>`
+		let popup = `<div>${book.trip_date} ${book.trip_time}</div><div>${google_map_url}</div>`
 
 		let pair1: any = {};
 		let pair2: any = {};
@@ -364,6 +364,8 @@ export class MapService {
 	mark_pair(pair:any) : boolean
 	{
 		if(!pair) return false;
+		//console.debug('201811241314 MapService.mark_pair() pair=\n'); 
+		//console.debug(C.stringify(pair)); 
 		let p1 = pair.p1 ;
 		let p2 = pair.p2 ;
 		if(!p1) return false;

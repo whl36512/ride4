@@ -50,9 +50,9 @@ pub fn router_setup() -> iron::Chain  {
     router.post("/ws/get_session", handlers::get_session, "get_session");
     router.post("/ws/ins_trip", handlers::ins_trip, "ins_trip");
     router.post("/ws/upd_trip", handlers::upd_trip, "upd_trip");
-    //router.post("/ws/search", handlers::search, "search");
+    router.post("/ws/search", handlers::search, "search");
     //router.post("/ws/search_all", handlers::search_all, "search_all");
-    router.post("/ws/search_region", handlers::search_region, "search_region");
+    //router.post("/ws/search_region", handlers::search_region, "search_region");
     router.post("/ws/book", handlers::book, "book");
     router.post("/ws/activity", handlers::activity, "activity");
     router.post("/ws/myoffers", handlers::myoffers, "myoffers");

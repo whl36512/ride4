@@ -37,7 +37,7 @@ import { DBService } 		from './models/remote.service';
 import { HttpService } 		from './models/remote.service';
 import {CommunicationService} 	from './models/communication.service';
 //import { SearchComponent } 	from './views/search/search.component' ;
-import { JourneyComponent } 	from './views/journey/journey.component';
+import { TriplistComponent } 	from './views/triplist/triplist.component';
 //import { TouComponent } from './views/tou/tou.component';
 //import { TosComponent } from './views/tos/tos.component';
 //import { PrivacyComponent } from './views/privacy/privacy.component';
@@ -67,7 +67,7 @@ import { MiscComponent } from './views/misc/misc.component';
 		//LinkedinComponent,
 		Map2Component,
 		//SearchComponent,
-		JourneyComponent,
+		TriplistComponent,
 		//TouComponent,
 		//TosComponent,
 		//PrivacyComponent,
