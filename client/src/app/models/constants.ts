@@ -9,11 +9,11 @@ export class Constants{
 
 	static GET_USER_URL 		= '/ws/get_user'	;
 	static SAVE_USER_URL 		= '/ws/save_user'	;
-	static UPD_TRIP_URL 		= '/ws/upd_trip'	;
 
 	static URL_SAVE_USER 		= '/ws/save_user'	;
 	static URL_GET_USER 		= '/ws/get_user'	;
 	static URL_UPD_USER 		= '/ws/upd_user'	;
+	static URL_INS_TRIP 		= '/ws/ins_trip'	;
 	static URL_UPD_TRIP 		= '/ws/upd_trip'	;
 	static URL_SEARCH 			= '/ws/search'	;
 	static URL_SEARCH_ALL 		= '/ws/search_all'	;
@@ -81,6 +81,7 @@ export class Constants{
 	static KEY_MYOFFERS			= 'form_myoffers'	;
 	static KEY_MYBOOKING		= 'form_mybooking'	;
 	static KEY_FORM_ACTIVITY	= 'form_activity'	;
+	static KEY_FORM_ACTIVITY_FILTER	= 'form_activity_filter'	;
 	static KEY_FORM_THIST		= 'form_thist'		;
 
 	static VERSION_FORM_SEARCH	= 2					;

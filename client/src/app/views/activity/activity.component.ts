@@ -38,7 +38,6 @@ import { MapService             }   from '../../models/map.service';
 
 export class ActivityComponent extends BaseComponent {
 	bookings_from_db: any= [];
-	filter:any ;
 
     constructor( public changeDetectorRef       : ChangeDetectorRef
                 , public mapService             : MapService
@@ -62,15 +61,6 @@ export class ActivityComponent extends BaseComponent {
 			form_value_from_storage= {
 				date1					:	C.TODAY()
 			,	date2					:	''
-			,	show_driver				:	true
-			,	show_rider				: 	true
-			,	show_published	: 	true
-			,	show_pending			: 	true
-			,	show_confirmed			: 	true
-			,	show_rejected			: 	false
-			,	show_cancelled_by_driver: 	false
-			,	show_cancelled_by_rider	: 	false
-			,	show_finished			: 	true
 			};
 		}
 		StorageService.storeForm(C.KEY_FORM_ACTIVITY, form_value_from_storage); 
@@ -80,17 +70,7 @@ export class ActivityComponent extends BaseComponent {
 		this.form = this.form_builder.group({
 			date1					: [f.date1, [Validators.min]]
 		,	date2					: [f.date2, [Validators.min] ]
-		,	show_driver				: [f.show_driver, [] ]
-		,	show_rider				: [f.show_rider, [] ]
-		,	show_published			: [f.show_published, [] ]
-		,	show_pending			: [f.show_pending, [] ]
-		,	show_confirmed			: [f.show_confirmed, [] ]
-		,	show_rejected			: [f.show_rejected, [] ]
-		,	show_cancelled_by_driver: [f.show_cancelled_by_driver, [] ]
-		,	show_cancelled_by_rider	: [f.show_cancelled_by_rider, [] ]
-		,	show_finished			: [f.show_finished, [] ]
 		});
-		this.filter= this.form.value;
 
 		this.onChange();
 	}
@@ -113,8 +93,7 @@ export class ActivityComponent extends BaseComponent {
 				this.reset_msg();
 				this.bookings_from_db = bookings_from_db ;	
 				if (this.bookings_from_db.length==0) this.warning_msg='Nothing found' ; 
-				else this.info_msg =`Found ${this.bookings_from_db.length} activities before filtering.`	;
-				this.set_filter();
+				else this.info_msg =`Found ${this.bookings_from_db.length} activities.`	;
 				this.changeDetectorRef.detectChanges();
 			},
 			error	=> { 
@@ -126,58 +105,12 @@ export class ActivityComponent extends BaseComponent {
 		
 	}
 
-	set_filter()
-	{
-		StorageService.storeForm(C.KEY_FORM_ACTIVITY, this.form.value); 
-		this.filter= this.form.value;
-
-		for ( let index in this.bookings_from_db) {
-			this.bookings_from_db[index].show_booking
-				=this.show_booking(this.bookings_from_db[index], Number(index));
-			
-		}
-		// change this.bookings_from_db reference, so the bookings component can refresh
-		let tmp= this.bookings_from_db;
-		this.bookings_from_db =[];
-		this.changeDetectorRef.detectChanges();
-		this.bookings_from_db = tmp;
-		this.changeDetectorRef.detectChanges();
-	}
-
-	show_booking(booking: any, index: number): boolean {
-		console.debug("201810131007 BookingsComponent.show_this() booking.status_cd="
-			, booking.status_cd)	;
-		console.debug("201810131007 BookingsComponent.show_this() index=", index)	;
-		console.debug("201810131007 BookingsComponent.show_this() this.filter"
-			, this.filter)	;
-		let status	=false;
-		if		(booking.status_cd =='P' && this.filter.show_pending			) status=true;
-		else if (booking.status_cd =='C' && this.filter.show_confirmed			) status=true;
-		else if (booking.status_cd =='RD' && this.filter.show_rejected			) status=true;
-		else if (booking.status_cd =='RR' && this.filter.show_rejected			) status=true;
-		else if (booking.status_cd =='CD' && this.filter.show_cancelled_by_driver) status=true;
-		else if (booking.status_cd =='CPD' && this.filter.show_cancelled_by_driver) status=true;
-		else if (booking.status_cd =='CR' && this.filter.show_cancelled_by_rider ) status=true;
-		else if (booking.status_cd =='CPR' && this.filter.show_cancelled_by_rider ) status=true;
-		else if (booking.status_cd =='F' && this.filter.show_finished			) status=true;
-		else if (!booking.status_cd  && this.filter.show_published	) status=true;
-
-		let ret=false;
-		if ( booking.is_rider && this.filter.show_rider && status) ret= true;
-		else if ( ! booking.is_rider && this.filter.show_driver && status) ret= true;
-
-		console.debug("201810131045 BookingsComponent.show_this() ret="+ ret)	;
-
-		return ret;
-	}
-
-
 	subscription_action(msg): void {
 		if (msg != undefined && msg != null && msg.msgKey == C.MSG_KEY_SHOW_ACTIVITY_BODY) {
 			this.show_body = msg.show_body;
 		}
 		else {
-			console.debug('201810211444 ActivityComponent.subscription_action() ignore msg');
+			this.subscription_action_ignore();
 		}
 
 		

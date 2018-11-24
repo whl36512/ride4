@@ -48,15 +48,15 @@ pub fn router_setup() -> iron::Chain  {
     router.post("/ws/upd_user", handlers::upd_user, "upd_user");
     router.get("/ws/redirect", handlers::redi, "redi");
     router.post("/ws/get_session", handlers::get_session, "get_session");
-    //router.post("/ws/upd_trip", handlers::upd_trip, "upd_trip");
-    router.post("/ws/upd_trip", handlers::ins_trip, "ins_trip");
+    router.post("/ws/ins_trip", handlers::ins_trip, "ins_trip");
+    router.post("/ws/upd_trip", handlers::upd_trip, "upd_trip");
     //router.post("/ws/search", handlers::search, "search");
     //router.post("/ws/search_all", handlers::search_all, "search_all");
     router.post("/ws/search_region", handlers::search_region, "search_region");
     router.post("/ws/book", handlers::book, "book");
     router.post("/ws/activity", handlers::activity, "activity");
     router.post("/ws/myoffers", handlers::myoffers, "myoffers");
-    router.post("/ws/upd_journey", handlers::upd_journey, "upd_journey");
+    //router.post("/ws/upd_journey", handlers::upd_journey, "upd_journey");
     router.post("/ws/mybooking", handlers::mybooking, "mybooking");
     router.post("/ws/cancel_booking", handlers::cancel_booking, "cancel_booking");
     router.post("/ws/finish", handlers::finish, "finish");

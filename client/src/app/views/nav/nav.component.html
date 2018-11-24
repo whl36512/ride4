@@ -8,7 +8,7 @@
 
 	<ul class="nav" *ngIf="show_nav&&false"  >
 		 	<li			(click)="select(C.PAGE_SEARCH)" 		>Search</li>
-		 	<li *ngIf="is_signed_in" (click)="select(C.PAGE_TRIP)" 		>Post a Trip</li>
+		 	<li *ngIf="is_signed_in" (click)="select(C.PAGE_TRIP)" 		>Publish my Trip</li>
 		 	<li *ngIf="is_signed_in" (click)="select(C.PAGE_ACTIVITY)"		>My Activities</li>
 		 	<li *ngIf="is_signed_in" (click)="select(C.PAGE_THIST)"		>Transaction History</li>
 		<li *ngIf="is_signed_in" (click)="select(C.PAGE_USER)" 		>My Profile</li>
@@ -20,7 +20,7 @@
 	</ul>
 
 	 	<ul class="nav" *ngIf="show_nav"  >
-		<a routerLink='/search_setting' 	
+		<a routerLink='/Trip/form_search' 	
 			routerLinkActive='active' 
 			(click)="nav_menu_off(); map_search_stop()"	>
 			<li>
@@ -42,12 +42,12 @@
 				List Search Result
 			</li>			
 		</a>
-		<a routerLink='/Trip' 		
+		<a routerLink='/Trip/form_trip' 		
 			routerLinkActive='active' 	
 			*ngIf="is_signed_in" 
 			(click)="nav_menu_off();map_search_stop()">
 			<li>
-				Post a Trip		
+				Publish my Trip		
 			</li>			
 		</a>
 		<a routerLink='/Activity'	

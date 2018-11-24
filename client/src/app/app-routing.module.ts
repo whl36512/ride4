@@ -69,7 +69,7 @@ const appRoutes: Routes = [
 		, data: { title: 'Search Result' }
 	},
 	{
-		  path: 'Trip'
+		  path: 'Trip/:form_key'
 		, component: TripComponent
 		, data: { title: 'Trip' }
 	},

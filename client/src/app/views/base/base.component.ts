@@ -10,6 +10,7 @@ import { FormBuilder			}	from '@angular/forms';
 import { FormGroup 				} 	from '@angular/forms';
 import { timer 					}	from 'rxjs' ;
 import { Router					}	from '@angular/router';
+import { NavigationEnd					}	from '@angular/router';
 //import { TimerObservable } from 'rxjs/observable/TimerObservable';
 import { map, filter, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 
@@ -53,6 +54,7 @@ export abstract class BaseComponent implements OnInit, OnDestroy {
 	error_msg				: string|null	= null;
 	warning_msg 			: string|null	= null;
 	info_msg				: string|null	= null;
+	validation_error			: string|null	= null;
 	change_detect_count		: number 		= 0;
 	show_body				: string|null	= C.BODY_SHOW ;
 	is_signed_in			: boolean 		= false;
@@ -63,6 +65,9 @@ export abstract class BaseComponent implements OnInit, OnDestroy {
 	form_values_new			: any = {}			;
 	today					: string			;	// browser local date
 	current_time			: string			;	// browser local time
+
+	static timer = timer(C.TIMER_INTERVAL, C.TIMER_INTERVAL);
+	nav_end_observable		:	Observable<NavigationEnd>;
 
 	class_name = this.constructor.name;
 
@@ -76,7 +81,6 @@ export abstract class BaseComponent implements OnInit, OnDestroy {
 	geo_watcher_sub			: Subscription |null = null;
 	timer_for_injector_sub	: Subscription |null = null;
 	timer_sub				: Subscription |null = null;
-	static timer = timer(C.TIMER_INTERVAL, C.TIMER_INTERVAL);
 
 	C = C;
 	//Constants = C;
@@ -120,6 +124,7 @@ export abstract class BaseComponent implements OnInit, OnDestroy {
 		//this.communicationService.ws_send(C.MSG_KEY_GREETING, `{"say":"Greeting from ${this.class_name}"}` );
 		this.ngoninit();
 		this.subscribe_form_change();
+		//this.subscribe_nav_end();
 		console.debug ('201810290933 ', this.class_name,'.ngOnInit() exit.');
 	}
 
@@ -136,9 +141,23 @@ export abstract class BaseComponent implements OnInit, OnDestroy {
 					this.form_values_old = Util.deep_copy(newValues);
 				}
 			);
-        this.form_status_sub = this.form.statusChanges
-            .subscribe(data => console.log('Form status changes', data));
+		this.form_status_sub = this.form.statusChanges
+			.subscribe(data => console.log('Form status changes', data));
 	}
+
+	subscribe_nav_end()
+	{
+		// causing form_change subscrition not to trigger. don't know why
+		this.nav_end_observable = this.router.events.pipe(
+      			filter(evt => evt instanceof NavigationEnd)
+    	) as Observable<NavigationEnd>;
+
+		this.nav_end_sub = this.nav_end_observable.subscribe(
+            evt => this.nav_end_action()
+        );
+	}
+
+	nav_end_action(){};
 
 	form_change_action() {};
 
@@ -224,15 +243,16 @@ export abstract class BaseComponent implements OnInit, OnDestroy {
 	ngOnDestroy(): void {
 		console.debug ('201810290932 ', this.class_name,'.ngOnDestroy() enter.');
 		// prevent memory leak when component destroyed
-		if( this.subscription0	!= null) this.subscription0.unsubscribe();
-		if( this.subscription1	!= null) this.subscription1.unsubscribe();
-		if( this.subscription2	!= null) this.subscription2.unsubscribe();
-		if( this.subscription3	!= null) this.subscription3.unsubscribe();
-		if( this.form_value_sub	!= null) this.form_value_sub.unsubscribe();
-		if( this.form_status_sub!= null) this.form_status_sub.unsubscribe();
-		if( this.timer_sub		!= null) this.timer_sub.unsubscribe();
-		if( this.ws_sub			!= null) this.ws_sub.unsubscribe();
-		if( this.geo_watcher_sub!= null) this.geo_watcher_sub.unsubscribe();
+		if( this.subscription0	!= null)	this.subscription0.unsubscribe();
+		if( this.subscription1	!= null)	this.subscription1.unsubscribe();
+		if( this.subscription2	!= null)	this.subscription2.unsubscribe();
+		if( this.subscription3	!= null)	this.subscription3.unsubscribe();
+		if( this.form_value_sub	!= null)	this.form_value_sub.unsubscribe();
+		if( this.form_status_sub!= null)	this.form_status_sub.unsubscribe();
+		if( this.timer_sub		!= null)	this.timer_sub.unsubscribe();
+		if( this.ws_sub			!= null)	this.ws_sub.unsubscribe();
+		if( this.geo_watcher_sub!= null)	this.geo_watcher_sub.unsubscribe();
+		if( this.nav_end_sub!= null) 		this.nav_end_sub.unsubscribe();
 		this.communicationService.send_msg(C.MSG_KEY_MAP_BODY_NOSHOW, {});
 		this.onngdestroy();
 		console.debug ('201810290932 ', this.class_name,'.ngOnDestroy() exit.');
@@ -281,11 +301,11 @@ export abstract class BaseComponent implements OnInit, OnDestroy {
 
 		if (element_id == "p1_loc" ) {
 			p= pair.p1 ;
-			loc_old = p.loc
+			loc_old = p.loc	;
 			p.loc = form.value.p1_loc;
 		} else {
 			p= pair.p2;
-			loc_old= p.loc
+			loc_old= p.loc	;
 			p.loc = form.value.p2_loc;
 		}
 
@@ -298,7 +318,8 @@ export abstract class BaseComponent implements OnInit, OnDestroy {
 			this.communicationService.send_msg(C.MSG_KEY_MARKER_PAIR, pair);
 			this.communicationService.send_msg(C.MSG_KEY_MARKER_FIT, pair);
 
-			this.changeDetectorRef.detectChanges();
+			//this.validate_form();
+			//this.changeDetectorRef.detectChanges();
 			this.routing(pair, pair_before_geocode);
 			return; // must type at least 3 letters before geocoding starts
 		}
@@ -322,7 +343,8 @@ export abstract class BaseComponent implements OnInit, OnDestroy {
 					this.communicationService.send_msg(C.MSG_KEY_MARKER_CLEAR, {});
 					this.communicationService.send_msg(C.MSG_KEY_MARKER_PAIR, pair);
 					this.communicationService.send_msg(C.MSG_KEY_MARKER_FIT, pair);
-					this.changeDetectorRef.detectChanges();
+					//this.validate_form();
+					//this.changeDetectorRef.detectChanges();
 					this.routing(pair, pair_before_geocode);
 					//this.mapService.try_mark_pair ( pair);
 				//		this.show_map()
@@ -335,7 +357,8 @@ export abstract class BaseComponent implements OnInit, OnDestroy {
 	{
 		if ( !pair.p1.display_name || ! pair.p2.display_name) {
 			pair.distance=C.ERROR_NO_ROUTE ;
-			this.changeDetectorRef.detectChanges();
+			//this.validate_form();
+			//this.changeDetectorRef.detectChanges();
 			return;
 		}
 		else if (	pair.p1.lat == pair_before_geocode.p1.lat
@@ -344,7 +367,8 @@ export abstract class BaseComponent implements OnInit, OnDestroy {
 				&&	pair.p2.lon == pair_before_geocode.p2.lon) {
 			// no change of latlon. Skip routing
 			//pair.distance= oair_before_geocode.distance;
-			this.changeDetectorRef.detectChanges();
+			//this.validate_form();
+			//this.changeDetectorRef.detectChanges();
 			return;
 		}
 
@@ -361,16 +385,19 @@ export abstract class BaseComponent implements OnInit, OnDestroy {
 				if( body.routes.length >0 ) {
 					let distance=body.routes[0].distance ;
 					pair.distance= Math.round(distance /160)/10;
-					this.changeDetectorRef.detectChanges();
+					//this.validate_form();
+					//this.changeDetectorRef.detectChanges();
 				}
 				else {
 					pair.distance=C.ERROR_NO_ROUTE ;
-					this.changeDetectorRef.detectChanges();
+					//this.validate_form();
+					//this.changeDetectorRef.detectChanges();
 				}
 			},
 			error => {
 				pair.distance=C.ERROR_NO_ROUTE ;
-				this.changeDetectorRef.detectChanges();
+				//this.validate_form();
+				//this.changeDetectorRef.detectChanges();
 			}
 		);
 	}
@@ -391,6 +418,33 @@ export abstract class BaseComponent implements OnInit, OnDestroy {
 		let combined_payload = this.package_payload(payload);
 		this.communicationService.ws_send(relative_url, combined_payload);
 	}
+
+	call_wservice(url, payload)
+	{
+		let data_from_db_observable  = this.dbService.call_db(url, payload);
+		data_from_db_observable.subscribe(
+			data_from_db => {
+				console.info("201808201201", this.class_name, ".call_wservice() data_from_db ="
+					, C.stringify(data_from_db));
+				if (data_from_db.error_desc) {
+					this.error_msg = C.stringify(data_from_db) ;
+					this.changeDetectorRef.detectChanges() ;
+				}
+				else {
+					this.on_get_data_from_wservice(data_from_db);
+					this.changeDetectorRef.detectChanges() ;
+					}
+			},
+			error => {
+				this.error_msg=error;
+				this.changeDetectorRef.detectChanges() ;
+			}
+		)
+	}
+
+	on_get_data_from_wservice(data_from_db: any) { };
+	validate_form(){}
+
 
 /*
 	getLocation() {

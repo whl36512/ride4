@@ -15,6 +15,7 @@ import { ChangeDetectionStrategy } from '@angular/core';
 import { ChangeDetectorRef } from '@angular/core';
 import { NgZone } from '@angular/core';
 import { Router			 }   from '@angular/router';
+import { ActivatedRoute			 }   from '@angular/router';
 
 
 //import { EventEmitter, Input, Output} from '@angular/core';
@@ -46,13 +47,14 @@ export class TripComponent extends BaseComponent {
 	// By initialize trip to an empty structure, repeated calling of constructor can be avoided
 		form_saved_to_db: boolean=false;
 
-	trip:any;
-	step=1;
-	button_label = 'Publish Trip';
+	trip		:any;
+	button_label 	= 'Publish Trip';
 	user_from_db: any = {};
-	show_form	= C.BODY_SHOW;
-	max_price	=C.MAX_PRICE;
-	form_is_valid	=false;
+	show_form		= C.BODY_SHOW;
+	max_price		=C.MAX_PRICE;
+	form_key		=	C.KEY_FORM_SEARCH // or C.KEY_FORM_TRIP
+	from		:string;
+	to			:string;
 
 	constructor( public changeDetectorRef   : ChangeDetectorRef
 				, public mapService			 : MapService
@@ -60,63 +62,80 @@ export class TripComponent extends BaseComponent {
 				, public dbService			  : DBService
 				, public geoService			 : GeoService
 				, public form_builder		   : FormBuilder
-				, public router				 : Router )  {
+				, public router				 : Router 
+				, public route: ActivatedRoute)  {
 		super(changeDetectorRef,mapService, communicationService, dbService
 				, geoService, form_builder, router );
 
+		this.router.routeReuseStrategy.shouldReuseRoute = function() {
+			// force recreate of component, so this.route.snapshot.paramMap.get will work
+       		return false;
+		};
+
 		this.page_name= C.PAGE_TRIP;
+        this.timer_sub = BaseComponent.timer.subscribe(
+           val => {
+                if(val >5 && val % 1 == 0) {
+					this.validation_error=this.validate_form();
+					this.changeDetectorRef.detectChanges() ;
+                }
+            },
+        );
+
+
   		console.log("201811011725", this.class_name, '.constructor() exit')  ;
   	} 
 
 	ngoninit():void {
+  		this. form_key = this.route.snapshot.paramMap.get('form_key');
+
 		this.setup_form();
-		let data_from_db_observable	 = this.dbService.call_db(C.URL_GET_USER, {});
-		data_from_db_observable.subscribe(
-			user_from_db => {
-				console.debug("201808201201 TripComponent.ngoninit() user_from_db =" 
-					, C.stringify(user_from_db));
-				this.user_from_db =user_from_db;
-			},
-			error => {
-				this.error_msg=error;
-				this.changeDetectorRef.detectChanges() ;
-			}
-		)
-		this.changeDetectorRef.detectChanges() ;
+		this.form_change_action();
+		if ( this. form_key == C.KEY_FORM_TRIP) {
+			let data_from_db_observable	 = this.dbService.call_db(C.URL_GET_USER, {});
+			data_from_db_observable.subscribe(
+				user_from_db => {
+					console.debug("201808201201 TripComponent.ngoninit() user_from_db =" 
+						, C.stringify(user_from_db));
+					this.user_from_db =user_from_db;
+				},
+				error => {
+					this.error_msg=error;
+					//this.changeDetectorRef.detectChanges() ;
+				}
+			);
+		}
+		//this.changeDetectorRef.detectChanges() ;
 	}
 
 	setup_form()
 	{
 
-		let trip = StorageService.getForm(C.KEY_FORM_TRIP);
+		let trip = StorageService.getForm(this.form_key);
 		if ( !trip ) {
-			trip = this.Util.create_empty_trip();
+			trip = this.create_empty_trip();
 		}
-		console.debug("201810291814", this.class_name, ".ngOnInit() trip=",
-			C.stringify(trip));
+		if (trip.trip_date) trip.trip_date 	=  this.today > trip.trip_date ? this.today: trip.trip_date ;
+		if (trip.date1) 	trip.date1 		=  this.today > trip.date1 ? this.today: trip.date1 ;
+		if (trip.date2) 	trip.date2 		=  this.today > trip.date2 ? this.today: trip.date2 ;
 	
-		trip.trip_date =  this.today > trip.trip_date ? this.today: trip.trip_date ;
-	
+		StorageService.storeForm(this.form_key, trip);
 		this.trip=trip;
-		StorageService.storeForm(C.KEY_FORM_TRIP, trip);
 
 		this.form= this.form_builder.group(
 			{
 				//sync validators must be in an array
 				rider_ind			: [trip.rider_ind, [Validators.required]], 
 				p1_loc				: [trip.p1.loc, [Validators.required]], 
-				//start_lat	: ['', []],	 
-				//start_lon	: ['', []],	 
-				//start_display_name	: ['', []], 
 				p2_loc				: [trip.p2.loc, [Validators.required]], 
-				//end_lat			: ['', []], 
-				//end_lon			: ['', []],
-				//end_display_name	: ['', []],
 				trip_date			: [trip.trip_date, [Validators.required, Validators.min]], 
+				date1				: [trip.date1, [Validators.required, Validators.min]], 
+				date2				: [trip.date2, [Validators.required, Validators.min]], 
 				trip_time			: [trip.trip_time, [Validators.required]], 
 				seats				: [trip.seats, [Validators.required]], 
 				price				: [trip.price, [Validators.required]], 
 				description			: [trip.description, ], 
+				search_tightness	: [trip.search_tightness, ], 
 			},	 
 			{ 
 				//validator		: this.validate_trip
@@ -126,18 +145,54 @@ export class TripComponent extends BaseComponent {
 		this.show_map();
   	}
 
+	create_empty_trip () : any{
+		let trip =	{
+			  version			: 	C.VERSION_FORM_SEARCH
+			, rider_ind			: 	'false'
+			, trip_date			: 	this.today
+			, date1				:	this.today
+			, date2				:	this.today
+			, trip_time			: 	this.current_time
+			, distance			: 	C.ERROR_NO_ROUTE
+			, seats				:	1
+			, price				:	C.MAX_PRICE
+			, p1	:{  	loc		: ''
+						,   lat		: null
+						,   lon		: null
+						,   display_name: null
+					}
+			, p2:   {   	loc		: ''
+						,   lat		: null
+						,   lon		: null
+						,   display_name: null
+					}
+			, description		   : ''
+			, search_tightness	  : 3
+			}
+		return trip;
+	}
+
 	form_change_action(){
 		this.reset_msg() ;
-		let changed_field=this.form_loc_change_detect();
-		if ( changed_field) this.geocode(changed_field, this.trip, this.form) ;
-		this.validate_trip();
-		this.changeDetectorRef.detectChanges() ;
+		let f= this.form.value;
+		if (f.rider_ind=='true') 	this.max_price	=	C.MAX_PRICE_RIDER;
+		else				this.max_price = C.MAX_PRICE;
+
+		if (f.rider_ind=='true' ) 	this.from 	= 'Pickup Location';
+		else				this.from	= 'Departure Location';
+
+		if (f.rider_ind=='true' ) 	this.to		= 'Dropoff Location';
+		else				this.to		= 'Arrival Location';
+		console.debug("201808201534", this.class_name, "form_change_action() this.from" , this.from);
+
+		let changed_loc=this.form_loc_change_detect();
+		if ( changed_loc) this.geocode(changed_loc, this.trip, this.form) ;
 	}
 
 	onSubmit() {
 		this.reset_msg() ;
-			console.warn("201808201534", this.class_name, ".onSubmit() this.form.value=" 
-			, C.stringify(this.form.value) );
+        this.changeDetectorRef.detectChanges();
+
 		// save trip to db
 		// combining data
 		this.trip = { ...this.trip, ...this.form.value};
@@ -145,39 +200,27 @@ export class TripComponent extends BaseComponent {
 		this.trip.p2.loc = this.form.value.p2_loc;
 		delete this.trip.p1_loc;
 		delete this.trip.p2_loc;
-		StorageService.storeForm(C.KEY_FORM_TRIP, this.trip);
+		StorageService.storeForm(this.form_key, this.trip);
 
-		let trip_to_db = Util.deep_copy( this.trip);
-		// convert p1,p2, date1, date2 to column names in db 
-		Util.convert_pair_to_trip(trip_to_db);
+		if (this.form_key == C.KEY_FORM_TRIP) {
+			let trip_to_db = Util.deep_copy( this.trip);
+			let trip_from_db_observable	 = this.call_wservice(C.URL_INS_TRIP, trip_to_db);
+		}
+		else if (this.form_key == C.KEY_FORM_SEARCH) {
+            let url = '/map_search_start';
+            this.router.navigate([url]);
+		}
+	}
 
-		let trip_from_db_observable	 = this.dbService.call_db(C.UPD_TRIP_URL, trip_to_db);
-		trip_from_db_observable.subscribe(
-				trip_from_db => {
-					console.info("201808201201 TripComponent.constructor() trip_from_db =" 
-						, C.stringify(trip_from_db));
-					if (trip_from_db.trip_id) {
-						this.form_saved_to_db=true;
-						this.info_msg
-							='The trip is published. Other users can start to book the trip.';
-						if (trip_from_db.rider_ind) 
-							this.warning_msg = ' You MUST maintain your balance over Estimated Cost. Otherwise othes cannot find your trip.'
-						this.button_label='Publish Another Trip';
-						this.changeDetectorRef.detectChanges() ;
-					}
-					else {
-						if (trip_from_db.error_desc)
-							this.error_msg = trip_from_db.error_desc + '. Request to publish rejected.' ;
-						else
-							this.error_msg ='Invalid data. Request to publish rejected.';
-						this.changeDetectorRef.detectChanges() ;
-					}
-			},
-			error => {
-				this.error_msg=error;
-				this.changeDetectorRef.detectChanges() ;
-			}
-		)
+	on_get_data_from_wservice(data){
+		if (data.trip_id) {
+			//this.form_saved_to_db=true;
+			this.info_msg ='The trip is published. Other users can start to book the trip.';
+			if (data.rider_ind) this.warning_msg 
+			= ' You MUST maintain your balance over Estimated Cost. Otherwise othes cannot find your trip.'
+			this.button_label='Publish Another Trip';
+		}
+		else this.error_msg = C.ACTION_FAIL;
 	}
 
 	show_map(){
@@ -197,30 +240,42 @@ export class TripComponent extends BaseComponent {
 
 
 	//validate_trip(fg: FormGroup): ValidationErrors | null {
-	validate_trip() {
-		//console.debug('DEBUG 2018009080943 TripComponent.validate_trip() fg.value=\n' ) ; 
-		//console.debug(fg.value ) ; 
+	validate_form(): string|null {
+		let validation_error=null;
+		//console.debug('201811232324', this.class_name, 'validate_form() this.trip='
+			//, C.stringify(this.trip));
+		let f = this.form.value;
+		if ( this.form_key == C.KEY_FORM_TRIP) {
+			if ( this.user_from_db.balance == null ) {
+				validation_error = 'Please sign in to post a trip' ;
+			}
+			else if ( this.trip.distance == C.ERROR_NO_ROUTE) validation_error='ERROR: Trip not routable';
+			else if ( f.rider_ind =='true' 
+					&& this.trip.distance != C.ERROR_NO_ROUTE
+					&& this.user_from_db.balance < this.estimate_cost()
+					) 
+				validation_error = 'ERROR: You MUST maintain a balance above Estimated Cost to publish a trip as rider';
+			else if ( this.user_from_db.balance < 0)
+				validation_error = 'ERROR: You cannot publish trip with a negative account balance';
+			else if ( !f.trip_time )
+				validation_error = 'Please enter Departure Time';
+		}
 
-		 if ( this.user_from_db.balance == null ) {
-			this.error_msg = 'You must sign in to post a trip' ;
-			this.form_is_valid= false;
+		else if (this.form_key == C.KEY_FORM_SEARCH )	{
+			if ( this.trip.p1.lat == null )  {
+				if (f.rider_ind=='true') validation_error 	= 'Please enter Pickup Location';
+				else if (f.rider_ind=='false') validation_error 	= 'Please enter Departure Location';
+			}
+			else if (!this.trip.p2.lat)  {
+				if (f.rider_ind=='true') validation_error 	= 'Please enter Dropoff Location';
+			}
+			else if (f.rider_ind=='true' && this.trip.distance == C.ERROR_NO_ROUTE) 
+				validation_error = 'ERROR: Trip not routable';
+			else if (f.date2<f.date1) validation_error= 'ERROR: Invalid date range';
 		}
-		else if ( this.form.value.rider_ind =='true' 
-				&& this.trip.distance != C.ERROR_NO_ROUTE
-				&& this.user_from_db.balance < this.estimate_cost()
-				) {
-			this.error_msg = 'Your balance is under Estimated Cost. You MUST maintain a balance above Estimated Cost to publish a trip as rider';
-			this.form_is_valid= false;
-			//return {balance: this.error_msg};
-		}
-		else if ( this.user_from_db.balance < 0)
-		{ 
-			this.error_msg = 'Your account balance is negative. You cannot publish trip with a negative balance';
-			this.form_is_valid= false;
-			//return {balance: this.error_msg};
-		}
-		else 
-			this.form_is_valid= true;
+		//console.debug('201811232324', this.class_name, 'validate_form() validation_error='
+			//, validation_error
+		return validation_error;
 	}
 
 	current_location()
@@ -237,11 +292,20 @@ export class TripComponent extends BaseComponent {
 	set_time(minutes: number)
 	{
 		let [trip_date, trip_time] = Util.current_time_and_minutes(minutes);
-		this.form.patchValue ({
-			trip_date: trip_date,
-			trip_time:	trip_time
-		});
-		this.changeDetectorRef.detectChanges() ;
+		if( this.form_key==C.KEY_FORM_TRIP) {
+			this.form.patchValue ({
+				trip_date: trip_date,
+				trip_time:	trip_time
+			});
+		}
+		else  {
+			this.form.patchValue ({
+				date1: trip_date,
+				date2: trip_date,
+				trip_time:	trip_time
+			});
+		}	
+
 	}
 
 
@@ -264,9 +328,10 @@ export class TripComponent extends BaseComponent {
 	// the getter is required for reactive form validation to work 
 	get p1_loc		() { return this.form.get('p1_loc'	); }  
 	get p2_loc		() { return this.form.get('p2_loc'	); }  
+	get trip_date	() { return this.form.get('trip_date'	); }
+	get trip_time	() { return this.form.get('trip_time'	); }
 	get date1		() { return this.form.get('date1'	); }
 	get date2		() { return this.form.get('date2'	); }
-	get departure_time	() { return this.form.get('departure_time'	); }
 	get seats		() { return this.form.get('seats'		); }
 	get price		() { return this.form.get('price'		); }
 }

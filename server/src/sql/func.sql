@@ -12,8 +12,8 @@ create type funcs.criteria as
 		,	date2				date
 		,	p1					location
 		,	p2					location
-		,	bp1					location				-- bounding box
-		,	bp2					location				-- bounding box
+		,	box_p1					location				-- bounding box
+		,	box_p2					location				-- bounding box
 		,	distance			decimal(8,2)
 		,	trip_date			time
 		,	trip_time			time
@@ -302,7 +302,7 @@ DECLARE
 	c	RECORD	;
 BEGIN
 	t0	:=	funcs.json_populate_record(NULL::trip	, in_trip) ;
-	u0	:=	funcs.json_populate_record(NULL::usr	, in_usr) ;
+	u0	:=	funcs.json_populate_record(NULL::usr	, in_user) ;
 	c	:=	funcs.calc_cost(0,0,0)	;	
 
 	if u0.usr_id is null then
@@ -604,10 +604,10 @@ $body$
 	, c0 as (
 		SELECT		
 			-- bounding box
-			  least		((t.bp1).lat, (t.bp2).lat) bp1_lat	
-			, greatest	((t.bp1).lat, (t.bp2).lat) bp2_lat	
-			, least		((t.bp1).lon, (t.bp2).lon) bp1_lon
-			, greatest	((t.bp1).lon, (t.bp2).lon) bp2_lon	
+			  least		((t.box_p1).lat, (t.box_p2).lat) box_p1_lat	
+			, greatest	((t.box_p1).lat, (t.box_p2).lat) box_p2_lat	
+			, least		((t.box_p1).lon, (t.box_p2).lon) box_p1_lon
+			, greatest	((t.box_p1).lon, (t.box_p2).lon) box_p2_lon	
 			, coalesce(t.seats		, 1)				 seats
 			, coalesce(t.price/c.margin_factor , c.max_price_driver)	max_price_driver
 			, funcs.bearing(t.p1, t.p2)- 43+4*search_tightness		min_dir
@@ -677,10 +677,10 @@ $body$
 		and t.trip_date between c0.date1 and c0.date2
 		and t.trip_time between c0.time1 and c0.time2
 		-- trip start and end must inside the bounding box
-		and (t.p1).lat between c0.bp1_lat and c0.bp2_lat
-		and (t.p1).lon between c0.bp1_lon and c0.bp2_lon
-		and (t.p2).lat between c0.bp1_lat and c0.bp2_lat
-		and (t.p2).lon between c0.bp1_lon and c0.bp2_lon
+		and (t.p1).lat between c0.box_p1_lat and c0.box_p2_lat
+		and (t.p1).lon between c0.box_p1_lon and c0.box_p2_lon
+		and (t.p2).lat between c0.box_p1_lat and c0.box_p2_lat
+		and (t.p2).lon between c0.box_p1_lon and c0.box_p2_lon
 		and t.distance	between c0.min_distance and c0.max_distance
 		and ( 	t.dir	 between c0.min_dir and c0.max_dir
 				or	t.dir	 between c0.min_dir_360 and c0.max_dir_360
@@ -720,15 +720,15 @@ BEGIN
 
 	SELECT		
 			-- bounding box
-			  least		((t.bp1).lat, (t.bp2).lat) bp1_lat	
-			, greatest	((t.bp1).lat, (t.bp2).lat) bp2_lat	
-			, least		((t.bp1).lon, (t.bp2).lon) bp1_lon
-			, greatest	((t.bp1).lon, (t.bp2).lon) bp2_lon	
+			  least		((t.box_p1).lat, (t.box_p2).lat) box_p1_lat	
+			, greatest	((t.box_p1).lat, (t.box_p2).lat) box_p2_lat	
+			, least		((t.box_p1).lon, (t.box_p2).lon) box_p1_lon
+			, greatest	((t.box_p1).lon, (t.box_p2).lon) box_p2_lon	
 			-- center box
-			, ((t.bp1).lat + (t.bp2).lat)/2 - ((t.bp2).lat-(t.bp1).lat)/6 p1_lat_cb
-			, ((t.bp1).lat + (t.bp2).lat)/2 + ((t.bp2).lat-(t.bp1).lat)/6 p2_lat_cb
-			, ((t.bp1).lon + (t.bp2).lon)/2 - ((t.bp2).lon-(t.bp1).lon)/6 p2_lon_cb
-			, ((t.bp1).lon + (t.bp2).lon)/2 + ((t.bp2).lon-(t.bp1).lon)/6 p2_lon_cb
+			, ((t.box_p1).lat + (t.box_p2).lat)/2 - ((t.box_p2).lat-(t.box_p1).lat)/6 p1_lat_cb
+			, ((t.box_p1).lat + (t.box_p2).lat)/2 + ((t.box_p2).lat-(t.box_p1).lat)/6 p2_lat_cb
+			, ((t.box_p1).lon + (t.box_p2).lon)/2 - ((t.box_p2).lon-(t.box_p1).lon)/6 p2_lon_cb
+			, ((t.box_p1).lon + (t.box_p2).lon)/2 + ((t.box_p2).lon-(t.box_p1).lon)/6 p2_lon_cb
 			, coalesce(t.seats		, 1)				 seats
 			, coalesce(t.price*c.margin_factor , 0)	min_price_rider
 			, t.p1
@@ -767,10 +767,10 @@ BEGIN
 		and t.trip_time between c0.trip_time - t.distance *600 * interval '1 second' 
 				and c0.trip_time +  t.distance *600 * interval '1 second'
 		-- trip start and end must inside the bounding box
-		and (t.p1).lat between c0.bp1_lat and c0.bp2_lat
-		and (t.p1).lon between c0.bp1_lon and c0.bp2_lon
-		--and (t.p2).lat between c0.bp1_lat and c0.bp2_lat
-		--and (t.p2).lon between c0.bp1_lon and c0.bp2_lon
+		and (t.p1).lat between c0.box_p1_lat and c0.box_p2_lat
+		and (t.p1).lon between c0.box_p1_lon and c0.box_p2_lon
+		--and (t.p2).lat between c0.box_p1_lat and c0.box_p2_lat
+		--and (t.p2).lon between c0.box_p1_lon and c0.box_p2_lon
 		and ur.balance >= (funcs.calc_cost_driver(t.price, t.distance , t.seats )).cost_rider
 		order by t.trip_date, t.trip_time
 		limit 100
@@ -848,7 +848,7 @@ BEGIN
 	insert into book (
     	trip_id
     ,   usr_id
-    ,   rider_ind
+    --,   rider_ind
     ,   p1
     ,   p2
     ,   distance
@@ -862,7 +862,7 @@ BEGIN
 	(
 		b0.trip_id
 	,	b0.usr_id
-	,	b0.rider_ind
+	--,	b0.rider_ind
 	,	b0.p1
 	,	b0.p2
 	,	b0.distance
@@ -922,7 +922,7 @@ BEGIN
 	insert into book (
     	trip_id
     ,   usr_id
-    ,   rider_ind
+    --,   rider_ind
     ,   p1
     ,   p2
     --,   distance
@@ -936,7 +936,7 @@ BEGIN
 	(
 		b0.trip_id
 	,	b0.usr_id
-	,	b0.rider_ind
+	--,	b0.rider_ind
 	,	b0.p1
 	,	b0.p2
 	--,	b0.distance
@@ -1143,11 +1143,11 @@ BEGIN
 			, ids.book_id
 			, ids.my_usr_id
 			, ids.other_usr_id
-			, t.p1
-			, t.p2
+			, case when t.rider_ind then t.p1 else b.p1 end p1r
+			, case when t.rider_ind then t.p2 else b.p2 end p2r
+			, case when t.rider_ind then b.p1 else t.p1 end p1d
+			, case when t.rider_ind then b.p2 else t.p2 end p2d
 			, t.description
-			, b.p1 p1b
-			, b.p2 p2b
 			-- , t.distance
 			, t.trip_date
 			, t.trip_time
@@ -1162,14 +1162,13 @@ BEGIN
 			  end unified_cost -- either driver's cost or rider's cost
 			, coalesce(b.seats , t.seats) seats	-- either seats available or seats booked
 			, coalesce( bs.description, ts.description) status_description
-			, case when t.usr_id = ids.my_usr_id then t.rider_ind 	else not t.rider_ind end rider_ind
-			, case when b.usr_id = ids.my_usr_id then true 			else false 			end booker_ind
-			, uo.headline
+			, case when t.usr_id = ids.my_usr_id then t.rider_ind 	else not t.rider_ind 	end rider_ind
+			, case when t.usr_id = ids.my_usr_id then false 		else true 				end booker_ind
+			, case when t.rider_ind and t.usr_id = ids.my_usr_id then uo.headline else null end headline_r
+			, case when not t.rider_ind and t.usr_id = ids.my_usr_id then uo.headline else null end headline_d
+			, case when t.rider_ind and t.usr_id = ids.my_usr_id then uo.sm_link else null end sm_link_r
+			, case when not t.rider_ind and t.usr_id = ids.my_usr_id then uo.sm_link else null end sm_link_d
 			, uo.sm_link	
-			, case when ids.my_usr_id=t.usr_id and t.rider_ind	then true
-					when ids.my_usr_id= b.usr_id	and not t.rider_ind then true
-					else false
-					end  is_rider
 			, coalesce(bs.description , 'Published') book_status_description
 		from ids 
 		join trip 				t 	on ( t.trip_id=ids.trip_id )
@@ -1178,6 +1177,7 @@ BEGIN
 		left outer join book 	b 	on (b.book_id= ids.book_id )
 		left outer join book_status bs 	on (bs.status_cd= b.status_cd)
 	)
+	
 	select row_to_json(a) 
 	from a
 	order by a.trip_date , a.trip_time, a.status_cd nulls last

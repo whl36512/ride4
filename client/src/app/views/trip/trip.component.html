@@ -4,7 +4,8 @@
 	<button (click)='show_body=C.BODY_SHOW'   *ngIf='show_body==C.BODY_NOSHOW' > {{C.ICON_ARROW_DOWN}}</button>
 </div>
 
-<div class="center f12" >Offer a Trip  </div>
+<div class="center f12" *ngIf='form_key==C.KEY_FORM_TRIP' >Publish my Trip</div>
+<div class="center f12" *ngIf='form_key==C.KEY_FORM_SEARCH' >Search Settings</div>
 <div class={{show_body}} >
 	<form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf='show_form==C.BODY_SHOW'>
 		<dl> 
@@ -14,7 +15,7 @@
 					<label><input type="radio" formControlName='rider_ind' value=true  />Rider</label>
 			</dt>
 	  		<dt>
-				From 
+				{{from}}
 				<span class='clickable-text button' (click)='current_location()'>Current Location</span>
 			</dt>
 	  		<dd>
@@ -33,14 +34,16 @@
 
 		<dl >
 	  		<dt>
-				To
+				{{to}}
 			</dt>
 	  		<dd>
 	   			<input  type="text"  id="p2_loc" formControlName="p2_loc" 
 					placeholder="To" required
 					pattern=".{3,}"
 				/>
-				<span class="validity"></span>
+				<span class="validity" 
+					*ngIf='this.form_key==C.KEY_FORM_TRIP || this.form.value.rider_ind=="true"'>
+				</span>
 			</dd>
 			<dd class="f08 clickable-text" (click)='show_map()' >
 				{{trip.p2.lat}} {{trip.p2.lon}} <br/>
@@ -54,17 +57,37 @@
 		</dl>
 
 		<dl >
-	  		<dt>Trip date
-			</dt>
-	  		<dd>
-			<input type="date" formControlName="trip_date" 
-				pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" min={{today}} 
-				required 
-			/>
-			<span class="validity"></span>
-	  		</dd>
+			<div *ngIf='form_key==C.KEY_FORM_TRIP'>
+	  			<dt>Trip Date </dt>
+	  			<dd>
+					<input type="date" formControlName="trip_date" *ngIf='form_key==C.KEY_FORM_TRIP'
+						pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" min={{today}} 
+						required 
+					/>
+					<span class="validity"></span>
+				</dd>
+			</div>
+			<div *ngIf='form_key==C.KEY_FORM_SEARCH'>
+				<dt>Search Dates between</dt>
+				<dd>
+					<input type="date" formControlName="date1" 
+						pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" min={{today}} 
+						required 
+					/>
+					<span class="validity"></span>
+				</dd>
+				<dt>And</dt>
+				<dd>
+					<span class="validity"></span>
+					<input type="date" formControlName="date2" 
+						pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" min={{this.form.value.date1}} 
+					/>
+					<span class="validity"></span>
+				</dd>
+			</div>
 
-	  		<dt>Trip Time
+
+	  		<dt>Departure Time
 					<label><input name=set_time type="radio" (click)='set_time(0)' />Now</label> 
 					, In 
 					<label><input name=set_time type="radio" (click)='set_time(5)'  />5</label>
@@ -88,17 +111,18 @@
 	  		</dd>
 
 			<dt>Price: ${{this.form.value.price}} per mile per passenger.
-				<span *ngIf='this.form.value.rider_ind=="true"'> Estimated cost: 
+				<span *ngIf='this.form.value.rider_ind=="true" && this.form_key==C.KEY_FORM_TRIP'> Estimated cost: 
 					$ {{this.estimate_cost()}}
 				</span>
 			</dt>
 	  		<dd>
-			<input type="range" formControlName="price" value="0" step=0.01 min="0" 
-				max="{{max_price}}" 
-			/>
+				<input type="range" formControlName="price" value="0" step=0.01 min="0" 
+					max="{{max_price}}"  required
+				/>
+				<span class="validity" ></span>
 	  		</dd>
 		</dl>
-		<dl >
+		<dl *ngIf='form_key==C.KEY_FORM_TRIP'>
 	  		<dt>Description</dt>
 	  		<dd >
 				<textarea id="description" formControlName=description 
@@ -107,12 +131,27 @@
 				</textarea>
 	  		</dd>
 		</dl>
-		<button  type="submit" [disabled]="!form_is_valid || trip.distance==C.ERROR_NO_ROUTE " >
+		<dl *ngIf='form_key==C.KEY_FORM_SEARCH'>
+            You can reduce number of search results by tightening searches.
+            <dt><label for="seats">Tightness Level: {{this.form.value.search_tightness}}  </label></dt>
+            <dd>
+            <input type="range" formControlName="search_tightness" 
+				min="0" max="{{C.MAX_SEARCH_TIGHTNESS}}" step=1 />
+            </dd>
+
+        </dl>
+
+		<button  type="submit" [disabled]="validation_error" *ngIf='form_key==C.KEY_FORM_TRIP' >
 			{{button_label}}
 		</button>
+        <button type="submit" *ngIf='form_key==C.KEY_FORM_SEARCH' [disabled]="validation_error" >
+            Save Settings to this Device and Start Map Search
+        </button>
+
 
       </form>
 </div>
 <div *ngIf='error_msg'      class=error 	[innerHTML]='error_msg' ></div>
 <div *ngIf='info_msg'       class='info' 	[innerHTML]='info_msg' ></div>
 <div *ngIf='warning_msg'    class='warning' [innerHTML]='warning_msg' ></div>
+<div *ngIf='validation_error'    class='error' [innerHTML]='validation_error' ></div>

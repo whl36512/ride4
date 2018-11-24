@@ -63,17 +63,18 @@ export class MapControllerComponent extends BaseComponent {
 		let element = document.getElementById("main");
     	if(element) element.classList.add("map-controller"); // for changing style
 
-        let rider_criteria = StorageService.getForm(C.KEY_FORM_SEARCH) ;
+        let serach_criteria = StorageService.getForm(C.KEY_FORM_SEARCH) ;
+		let sc	= serach_criteria;
 
-		if (! rider_criteria || rider_criteria.distance== C.ERROR_NO_ROUTE 
-			||rider_criteria.version != C.VERSION_FORM_SEARCH) {
-			this.router.navigate(['/search_setting']);
+		if (! sc || (sc.distance== C.ERROR_NO_ROUTE && sc.rider_ind=='true')
+			||sc.version != C.VERSION_FORM_SEARCH) {
+			this.router.navigate(['/Trip/'+ C.KEY_FORM_SEARCH]);
 		}
 
 		this.warning_msg = 'Please adjust map area to search for available trips' ;
 
 		//move map viewport to contain rider_criteria
-		let viewport= MapService.map_viewport_with_margin(rider_criteria, C.MAP_VIEWPORT_MARGIN);
+		let viewport= MapService.map_viewport_with_margin(sc, C.MAP_VIEWPORT_MARGIN);
         this.communicationService.send_msg(C.MSG_KEY_MARKER_FIT, viewport);
 
  		this.timer_sub = BaseComponent.timer.subscribe(
@@ -128,11 +129,9 @@ export class MapControllerComponent extends BaseComponent {
         this.changeDetectorRef.detectChanges() ;
 
 
-        let rider_criteria = StorageService.getForm(C.KEY_FORM_SEARCH) ;
-		rider_criteria.rp1=rider_criteria.p1;
-		rider_criteria.rp2=rider_criteria.p2;
+        let search_criteria = StorageService.getForm(C.KEY_FORM_SEARCH) ;
 		// region p1,p2 overwrite rider_criteria.p1,p2
-		let search_criteria_combined = {...rider_criteria, ... JSON.parse(region_search_criteria)};
+		let search_criteria_combined = {...search_criteria, ... JSON.parse(region_search_criteria)};
 		
 		console.debug ('201810270146 MapControllerComponent.search() search_criteria_combined=\n'
 					, search_criteria_combined);
@@ -140,16 +139,16 @@ export class MapControllerComponent extends BaseComponent {
 			= this.dbService.call_db(C.URL_SEARCH_REGION, search_criteria_combined);
 		
 		data_from_db_observable.subscribe(
-			journeys_from_db => {
+			trips_from_db => {
 				this.reset_msg();
 				this.changeDetectorRef.detectChanges() ;
-				console.info("201808201201 MapControllerComponent.search() journeys_from_db ="
-						, C.stringify(journeys_from_db));
+				console.info("201808201201 MapControllerComponent.search() trips_from_db ="
+						, C.stringify(trips_from_db));
 				// save both search result and rider criteria at the same time
 				// rider criteria will be used to determin the Book button in journey page
-				this.Status.search_result= journeys_from_db;
-				this.Status.rider_criteria= rider_criteria;
-				let rows_found = journeys_from_db.length ;
+				this.Status.search_result= trips_from_db;
+				this.Status.search_criteria= search_criteria;
+				let rows_found = trips_from_db.length ;
 
 				if(rows_found == 0 ) this.warning_msg = 'Nothing found in the map region';
 				else if(rows_found >= C.MAX_SEARCH_RESULT ) 
@@ -159,8 +158,8 @@ export class MapControllerComponent extends BaseComponent {
 				else this.info_msg = `Found ${rows_found} offers.`
 				this.changeDetectorRef.detectChanges() ;
 
-				this.communicationService.send_msg(C.MSG_KEY_MARKER_BOOKS , journeys_from_db);
-				let pair = Util.deep_copy(rider_criteria);
+				this.communicationService.send_msg(C.MSG_KEY_MARKER_BOOKS , trips_from_db);
+				let pair = Util.deep_copy(search_criteria);
 				pair.line_color= C.MAP_LINE_COLOR_RIDER;
 				this.communicationService.send_msg(C.MSG_KEY_MARKER_PAIR , pair);
 				this.search_is_running= false ;
@@ -177,13 +176,13 @@ export class MapControllerComponent extends BaseComponent {
 
 	get_map_region(): any {
 		let mr= {	  
-				p1:		{ 
+				  box_p1:		{ 
 							  //lat	:MapService.static_map.getBounds().getSouth()
 							//, lon 	:MapService.static_map.getBounds().getWest()
 							  lat	:this.mapService.map.getBounds().getSouth()
 							, lon 	:this.mapService.map.getBounds().getWest()
 						}
-				, p2:		{ 
+				, box_p2:		{ 
 							  //lat	:MapService.static_map.getBounds().getNorth()
 							//, lon 	:MapService.static_map.getBounds().getEast()
 							  lat	:this.mapService.map.getBounds().getNorth()

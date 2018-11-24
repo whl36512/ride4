@@ -235,51 +235,60 @@ export class MapService {
 	mark_book (book, index: number, is_highlight:boolean) {
 		if (!book) return;
 		let i= index;
-		//let google_map_string = MapService.google_map_string(book);
 		let google_map_url = book.google_map_url;
 		if (!google_map_url) google_map_url= MapService.google_map_string(book);
 
-		Util.convert_book_to_pairs(book);
+		//Util.convert_book_to_pairs(book);
 		let popup = `<div>${book.journey_date} ${book.departure_time} ${google_map_url}</div>`
 
-		let pair: any = {};
-		pair.p1	= 	book.p1	;
-		pair.p2 =	book.p2	;
-		pair.p1.icon_type= DotIcon ;
-		pair.p2.icon_type= DotIcon ;
-		pair.p1.marker_text= 'D'+ (i+1);
-		pair.p2.marker_text= 'D'+ (i+1);
-		pair.p1.popup= popup  ;
-		pair.p2.popup= popup  ;
-		if ( is_highlight) {
-			//pair.line_color=C.MAP_LINE_COLOR_HIGHLIGHT;
-			pair.line_weight=C.MAP_LINE_WEIGHT_HIGHLIGHT;
-		} else {
-			pair.line_color=null;
-			pair.line_weight=null;
+		let pair1: any = {};
+		let pair2: any = {};
+		pair1.p1	= 	book.p1d	;
+		pair1.p2 	=	book.p2d	;
+		if ( pair1.p1) pair1.p1.marker_text= 'D'+ (i+1);
+		if ( pair1.p2) pair1.p2.marker_text= 'D'+ (i+1);
+		pair2.p1	= 	book.p1r	;
+		pair2.p2 	=	book.p2r	;
+		if ( pair2.p1) pair2.p1.marker_text= 'P'+ (i+1);
+		if ( pair2.p2) pair2.p2.marker_text= 'P'+ (i+1);
+
+		if( book.rider_ind ){
+			[pair1, pair2]= [pair2, pair1];
 		}
-		this.mark_pair(pair);
+
+		pair1.p1.icon_type= DotIcon ;
+		pair1.p2.icon_type= DotIcon ;
+		pair1.p1.popup= popup  ;
+		pair1.p2.popup= popup  ;
+		if ( is_highlight) {
+			//pair1.line_color=C.MAP_LINE_COLOR_HIGHLIGHT;
+			pair1.line_weight=C.MAP_LINE_WEIGHT_HIGHLIGHT;
+		} else {
+			pair1.line_color=null;
+			pair1.line_weight=null;
+		}
+		this.mark_pair(pair1);
 		//this.draw_line(pair);
 
 		if(!book.skip_book_part)
 		{
-			pair.p1	= 	book.rp1	;
-			pair.p2 =	book.rp2	;
-			pair.p1.icon_type= PinIcon ;
-			pair.p2.icon_type= PinIcon ;
-			pair.p1.marker_text= 'P'+ (i+1);
-			pair.p2.marker_text= 'P'+ (i+1);
-			pair.p1.popup= popup  ;
-			pair.p2.popup= popup  ;
+			if ( pair2.p1) {
+				pair2.p1.icon_type= PinIcon ;
+				pair2.p1.popup= popup  ;
+			}
+			if ( pair2.p2) {
+				pair2.p2.icon_type= PinIcon ;
+				pair2.p2.popup= popup  ;
+			}
 			if ( is_highlight) {
-				//pair.line_color=C.MAP_LINE_COLOR_HIGHLIGHT;
-				pair.line_weight=C.MAP_LINE_WEIGHT_HIGHLIGHT;
+				//pair2.line_color=C.MAP_LINE_COLOR_HIGHLIGHT;
+				pair2.line_weight=C.MAP_LINE_WEIGHT_HIGHLIGHT;
 			}
 			else {
-				//pair.line_color=null;
-				pair.line_weight=null;
+				//pair2.line_color=null;
+				pair2.line_weight=null;
 			}
-			this.mark_pair(pair);
+			this.mark_pair(pair2);
 			//this.draw_line(pair);
 		}
 	}
@@ -294,8 +303,18 @@ export class MapService {
 	}
 
 	fit_book(book){
-		Util.convert_book_to_pairs(book);
-		this.fit_pair(book);
+		let pair1: any = {};
+		let pair2: any = {};
+		pair1.p1	= 	book.p1d	;
+		pair1.p2 	=	book.p2d	;
+		pair2.p1	= 	book.p1r	;
+		pair2.p2 	=	book.p2r	;
+
+		if( book.rider_ind ){
+			[pair1, pair2]= [pair2, pair1];
+		}
+
+		this.fit_pair(pair1);
 	}
 
 
@@ -433,11 +452,11 @@ export class MapService {
 
 	static google_map_string(book): string | null {
 		if (!book) return null ;
-		Util.convert_book_to_pairs(book);
-		let p1 = book.p1 ;
-		let p2 = book.rp1 ;
-		let p3 = book.rp2 ;
-		let p4 = book.p2 ;
+		//Util.convert_book_to_pairs(book);
+		let p1 = book.p1d ;
+		let p2 = book.p1r ;
+		let p3 = book.p2r ;
+		let p4 = book.p2d ;
 		
 		return MapService.google_map_string_from_points([p1, p2, p3, p4]);
 	}

@@ -104,7 +104,7 @@ CREATE TABLE book
 		book_id		sys_id		not null
 	,	trip_id		sys_id		not null	
 	,	usr_id		sys_id		not null
-	,	rider_ind	boolean		-- Driver Rider
+	--,	rider_ind	boolean		-- Driver Rider
 	--,	trip_date	date		
 	--,	trip_time	time		
 	,	p1			location	not null

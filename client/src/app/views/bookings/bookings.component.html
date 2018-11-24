@@ -1,3 +1,36 @@
+<form [formGroup]="form" >
+   <dl>
+        <dt>
+            Show activities when I am a <br/>
+        </dt>
+        <dd>
+            <label><input type=checkbox formControlName='show_driver'
+                (change)='set_filter()' />Driver</label>
+            <label><input type=checkbox formControlName='show_rider'
+                (change)='set_filter()' />Rider</label>
+        </dd>
+        <dt>
+            Show activities when status is <br/>
+        </dt>
+        <dd>
+            <label><input type=checkbox formControlName='show_published'
+                (change)='set_filter()' />Published</label><br/>
+            <label><input type=checkbox formControlName='show_pending'
+                (change)='set_filter()' />Pending Comfirmation</label><br/>
+            <label><input type=checkbox formControlName='show_confirmed'
+                (change)='set_filter()' />Confirmed</label><br/>
+            <label><input type=checkbox formControlName='show_rejected'
+                (change)='set_filter()' />Rejected</label><br/>
+            <label><input type=checkbox formControlName='show_cancelled_by_driver'
+                (change)='set_filter()' />Cancelled by Driver</label><br/>
+            <label><input type=checkbox formControlName='show_cancelled_by_rider'
+                (change)='set_filter()' />Cancelled by Rider</label><br/>
+            <label><input type=checkbox formControlName='show_finished'
+                (change)='set_filter()' />Finished</label>
+        </dd>
+    </dl>
+</form>
+
 <div *ngIf='error_msg!=null' class=error>{{error_msg}}</div>
 <div *ngIf='warning_msg!=null' class=warning>{{warning_msg}}</div>
 <div class=warning *ngIf='false'>change_detect_count={{change_detect_counter()}}</div>
@@ -35,8 +68,6 @@
 				<td *ngIf='bookings_from_db[i].book_id != null'>{{bookings_from_db[i].seats}}</td>
 				<td *ngIf='bookings_from_db[i].book_id != null'>{{bookings_from_db[i].unified_cost}}</td>
 				<td class='warning width05' >{{bookings_from_db[i].book_status_description}}</td>
-
-				
 			</tr>
 		</tbody>
 	</table>
@@ -47,7 +78,7 @@
 		<span *ngIf='!bookings_from_db[i].show_messaging_panel' > &#xfe40;</span>
 	</button>
 	<button (click)="update(booking,i)" *ngIf='bookings_from_db[i].show_update_button' 
-		title='Change available seats and unit price'>Update available seats and price
+		title='Change seats and unit price'>Update seats and price
 	</button>
 	<span *ngIf='bookings_from_db[i].update_msg!=null' class="info fade">
 		{{bookings_from_db[i].update_msg}}
@@ -77,9 +108,11 @@
                         >
 	</app-message>
 	<div >
- 		<div *ngIf='!bookings_from_db[i].is_driver' >
+ 		<div *ngIf='bookings_from_db[i].headline_d' >
  			<span class='driver clickable-text' >
-				<a [href]='bookings_from_db[i].sm_link' target=_blank>Driver:</a>
+				<a [href]='bookings_from_db[i].sm_link' target=_blank>
+					Driver:
+				</a>
 			</span>
 			{{bookings_from_db[i].headline}} 
  			<span class=warning *ngIf='!(bookings_from_db[i].sm_link)'>
@@ -89,28 +122,46 @@
 				<a [href]='bookings_from_db[i].sm_link' target=_blank>LinkedIn Profile</a>
 			</span>
 		</div>
-		<span class='from clickable-text' (click)='geo_mark(i)'>Driver from:</span> 
-		{{bookings_from_db[i].start_display_name}} <br/>
-		<span class='to clickable-text' (click)='geo_mark(i)' >Driver to:</span> 
-		{{bookings_from_db[i].end_display_name}} <br/>
-		<span *ngIf='bookings_from_db[i].book_id!=null'>
-			<span  *ngIf='!bookings_from_db[i].is_rider'>
- 				<span class='driver clickable-text' >
-					<a [href]='bookings_from_db[i].sm_link' target=_blank>Passenger:</a>
-				</span>
-				{{bookings_from_db[i].headline}} 
- 				<span class=warning *ngIf='!(bookings_from_db[i].sm_link)'>
-				LinkedIn profile opted out
-				</span>
- 				<span class='button clickable-text'  *ngIf='(bookings_from_db[i].sm_link)' >
-					<a [href]='bookings_from_db[i].sm_link' target=_blank>LinkedIn Profile</a>
-				</span> <br/>
+		<div *ngIf='bookings_from_db[i].p1d'>
+			<span class='from clickable-text' (click)='geo_mark(i)'>
+				<span *ngIf='  bookings_from_db[i].rider_ind'> Driver from:</span>
+				<span *ngIf='! bookings_from_db[i].rider_ind'> Me from:</span>
+			</span> 
+			{{bookings_from_db[i].p1d.display_name}} 
+		</div>
+		<div *ngIf='bookings_from_db[i].p2d' >
+			<span class='to clickable-text'   (click)='geo_mark(i)' >
+				<span *ngIf='  bookings_from_db[i].rider_ind'> Driver to:</span>
+				<span *ngIf='! bookings_from_db[i].rider_ind'> Me to:</span>
+			</span> 
+			{{bookings_from_db[i].p2d.display_name}}
+		</div>
+		<div  *ngIf='bookings_from_db[i].headline_r'>
+ 			<span class='driver clickable-text' >
+				<a [href]='bookings_from_db[i].sm_link' target=_blank>Passenger:</a>
 			</span>
-			<span class='from clickable-text' (click)='geo_mark(i)'>Passenger Pickup:</span> 
-			{{bookings_from_db[i].pickup_display_name}}<br/>
-			<span class='to clickable-text' (click)='geo_mark(i)'>Passenger Dropoff:</span> 
-			{{bookings_from_db[i].dropoff_display_name}} <br/>
-		</span>
+			{{bookings_from_db[i].headline}} 
+ 			<span class=warning *ngIf='!(bookings_from_db[i].sm_link)'>
+			LinkedIn profile opted out
+			</span>
+ 			<span class='button clickable-text'  *ngIf='(bookings_from_db[i].sm_link)' >
+				<a [href]='bookings_from_db[i].sm_link' target=_blank>LinkedIn Profile</a>
+			</span> <br/>
+		</div>
+		<div  *ngIf='bookings_from_db[i].p1r' >
+			<span class='from clickable-text' (click)='geo_mark(i)'>
+				<span *ngIf='  bookings_from_db[i].rider_ind'> My Pickup:</span>
+				<span *ngIf='! bookings_from_db[i].rider_ind'> Passenger Pickup:</span>
+			</span> 
+			{{bookings_from_db[i].p1r.display_name}}
+		</div>
+		<div  *ngIf='bookings_from_db[i].p2r' >
+			<span class='to clickable-text'   (click)='geo_mark(i)'>
+				<span *ngIf='  bookings_from_db[i].rider_ind'> My Dropoff:</span>
+				<span *ngIf='! bookings_from_db[i].rider_ind'> Passenger Dropoff:</span>
+			</span> 
+			{{bookings_from_db[i].p2r.display_name}}
+		</div>
 		<span class='button clickable-text' [innerHTML]="bookings_from_db[i].google_map_url"></span>
 		<div>Description: {{bookings_from_db[i].description}}</div>
 	</div>

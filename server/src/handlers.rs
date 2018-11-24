@@ -87,15 +87,14 @@ pub fn get_user(req: &mut Request) -> IronResult<Response> {
 pub fn upd_user(req: &mut Request) -> IronResult<Response> {
 	request_sql(req, constants::SQL_UPD_USER, 1)
 }
-pub fn ins_trip(req: &mut Request) -> IronResult<Response> {
-	request_sql(req, constants::SQL_INS_TRIP, 1)
+pub fn ins_trip(req: &mut Request) -> IronResult<Response> { 
+	request_sql(req, constants::SQL_INS_TRIP, 1) 
 }
-//pub fn search(req: &mut Request) -> IronResult<Response> {
-	//request_sql(req, constants::SQL_SEARCH, 2)
-//}
-//pub fn search_all(req: &mut Request) -> IronResult<Response> {
-	//request_sql(req, constants::SQL_SEARCH_ALL, 2)
-//}
+pub fn upd_trip(req: &mut Request) -> IronResult<Response> {
+	request_sql(req, constants::SQL_UPD_TRIP, 1)
+}
+//pub fn search(req: &mut Request) -> IronResult<Response> { request_sql(req, constants::SQL_SEARCH, 2) } 
+//pub fn search_all(req: &mut Request) -> IronResult<Response> { request_sql(req, constants::SQL_SEARCH_ALL, 2) }
 pub fn search_region(req: &mut Request) -> IronResult<Response> {
 	request_sql(req, constants::SQL_SEARCH_REGION, 2)
 }
@@ -105,9 +104,9 @@ pub fn activity(req: &mut Request) -> IronResult<Response> {
 pub fn myoffers(req: &mut Request) -> IronResult<Response> {
 	request_sql(req, constants::SQL_MYOFFER, 2)
 }
-pub fn upd_journey(req: &mut Request) -> IronResult<Response> {
-	request_sql(req, constants::SQL_UPD_JOURNEY, 1)
-}
+//pub fn upd_journey(req: &mut Request) -> IronResult<Response> {
+	//request_sql(req, constants::SQL_UPD_JOURNEY, 1)
+//}
 pub fn book(req: &mut Request) -> IronResult<Response> {
 	request_sql(req, constants::SQL_BOOK, 1)
 }
