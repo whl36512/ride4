@@ -66,6 +66,7 @@ create type funcs.extended_criteria as
 		, p2					location
 		, trip_date				date
 		, trip_time				time
+		, trip_time_epoch		integer
 		, date1					date
 		, date2					date
 		, time1					time
@@ -137,7 +138,7 @@ BEGIN
 	cost.price_rider	:=	p							;
 	cost.price_driver	:=	p/cost.margin_factor	;
 	cost.cost_rider		:=	round((cost.booking_fee + p * d) * s,2) ;
-	cost.cost_driver	:=	round( p * s/cost.margin_factor  , 2) ;
+	cost.cost_driver	:=	round( p *d * s/cost.margin_factor  , 2) ;
 END
 $body$
 language plpgsql;
@@ -386,11 +387,11 @@ DECLARE
 	m1	money_tran ;
 	u1  usr	;
 BEGIN
-	if actual_amount is null then return null::money_tran ; end if;
-	if actual_amount = 0 then return null::money_tran ;	end if;
+	if in_actual_amount is null then return null::money_tran ;	end if;
+	if in_actual_amount = 0 	then return null::money_tran ;	end if;
 
 	update usr u
-	set balance = 	balance + actual_amount
+	set balance = 	balance + in_actual_amount
 	where	u.usr_id = in_usr_id
 	returning u.* into u1
 	;
@@ -409,7 +410,7 @@ BEGIN
 		, clock_timestamp()
 		, in_ref_no
 		, u1.balance
-	returning m.* into m1
+	returning * into m1
 	;
 
 	return m1;
@@ -695,6 +696,7 @@ BEGIN
 		, t.p2
 		, t.trip_date
 		, t.trip_time
+		, extract (epoch from t.trip_time) trip_time_epoch
 		, t.date1
 		, t.date2
 		, time '0:0' 
@@ -857,8 +859,10 @@ BEGIN
 	RETURN QUERY
 	with a as (
 		select 
-			  t.p1	p1r
-			, t.p2	p2r
+			  t.p1
+			, t.p2
+			--, t.p1	p1r
+			--, t.p2	p2r
 			--, t.distance 
 			, t.description
 			, t.usr_id				
@@ -867,20 +871,27 @@ BEGIN
  			, t.trip_time	
 			, t.seats
 			, funcs.calc_cost_driver(t.price, t.distance , t.seats ) as cost
+			--, (funcs.calc_cost_driver(t.price, t.distance , t.seats )).cost_driver 
 			, ur.headline
-			, c0.p1 p1d
-			, c0.p2 p2d
+			--, c0.p1 p1d
+			--, c0.p2 p2d
 			, t.rider_ind
+			, case when u0.balance is null 	then false else true end is_signed_in 
+			, case when u0.balance >= 0 	then true else false end sufficient_balance
+			, coalesce ( b.seats, 0)	seats_booked	-- should always be 0
 		from trip t
 		join usr ur on (ur.usr_id = t.usr_id) -- to get riders headline and balance
+		left outer join book b on (b.trip_id=t.trip_id and b.usr_id=u0.usr_id)
 		where t.status_cd = 'A'
-		--and t.usr_id	!= 	u0.usr_id
+		and t.usr_id	!= 	u0.usr_id
+		and t.seats > 0
 		and t.seats <= c0.seats
 		and	t.rider_ind = c0.trip_rider_ind
 		and t.price >= c0.min_price_rider
 		and t.trip_date between c0.date1 and c0.date2
-		and t.trip_time between c0.trip_time - sqrt(t.distance) *600 * interval '1 second' 
-				and c0.trip_time +  sqrt(t.distance) *600 * interval '1 second'
+		-- bad logic. Need fix. problem around midnight
+		and extract( epoch from t.trip_time) between c0.trip_time_epoch - sqrt(t.distance) *600  
+				and c0.trip_time_epoch +  sqrt(t.distance) *600 
 		-- trip start must be near by and 
 		-- end must be inside the bounding box
 		and (t.p1).lat between (c0.p1).lat - t.distance/60/6 and (c0.p1).lat + t.distance/60/6
@@ -898,183 +909,180 @@ END
 $body$
 language plpgsql;
 
---select * from funcs.search('{"departure_time": null, "distance": 30.7, "end_date": null, "end_display_name": "Millennium Centre, 33, West Ontario Street, Magnificent Mile, Chicago, Cook County, Illinois, 60654, USA", "end_lat": "41.89285925", "end_loc": "33 w ontario st, chicago", "end_lon": "-87.6292175246499", "price": 0.2, "seats": 1, "start_date": null, "start_display_name": "2916, Colton Court, Lisle, DuPage County, Illinois, 60532, USA", "start_lat": "41.7944060204082", "start_loc": "2916 colton ct", "start_lon": "-88.1075615306122"}');
-
 create or replace function funcs.book( in_book text,	in_user text)
 	returns json
 as
 $body$
 DECLARE
-		u0 RECORD ;
-		b0 RECORD ;
-		t0 RECORD ;
+		u0 usr ;
+		ut usr ;
+		b0 book ;
+		t0 trip ;
 BEGIN
-	u0 := funcs.json_populate_record(NULL::usr , in_usr) ;
+	select usr.* 
+	into u0 
+	from usr ,  funcs.json_populate_record(NULL::usr , in_user) u  
+	where	usr.usr_id= u.usr_id
+	;
+	--return funcs.gen_error('201811250044', 'balance='||coalesce(u0.balance,-1.234567));
+
 	b0 := funcs.json_populate_record(NULL::book , in_book) ;
-	SELECT * into t0 FROM trip where t0.trip_id = b0.trip_id;
+
+	SELECT * into t0 FROM trip t where t.trip_id = b0.trip_id;
+	SELECT * into ut FROM usr u where u.usr_id = t0.usr_id;
 
 	if u0.usr_id is null then
 		return funcs.gen_error('201811190902', 'user not signed in');
 	end if;
 
-	if u0.usr_id = t0.usr_id then
+	if u0.usr_id <> t0.usr_id then
+		null;
+	else
 		return funcs.gen_error('201811190902', 'offerer and booker cannot be the same');
 	end if;
 
-	if 		not t0.rider_ind and b0.rider_ind	then return funcs.book_rider	(in_book ,    in_user )	;
-	elsif 	not b0.rider_ind and t0.rider_ind 	then return funcs.book_driver	(in_book ,    in_user )	;
-	else 	return funcs.gen_error('201811190018', 'both are driver or rider');
+	if 	t0.rider_ind	then 	return funcs.book_by_driver	(t0, b0, u0, ut )	;
+	else 						return funcs.book_by_rider	(t0, b0, u0, ut )	;
 	end if;
 END
 $body$
 language plpgsql;
 	
-create or replace function funcs.book_rider( in_book text,	in_user text)
+create or replace function funcs.book_by_rider( t0 trip, b0 book, u0 usr, ut usr)
+-- rider is booking
 	returns json
 as
 $body$
 DECLARE
-		u0	RECORD ;
-		b0	RECORD ;
-		t0	RECORD ;
-		u1	RECORD ;
 		b1	RECORD ;
 		m1	RECORD ;
 		cost RECORD	;
 BEGIN
-	u0	:= funcs.json_populate_record(NULL::usr		, in_usr) ;
-	b0	:= funcs.json_populate_record(NULL::book	, in_book) ;
-
-	select * into t0	from trip t where t.trip_id = b0.trip_id ;
-	select * into u1	from usr	where u.usr_id= u0.usr_id	;
-
-	if b0.seats > t0.seats 
+	if b0.seats <= t0.seats 
 	then
+		null;
+	else
 		return funcs.gen_error('201811190020', 'Not enough seats');
 	end if;
 
-
 	cost 	:= funcs.calc_cost(t0.price , b0.distance , b0.seats )	;
 
-	if cost.cost_rider > u1.balance
-	then
+	if cost.cost_rider <= (b0.cost).cost_rider then
+		null;
+	else
+		return funcs.gen_error('201811242209', 'Pricing has been changed by driver');
+	end if;
+
+	if cost.cost_rider <= u0.balance then
+		null;
+	else
 		return funcs.gen_error('201811191824', 'Insufficeint balance');
 	end if;
 
 	insert into book (
     	trip_id
     ,   usr_id
-    --,   rider_ind
     ,   p1
     ,   p2
     ,   distance
     ,   seats
-    ,   price_driver
-    ,   price_rider
-    ,   cost_driver
-    ,   cost_rider
+	,	cost
     ,   status_cd   
 	) values 
 	(
 		b0.trip_id
-	,	b0.usr_id
-	--,	b0.rider_ind
+	,	u0.usr_id
 	,	b0.p1
 	,	b0.p2
 	,	b0.distance
 	,	b0.seats
-	,	cost.price_driver
-	,	cost.price_rider
-	,	cost.cost_driver
-	,	cost.cost_rider
+	,	cost
 	,	'P'
 	) 
 	returning * into b1;
 
-	update trip
+	update trip t
 	set seats	= seats - b1.seats
 	where t.trip_id	=	b1.trip_id
 	;
 
-	select * into m1 from funcs.ins_money_tran( in_usr_id => b1.usr_id
-										, in_actual_amount => - b1.cost_rider
-										, in_tran_cd => 'B'
-										, in_ref_no => b1.book_id) ;
+	m1	:= funcs.ins_money_tran( in_usr_id => b1.usr_id
+								, in_actual_amount => - (b1.cost).cost_rider
+								, in_tran_cd => 'B'
+								, in_ref_no => b1.book_id::text) ;
 	return row_to_json(b1);
 END
 $body$
 language plpgsql;
 
-create or replace function funcs.book_driver( in_book text,	in_user text)
+create or replace function funcs.book_by_driver( t0 trip, b0 book, u0 usr, ut usr)
+-- driver is booking
 	returns json
 as
 $body$
 DECLARE
-		u0	RECORD ;
-		b0	RECORD ;
-		t0	RECORD ;
-		u1	RECORD ;
 		b1	RECORD ;
 		m1	RECORD ;
 		cost RECORD;
 BEGIN
-	u0	:= funcs.json_populate_record(NULL::usr 	, in_usr) ;
-	b0	:= funcs.json_populate_record(NULL::book 	, in_book) ;
-	select * into t0	from trip t where t.trip_id = b0.trip_id ;
-	select * into u1	from usr	where u.usr_id	= t0.usr_id	;		-- rider
-
-	cost 	:= funcs.calc_cost_driver(t0.price , b0.seats )	;
-
-	if b0.seats < t0.seats 
-	then
-		return funcs.gen_error('201811191857', 'driver has no enough seats');
+	if b0.seats = t0.seats then
+		null;
+	else
+		return funcs.gen_error('201811191857', 'Seats do not match');
 	end if;
 
-	if cost.cost_rider > u1.balance
-	then
+	cost 	:= funcs.calc_cost_driver(t0.price , t0.distance, b0.seats )	;
+
+	if u0.balance >= 0  then
+		null;
+	else
+		return funcs.gen_error('201811242215', 'Driver has negative balance $'|| coalesce(u0.balance,'-1.234')||'.');
+	end if;
+
+	if cost.cost_driver >= (b0.cost).cost_driver then
+		null;
+	else
+		return funcs.gen_error('201811242214', 'Rider has changed pricing');
+	end if;
+
+	if cost.cost_rider <= ut.balance then
+		null;
+	else
 		return funcs.gen_error('201811191856', 'Rider has insufficeint balance');
 	end if;
 
 	insert into book (
     	trip_id
     ,   usr_id
-    --,   rider_ind
     ,   p1
     ,   p2
-    --,   distance
+    ,   distance
     ,   seats
-    --,   price_offer
-    --,   price_book
-    ,   cost_rider
-    ,   cost_driver
+	,	cost
     ,   status_cd   
 	) values 
 	(
 		b0.trip_id
-	,	b0.usr_id
-	--,	b0.rider_ind
+	,	u0.usr_id
 	,	b0.p1
 	,	b0.p2
-	--,	b0.distance
+	,	b0.distance		-- can be null
 	,	t0.seats		-- must cover all requested seats
-	--,	cost.price_driver
-	--,	cost.price_rider
-	,	cost.cost_rider
-	,	cost.cost_driver
+	,	cost
 	,	'P'
 	) 
 	returning * into b1;
 
-	update trip
+	update trip t
 	set seats	= 0
 	where t.trip_id	=	b1.trip_id
 	;
 
 	-- deduct rider's cost from his balance
-	select * into m1 from funcs.ins_money_tran( in_usr_id => t0.usr_id
-										, in_actual_amount => - b1.cost_rider
-										, in_tran_cd => 'B'
-										, in_ref_no => b1.book_id) ;
+	m1 	:= funcs.ins_money_tran(  in_usr_id => t0.usr_id
+								, in_actual_amount => - (b1.cost).cost_rider
+								, in_tran_cd => 'B'
+								, in_ref_no => b1.book_id::text ) ;
 	return row_to_json(b1);
 END
 $body$
@@ -1268,22 +1276,24 @@ BEGIN
 			, t.trip_date
 			, t.trip_time
 			, b.status_cd
+			, b.cost
 			, case when b.book_id is null	then t.price	else null end price
 			, case 
-				when t.usr_id	= ids.my_usr_id and t.rider_ind 		and b.book_id is not null 
+				when b.usr_id	= ids.my_usr_id and t.rider_ind 		
+					then (b.cost).cost_driver
+				when b.usr_id	<> ids.my_usr_id and t.rider_ind 		
 					then (b.cost).cost_rider
-				when t.usr_id	= ids.my_usr_id and not t.rider_ind 	and b.book_id is not null 	
+				when b.usr_id	= ids.my_usr_id and not t.rider_ind 
+					then (b.cost).cost_rider
+				when b.usr_id	<> ids.my_usr_id and not t.rider_ind 
 					then (b.cost).cost_driver
 				else null
 			  end unified_cost -- either driver's cost or rider's cost
 			, coalesce(b.seats , t.seats) seats	-- either seats available or seats booked
 			, coalesce( bs.description, ts.description) status_description
-			, case when t.usr_id = ids.my_usr_id then t.rider_ind 	else not t.rider_ind 	end rider_ind
-			, case when t.usr_id = ids.my_usr_id then false 		else true 				end booker_ind
-			, case when t.rider_ind and t.usr_id = ids.my_usr_id then uo.headline else null end headline_r
-			, case when not t.rider_ind and t.usr_id = ids.my_usr_id then uo.headline else null end headline_d
-			, case when t.rider_ind and t.usr_id = ids.my_usr_id then uo.sm_link else null end sm_link_r
-			, case when not t.rider_ind and t.usr_id = ids.my_usr_id then uo.sm_link else null end sm_link_d
+			, case when t.usr_id = ids.my_usr_id then t.rider_ind 	else not t.rider_ind 	end is_rider
+			, case when t.usr_id = ids.my_usr_id then false 		else true 				end is_booker
+			, uo.headline	
 			, uo.sm_link	
 			, coalesce(bs.description , 'Published') book_status_description
 		from ids 

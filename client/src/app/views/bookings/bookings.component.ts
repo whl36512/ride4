@@ -39,7 +39,7 @@ import { MapService } 						from '../../models/map.service';
 	selector	: 'app-bookings'		,
 	templateUrl	: './bookings.component.html'	,
 	styleUrls	: ['./bookings.component.css']	,
-	changeDetection: ChangeDetectionStrategy.OnPush ,	// prevent change detection unless @Input reference is changed
+//	changeDetection: ChangeDetectionStrategy.OnPush ,	// prevent change detection unless @Input reference is changed
 })
 
 export class BookingsComponent extends BaseComponent {
@@ -116,9 +116,9 @@ export class BookingsComponent extends BaseComponent {
 			this.add_form(b);
 
 			b.show_update_button 	= ! b.book_id ;
-			b.show_confirm_button 	= b.status_cd == 'P' && ! b.booker_ind ;
-			b.show_reject_button	= b.status_cd == 'P' && ! b.booker_ind ;
-			b.show_cancel_button	= b.status_cd == 'C' || b.status_cd == 'P' && !b.booker_ind;
+			b.show_confirm_button 	= b.status_cd == 'P' && ! b.is_booker ;
+			b.show_reject_button	= b.status_cd == 'P' && ! b.is_booker ;
+			b.show_cancel_button	= b.status_cd == 'C' || b.status_cd == 'P' && b.is_booker;
 			b.show_finish_button	= b.status_cd == 'C' ;
 			b.show_msg_button 		= b.status_cd != 'P' && b.book_id ;
 		}
@@ -162,8 +162,8 @@ export class BookingsComponent extends BaseComponent {
 		else if (!b.status_cd  			&& f.show_published  			) status=true;
 
 		let ret=false;
-		if ( b.rider_ind && f.show_rider && status) ret= true;
-		else if ( ! b.rider_ind && f.show_driver && status) ret= true;
+		if ( b.is_rider && f.show_rider && status) ret= true;
+		else if ( ! b.is_rider && f.show_driver && status) ret= true;
 
 		console.debug("201810131045 BookingsComponent.show_this() ret="+ ret)   ;
 

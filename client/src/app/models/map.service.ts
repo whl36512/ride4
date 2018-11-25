@@ -302,6 +302,23 @@ export class MapService {
 	     }
 	}
 
+	try_mark_pairs (pairs)
+	{
+	    for ( let index in pairs) {
+				let i = Number(index) ;
+				let pair= pairs[index];
+				if ( pair.p1) {
+					pair.p1.icon_type=DotIcon;
+					pair.p1.marker_text=i+1;
+				}
+				if ( pair.p2) {
+					pair.p2.icon_type=DotIcon;
+					pair.p2.marker_text=i+1;
+				}
+				this.try_mark_pair(pairs[index]) ;
+	     }
+	}
+
 	fit_book(book){
 		let pair1: any = {};
 		let pair2: any = {};

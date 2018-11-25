@@ -55,7 +55,7 @@ create table usr
 	, email 			email 
 	, bank_email 		email
 	, member_since 		sys_ts not null
-	, trips_published 		integer not null default 0	-- for driver
+	, trips_published 	integer not null default 0	-- for driver
 	, rides_published 	integer not null default 0		-- for rider
 	, trips_completed 	integer not null default 0     -- for driver
 	, rides_completed 	integer not null default 0		-- for rider
@@ -109,8 +109,8 @@ CREATE TABLE book
 	--,	trip_time	time		
 	,	p1			location	not null
 	,	p2			location		-- can be null if booker is driver
-	,	dir			decimal (6,2)
-	,	distance	decimal(8,2)	not null default 0
+	--,	dir			decimal (6,2)
+	,	distance	decimal(8,2)	-- can be null if booker is driver
 	,	seats		smallint
 	, 	cost		cost
 	,	penalty_on_booker		ridemoney
@@ -122,7 +122,9 @@ CREATE TABLE book
 	,	cancel_ts	timestamp with time zone
 	,	finish_ts	timestamp with time zone
 	,	status_cd	text not null default 'P' 	-- for booking, booked Pending confirmation, Confirmed, trip Started,
-							-- Cancelled by Offerer, Cancelled by Booker, Finished, Rejected by offerer
+							-- Cancelled by Driver, Cancelled by Rider, Finished, 
+							-- Rejected by Rider, Rejected by Driver, Cancelled while pending by Driver, 
+							-- Cancelled while pending by Rider
 	,	c_ts		sys_ts not null
 	,	m_ts		sys_ts not null
 	,	c_usr 		text

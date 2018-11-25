@@ -87,14 +87,11 @@
 		(click)="action(booking,i, C.URL_CONFIRM)">Confirm
 	</button>
 	<button *ngIf='bookings_from_db[i].show_reject_button'
-		(click)="action(booking,i, C.URL_REJECT)">Reject
+		(click)="action(booking,i, C.URL_CANCEL)">Reject
 	</button>
 	
-	<button *ngIf='bookings_from_db[i].show_driver_cancel_button' 
-		(click)="action(booking,i, C.URL_REJECT)">Cancel
-	</button>
-	<button *ngIf='bookings_from_db[i].show_rider_cancel_button'
-		(click)="action(booking,i, C.URL_CANCEL_BOOKING)">Cancel
+	<button *ngIf='bookings_from_db[i].show_cancel_button' 
+		(click)="action(booking,i, C.URL_CANCEL)">Cancel
 	</button>
 	<button *ngIf='bookings_from_db[i].show_finish_button'
 		(click)="action(booking,i, C.URL_FINISH)">Finish
@@ -108,7 +105,7 @@
                         >
 	</app-message>
 	<div >
- 		<div *ngIf='bookings_from_db[i].headline_d' >
+ 		<div *ngIf='bookings_from_db[i].is_rider' >
  			<span class='driver clickable-text' >
 				<a [href]='bookings_from_db[i].sm_link' target=_blank>
 					Driver:
@@ -124,19 +121,19 @@
 		</div>
 		<div *ngIf='bookings_from_db[i].p1d'>
 			<span class='from clickable-text' (click)='geo_mark(i)'>
-				<span *ngIf='  bookings_from_db[i].rider_ind'> Driver from:</span>
-				<span *ngIf='! bookings_from_db[i].rider_ind'> Me from:</span>
+				<span *ngIf='  bookings_from_db[i].is_rider'> Driver from:</span>
+				<span *ngIf='! bookings_from_db[i].is_rider'> Driver(Me) from:</span>
 			</span> 
 			{{bookings_from_db[i].p1d.display_name}} 
 		</div>
-		<div *ngIf='bookings_from_db[i].p2d' >
+		<div *ngIf='bookings_from_db[i].p2d.display_name' >
 			<span class='to clickable-text'   (click)='geo_mark(i)' >
-				<span *ngIf='  bookings_from_db[i].rider_ind'> Driver to:</span>
-				<span *ngIf='! bookings_from_db[i].rider_ind'> Me to:</span>
+				<span *ngIf='  bookings_from_db[i].is_rider'> Driver to:</span>
+				<span *ngIf='! bookings_from_db[i].is_rider'> Driver(me) to:</span>
 			</span> 
 			{{bookings_from_db[i].p2d.display_name}}
 		</div>
-		<div  *ngIf='bookings_from_db[i].headline_r'>
+		<div  *ngIf='! bookings_from_db[i].is_rider'>
  			<span class='driver clickable-text' >
 				<a [href]='bookings_from_db[i].sm_link' target=_blank>Passenger:</a>
 			</span>
@@ -150,15 +147,15 @@
 		</div>
 		<div  *ngIf='bookings_from_db[i].p1r' >
 			<span class='from clickable-text' (click)='geo_mark(i)'>
-				<span *ngIf='  bookings_from_db[i].rider_ind'> My Pickup:</span>
-				<span *ngIf='! bookings_from_db[i].rider_ind'> Passenger Pickup:</span>
+				<span *ngIf='  bookings_from_db[i].is_rider'> Passenger(Me) Pickup:</span>
+				<span *ngIf='! bookings_from_db[i].is_rider'> Passenger Pickup:</span>
 			</span> 
 			{{bookings_from_db[i].p1r.display_name}}
 		</div>
 		<div  *ngIf='bookings_from_db[i].p2r' >
 			<span class='to clickable-text'   (click)='geo_mark(i)'>
-				<span *ngIf='  bookings_from_db[i].rider_ind'> My Dropoff:</span>
-				<span *ngIf='! bookings_from_db[i].rider_ind'> Passenger Dropoff:</span>
+				<span *ngIf='  bookings_from_db[i].is_rider'> Passenger(Me) Dropoff:</span>
+				<span *ngIf='! bookings_from_db[i].is_rider'> Passenger Dropoff:</span>
 			</span> 
 			{{bookings_from_db[i].p2r.display_name}}
 		</div>

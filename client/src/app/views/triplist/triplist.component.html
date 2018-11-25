@@ -30,8 +30,8 @@
 					<td>{{trip.trip_date}}<br/>
 					{{trip.trip_time}}</td>
 					<td>{{trip.seats}}</td>
-					<td *ngIf='trip.rider_ind'>{{trip.cost.driver_cost}} </td>
-					<td *ngIf='!trip.rider_ind'>{{trip.cost.roder_cost}} </td>
+					<td *ngIf='trip.rider_ind'>{{trip.cost.cost_driver}} </td>
+					<td *ngIf='!trip.rider_ind'>{{trip.cost.cost_rider}} </td>
 					<td *ngIf='is_signed_in'>{{trip.seats_booked}}</td>
 					<td>
 						<button #j (click)="book(trip)"
@@ -47,28 +47,28 @@
 			<div ><span (click)='false'  
 				class='driver clickable-text' >Driver:</span>{{trip.headline}}</div>
 			<div ><span (click)='show_map(i)' 
-				class='from clickable-text' >Driver from:</span>{{trip.p1d.display_name}}</div>
+				class='from clickable-text' >Driver from:</span>{{trip.p1.display_name}}</div>
 			<div><span (click)='show_map(i)' 
-				class='to clickable-text' >Driver to:</span>{{trip.p2d.display_name}}</div>
+				class='to clickable-text' >Driver to:</span>{{trip.p2.display_name}}</div>
 			<div ><span (click)='show_map(i)' 
-				class='from clickable-text' >Passenger(me) Pickup</span>{{trip.p1r.display_name}}</div>
+				class='from clickable-text' >Passenger(me) Pickup</span>{{search_criteria.p1.display_name}}</div>
 			<div ><span (click)='show_map(i)' 
-				class='to clickable-text' >Passenger(me) Dropoff:</span>{{trip.p2r.display_name}}</div>
+				class='to clickable-text' >Passenger(me) Dropoff:</span>{{search_criteria.p2.display_name}}</div>
 		</div>
 		<div *ngIf='trip.rider_ind'>
 			<div ><span (click)='show_map(i)' 
-				class='from clickable-text' >Driver(me) from:</span>{{trip.p1d.display_name}}</div>
-			<div *ngIf='trip.p2d.display_name'><span (click)='show_map(i)' 
-				class='to clickable-text' >Driver(me) to:</span>{{trip.p2d.display_name}}</div>
+				class='from clickable-text' >Driver(me) from:</span>{{search_criteria.p1.display_name}}</div>
+			<div *ngIf='search_criteria.p2.display_name'><span (click)='show_map(i)' 
+				class='to clickable-text' >Driver(me) to:</span>{{search_criteria.p2.display_name}}</div>
 			<div ><span (click)='false'  
 				class='driver clickable-text' >Passenger:</span>{{trip.headline}}</div>
 			<div ><span (click)='show_map(i)' 
-				class='from clickable-text' >Passenger Pickup:</span>{{trip.p1r.display_name}}</div>
+				class='from clickable-text' >Passenger Pickup:</span>{{trip.p1.display_name}}</div>
 			<div ><span (click)='show_map(i)' 
-				class='to clickable-text' >Passenger Dropoff:</span>{{trip.p2r.display_name}}</div>
+				class='to clickable-text' >Passenger Dropoff:</span>{{trip.p2.display_name}}</div>
 		</div>
 		<span class='f08 button clickable-text' [innerHTML]="trip.google_map_url"></span>
-		<div class=f08 >Description: {{trip.description}}</div>
+		<div>Description: {{trip.description}}</div>
 		<p>
 	</div>
 </div>

@@ -158,10 +158,11 @@ export class MapControllerComponent extends BaseComponent {
 				else this.info_msg = `Found ${rows_found} offers.`
 				this.changeDetectorRef.detectChanges() ;
 
-				this.communicationService.send_msg(C.MSG_KEY_MARKER_BOOKS , trips_from_db);
+				this.mapService.try_mark_pairs(trips_from_db);
 				let pair = Util.deep_copy(search_criteria);
 				pair.line_color= C.MAP_LINE_COLOR_RIDER;
-				this.communicationService.send_msg(C.MSG_KEY_MARKER_PAIR , pair);
+				//this.communicationService.send_msg(C.MSG_KEY_MARKER_PAIR , pair);
+				this.mapService.try_mark_pair(pair);
 				this.search_is_running= false ;
 				console.debug ('201811041111 MapControllerComponent.search() finish map searching.') ;
 			},

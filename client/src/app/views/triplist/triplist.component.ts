@@ -23,6 +23,7 @@ import { AppComponent } from '../../app.component';
 import { C } 			from '../../models/constants';
 import { StorageService } from '../../models/gui.service';
 import { UserService } from '../../models/gui.service';
+import { Util 			} from '../../models/gui.service';
 import { DotIcon } from '../../models/map.service';
 import { PinIcon } from '../../models/map.service';
 import { BaseComponent      } from '../base/base.component' ;
@@ -45,7 +46,7 @@ export class TriplistComponent extends BaseComponent {
 
     trips_from_db: any ;
 
-	rider_criteria :any= null
+	search_criteria :any= null
 
     constructor( public changeDetectorRef       : ChangeDetectorRef
                 , public mapService             : MapService
@@ -56,22 +57,18 @@ export class TriplistComponent extends BaseComponent {
                 , public router                 : Router )  {
         super(changeDetectorRef,mapService, communicationService, dbService
                 , geoService, form_builder, router );
-  		console.debug("201809262245", this.class_name, ".constructor() enter")  ;
 
-		this.trips_from_db = this.Util.deep_copy(this.Status.search_result);
-
-  		console.debug("201809262245 JourneyComponent.constructor() this.trips_from_db=\n"
-				, C.stringify(this.trips_from_db))  ;
-		this.rider_criteria = this.Status.rider_criteria;
 
   		console.debug("201809262245", this.class_name, ".constructor() exit")  ;
   	} 
 
 	ngoninit() {
-		//this.subscription1 
-			//= this.form.valueChanges.subscribe(data => console.log('Form value changes', data));
-		//this.subscription2 
-			//= this.form.statusChanges.subscribe(data => console.log('Form status changes', data));
+		this.trips_from_db = this.Util.deep_copy(this.Status.search_result);
+
+  		console.debug("201809262245 JourneyComponent.constructor() this.trips_from_db=\n"
+				, C.stringify(this.trips_from_db))  ;
+		this.search_criteria = this.Status.search_criteria;
+		let sc = this.search_criteria;
 
 		this.communicationService.send_msg(C.MSG_KEY_MARKER_CLEAR, {});
 
@@ -82,52 +79,52 @@ export class TriplistComponent extends BaseComponent {
 			let t = this.trips_from_db[index];
 
 			if ( ! this.is_signed_in) t.status_msg = 'Please sign in';
-			else if ( ! t.sufficient_balance ) t.status_msg = 'Insufficient<br/>balance';
+			else if ( ! t.sufficient_balance && ! t.rider_ind) t.status_msg = 'Insufficient<br/>balance';
+			else if ( ! t.sufficient_balance && t.rider_ind) t.status_msg = 'Negative<br/>balance';
 			else t.status_msg=null ;
 
+			t.show_book_button = 	this.is_signed_in && t.sufficient_balance
+					//&& Number(this.search_criteria.distance)
+					;
 
-			t.show_book_button
-				= 	this.is_signed_in 
-					&& t.sufficient_balance
-					&& Number(this.rider_criteria.distance);
-
-			//this.Util.convert_book_to_pairs(j);
-
-
-			t.google_map_url
-				= MapService.google_map_string_from_points([
-									 t.p1d
-									, t.p1r 
-									, t.p2r 
-									, t.p2d 
-					]);
-
+			if (t.rider_ind) 
+				t.google_map_url = MapService.google_map_string_from_points([ sc.p1, t.p1 , t.p2, sc.p2 ]); 
+			else 
+				t.google_map_url = MapService.google_map_string_from_points([ t.p1, sc.p1 , sc.p1, t.p2 ]); 
 		}
-		this.communicationService.send_msg(C.MSG_KEY_MARKER_BOOKS, this.trips_from_db);
-		this.mark_rider_pair();
+		this.mapService.try_mark_pairs(this.trips_from_db);
+		this.mark_my_pair();
   	}
 
-	mark_rider_pair(){
-		if(this.rider_criteria){
-	    	let pair = this.Util.deep_copy ( this.rider_criteria);
+	mark_my_pair(){
+		if(this.search_criteria){
+	    	let pair = this.Util.deep_copy ( this.search_criteria);
 			pair.p1.icon_type=PinIcon;
 			pair.p2.icon_type=PinIcon;
 			pair.line_color =C.MAP_LINE_COLOR_RIDER;
-	    	this.communicationService.send_msg(C.MSG_KEY_MARKER_PAIR, pair);
+	    	//this.communicationService.send_msg(C.MSG_KEY_MARKER_PAIR, pair);
+	    	this.mapService.try_mark_pair(pair);
 		}
 	}
 
 	book(trip: any): void {
-		let book_to_db = this.Util.deep_copy(this.rider_criteria);
-		//this.Util.convert_pair_to_book(book_to_db);	
 
-		book_to_db.trip_id = trip.trip_id ;
+		let seats = trip.rider_ind? trip.seats	:	this.search_criteria.seats	;
+		let book_to_db = {
+				  trip_id	:	trip.trip_id
+				, seats		:	seats
+				, cost		:	trip.cost
+				, p1		:	this.search_criteria.p1
+				, p2		:	this.search_criteria.p2
+				, distance	:	this.search_criteria.distance
+				};
+
 		let book_from_db_observable     = this.dbService.call_db(C.URL_BOOK, book_to_db);
 		book_from_db_observable.subscribe(
 	    	book_from_db => {
 				console.debug("201808201201 JourneyComponent.book() book_from_db =" + C.stringify(book_from_db));
 				if (book_from_db.status_cd=='P') trip.info_msg='Booked, pending<br/>confirmation' ;
-				if (book_from_db.status_cd=='!P') trip.error_msg='Booking failed' ;
+				else 							 trip.error_msg='Booking failed' ;
 				trip.show_book_button= book_from_db.status_cd!='P';
 				trip.seats_booked= trip.seats_booked
 							+ book_from_db.seats;
@@ -147,15 +144,14 @@ export class TriplistComponent extends BaseComponent {
 		this.show_body =	C.BODY_NOSHOW;
 		//this.communicationService.send_msg(C.MSG_KEY_MAP_BODY_SHOW, {});
 		this.communicationService.send_msg(C.MSG_KEY_MARKER_CLEAR, {});
-		this.communicationService.send_msg(C.MSG_KEY_MARKER_BOOKS, this.trips_from_db);
+		this.mark_my_pair();
+		let trips = Util.deep_copy(this.trips_from_db);
+		this.mapService.try_mark_pairs(trips);
 
-		let j = this.trips_from_db[index];
-		//this.place_all_markers();
-		C.convert_trip_to_pair(j);
-		this.communicationService.send_msg(C.MSG_KEY_MARKER_FIT, j);
-		//j.line_color = C.MAP_LINE_COLOR_HIGHLIGHT;
-		j.line_weight = C.MAP_LINE_WEIGHT_HIGHLIGHT;
-		this.communicationService.send_msg(C.MSG_KEY_MAP_LINE, j);
-		this.mark_rider_pair();
+		let t = trips[index];
+		this.mapService.fit_pair(t);
+		//t.line_color = C.MAP_LINE_COLOR_HIGHLIGHT;
+		t.line_weight = C.MAP_LINE_WEIGHT_HIGHLIGHT;
+		this.mapService.draw_line(t);
 	}
 }
