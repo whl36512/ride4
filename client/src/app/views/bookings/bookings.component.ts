@@ -18,7 +18,9 @@ import { Subscription }						from 'rxjs';
 //import { EventEmitter} 					from '@angular/core';
 import { Input} 							from '@angular/core';
 //import { Output} 							from '@angular/core';
-import { Router				 }   from '@angular/router';
+import { Router				 }   			from '@angular/router';
+import { SimpleChanges          }   from '@angular/core';
+
 
 
 import { AppComponent } 					from '../../app.component';
@@ -67,11 +69,15 @@ export class BookingsComponent extends BaseComponent {
 
 
 		console.debug("201809262245 BookingsComponent.constructor() enter")	;
-		} 
+	} 
 
 	ngoninit():void {
-		console.debug("201809262246 BookingsComponent.ngOnInit() this.bookings_from_db = "
-			+ C.stringify(this.bookings_from_db) );
+
+	}
+
+	ngonchanges(changes: SimpleChanges) {
+		console.debug("201811260243", this.class_name,".ngonchanges() this.bookings_from_db = "
+			, C.stringify(this.bookings_from_db) );
 
 		let form_value_from_storage = StorageService.getForm(C.KEY_FORM_ACTIVITY_FILTER);
 
@@ -104,27 +110,18 @@ export class BookingsComponent extends BaseComponent {
 		,   show_finished		   : [f.show_finished, [] ]
 		});
 
-
-
-
 		for ( let index in this.bookings_from_db) { // for.. in.. creates index, not object
-			let b = Util.convert_book_to_pairs(this.bookings_from_db[index]) ;
-			this.reset_msgs(Number(index));
-			this.reset_button(Number(index));
-			b.google_map_url = MapService.google_map_string_from_points
-									([ b.p1d ,	b.p1r ,	b.p2r , b.p2d ]);
+			//let b = Util.convert_book_to_pairs(this.bookings_from_db[index]) ;
+			let b = this.bookings_from_db[index] ;
+			this.reset_msgs(index);
+			this.reset_button(index);
+
+			b.google_map_url = MapService.google_map_string(b) ;
 			this.add_form(b);
-
-			b.show_update_button 	= ! b.book_id ;
-			b.show_confirm_button 	= b.status_cd == 'P' && ! b.is_booker ;
-			b.show_reject_button	= b.status_cd == 'P' && ! b.is_booker ;
-			b.show_cancel_button	= b.status_cd == 'C' || b.status_cd == 'P' && b.is_booker;
-			b.show_finish_button	= b.status_cd == 'C' ;
-			b.show_msg_button 		= b.status_cd != 'P' && b.book_id ;
+			this.set_button(index);
 		}
-
 		this.set_filter();
-
+		
 	}
 
 	set_filter()
@@ -143,23 +140,27 @@ export class BookingsComponent extends BaseComponent {
 
 	show_booking(booking: any, index: number): boolean {
 		let b = booking;
+		let bb = booking.book;
 		let f = this.filter ;
-		console.debug("201810131007 BookingsComponent.show_this() booking.status_cd="
-			, b.status_cd)	;
+		console.debug("201810131007 BookingsComponent.show_this() booking.book.status_cd="
+			, bb?bb.status_cd:null)	;
 		console.debug("201810131007 BookingsComponent.show_this() index=", index)   ;
 		console.debug("201810131007 BookingsComponent.show_this() this.filter"
 			, f)  ;
+
 		let status  =false;
-		if	  (b.status_cd =='P' 		&& f.show_pending				) status=true;
-		else if (b.status_cd =='C' 		&& f.show_confirmed		  	) status=true;
-		else if (b.status_cd =='RD' 	&& f.show_rejected		  	) status=true;
-		else if (b.status_cd =='RR' 	&& f.show_rejected		  	) status=true;
-		else if (b.status_cd =='CD' 	&& f.show_cancelled_by_driver	) status=true;
-		else if (b.status_cd =='CPD' 	&& f.show_cancelled_by_driver	) status=true;
-		else if (b.status_cd =='CR' 	&& f.show_cancelled_by_rider 	) status=true;
-		else if (b.status_cd =='CPR' 	&& f.show_cancelled_by_rider 	) status=true;
-		else if (b.status_cd =='F' 		&& f.show_finished		   	) status=true;
-		else if (!b.status_cd  			&& f.show_published  			) status=true;
+		if (bb) {
+			if	  	(bb.status_cd =='P' 	&& f.show_pending				) status=true;
+			else if (bb.status_cd =='C' 	&& f.show_confirmed		  	) status=true;
+			else if (bb.status_cd =='RD' 	&& f.show_rejected		  	) status=true;
+			else if (bb.status_cd =='RR' 	&& f.show_rejected		  	) status=true;
+			else if (bb.status_cd =='CD' 	&& f.show_cancelled_by_driver	) status=true;
+			else if (bb.status_cd =='CPD' 	&& f.show_cancelled_by_driver	) status=true;
+			else if (bb.status_cd =='CR' 	&& f.show_cancelled_by_rider 	) status=true;
+			else if (bb.status_cd =='CPR' 	&& f.show_cancelled_by_rider 	) status=true;
+			else if (bb.status_cd =='F' 		&& f.show_finished		   	) status=true;
+		}
+		else if	(f.show_published  			) status=true;
 
 		let ret=false;
 		if ( b.is_rider && f.show_rider && status) ret= true;
@@ -189,61 +190,76 @@ export class BookingsComponent extends BaseComponent {
 		}
 	}
 
-	add_form (booking: any) : void {
-		//console.debug("201810072302 BookingsComponent.add_form() booking = " + C.stringify(booking) );
+	add_form (book: any) : void {
+		//console.debug("201810072302 BookingsComponent.add_form() book = " + C.stringify(book) );
+		let bt= book.trip;
+		let bb= book.book;
 		let form = this.form_builder.group({
-				trip_id	: [booking.trip_id, []],
-				book_id	 : [booking.book_id, []],
-				seats	: [booking.seats, []],
-				price	: [booking.price, []],
+				trip_id	: [bt.trip_id, []],
+				book_id	: [bb?bb.book_id:'', []],
+				seats	: [bt.seats, []],
+				price	: [bt.price, []],
 				}
 			);
 		console.debug("201810072247 BookingsComponent.add_form() form="+ C.stringify(form.value));
 
 		this.forms.push(form);
-
 	}
 
-	reset_msgs(index: number) : void{
+	reset_msgs(index: string) : void{
 		this.bookings_from_db[index].fail_msg=null;
 		this.bookings_from_db[index].update_msg=null;
 		super.reset_msg();
 	}
 
-	reset_button(index: number) : void{
-		this.bookings_from_db[index].show_driver_cancel_button=false;
-		this.bookings_from_db[index].show_rider_cancel_button=false;
+	reset_button(index: string) : void{
+		this.bookings_from_db[index].show_cancel_button=false;
 		this.bookings_from_db[index].show_reject_button=false;
 		this.bookings_from_db[index].show_confirm_button=false;
 		this.bookings_from_db[index].show_finish_button=false;
 		this.bookings_from_db[index].show_msg_button=false;
 	}
 
-	update(form: any, index: number): void {
+	set_button (index: string) : void{
+		let b = this.bookings_from_db[index];
+		if (b) {
+			b.show_update_button 	= ! b.book ;
+			let bb	= b.book;
+			if (bb) {
+				b.show_confirm_button 	= bb.status_cd == 'P' && ! b.is_booker ;
+				b.show_reject_button	= bb.status_cd == 'P' && ! b.is_booker ;
+				b.show_cancel_button	= bb.status_cd == 'C' || bb.status_cd == 'P' && b.is_booker;
+				b.show_finish_button	= bb.status_cd == 'C' && b.is_rider ;
+				b.show_msg_button 		= bb.status_cd != 'P' ;
+			}
+		}
+	}
+
+	update(form: any, index: string): void {
 			console.debug("201809261901 BookingsComponent.update() form=" 
 			, C.stringify(form.value) );
 		this.reset_msgs(index); // remove msg and show it again, so fade would work
 		this.changeDetectorRef.detectChanges() ;
 		let booking_to_db = form.value;
-		if ( booking_to_db.price== this.bookings_from_db[index].price
-			&& booking_to_db.seats == this.bookings_from_db[index].seats)
+		if ( booking_to_db.price== this.bookings_from_db[index].trip.price
+			&& booking_to_db.seats == this.bookings_from_db[index].trip.seats)
 		{
 			this.bookings_from_db[index].update_msg=C.OK_NO_CHANGE ;
 			this.changeDetectorRef.detectChanges() ;
 			return;
 		}
 
-		this.call_wservice(C.URL_UPD_TRIP, booking_to_db);
-/*
+		//this.call_wservice(C.URL_UPD_TRIP, booking_to_db);
 		let data_from_db_observable	 = this.dbService.call_db(C.URL_UPD_TRIP, booking_to_db);
 		data_from_db_observable.subscribe(
 				trip_from_db => {
 					console.debug("201810072326 BookingsComponent.update() trip_from_db =" 
 						, C.stringify(trip_from_db));
 
-					this.bookings_from_db[index].update_msg=C.OK_UPDATE;
-					this.bookings_from_db[index].seats=trip_from_db.seats;
-					this.bookings_from_db[index].price=trip_from_db.price;
+					let b = this.bookings_from_db[index] ;
+					b.update_msg=C.OK_UPDATE;
+					b.trip.seats=trip_from_db.seats;
+					b.trip.price=trip_from_db.price;
 					this.changeDetectorRef.detectChanges() ;
 			},
 			error => {
@@ -252,79 +268,45 @@ export class BookingsComponent extends BaseComponent {
 				this.changeDetectorRef.detectChanges() ;
 			}
 		) ;
-*/
 	}
 
-	on_get_data_from_wservice(data:any)
-	{
-		let tid=	data.trip_id;	
-		let bid=	data.book_id;
-		let i='';
-
-
-		if (! tid) {
-			this.error_msg=C.ACTION_FAIL;
-			return;
-		}
-
-		for ( let index in this.bookings_from_db){
-			let b = this.bookings_from_db[index];
-			if ( tid == b.trip_id &&  bid==b.book_id) {
-				i=index;
-				break;
-			}
-		}
-
-		if ( tid && !bid ) {
-			//upd_trip
-			this.bookings_from_db[i].update_msg=C.OK_UPDATE;
-			this.bookings_from_db[i].seats=data.seats;
-			this.bookings_from_db[i].price=data.price;
-		}
-		else if (tid && bid) {
-			let b = this.bookings_from_db[i];
-			if ( data.status_cd==b.status_cd){
-					// no status_cd change
-					b.faile_msg=C.ACTION_FAIL;
-				}
-			else if ( data.status_cd == 'C') {
-				b.status_cd= data.status_cd;
-				this.reset_button(Number(i));
-				b.book_status_description='Confirmed';
-				b.show_msg_button=true;
-				b.show_rider_cancel_button =b.is_rider;
-				b.show_driver_cancel_button = b.is_driver ;
-			}
-			else if ( data.status_cd == 'RD' || data.status_cd =='RR' ) {
-				b.status_cd= data.status_cd;
-				this.reset_button(Number(i));
-				b.book_status_description='Rejected';
-			}
-			else if ( data.status_cd == 'CD' || data.status_cd =='CR' 
-						|| data.status_cd =='CPD' || data.status_cd=='CPR') {
-					b.status_cd= data.status_cd;
-					this.reset_button(Number(i));
-					b.book_status_description='Cancelled'
-			}
-			else if ( data.status_cd == 'F') {
-					b.status_cd= data.status_cd;
-					this.reset_button(Number(i));
-					b.book_status_description='Finished'
-			}
-		}
-	}
-
-	action(form: any, index: number, action : string): void {
+	action(form: any, index: string, action : string): void {
 		this.reset_msgs(index); // remove msg and show it again, so fade would work
 		this.changeDetectorRef.detectChanges();	// have to do this so fade would work
 			console.debug("201809261901 BookingsComponent.action() form=" 
 			+ C.stringify(form.value) );
 		let booking_to_db = form.value;
 
-		this.call_wservice(action, booking_to_db);
+		//this.call_wservice(action, booking_to_db);
+		let data_from_db_observable	 = this.dbService.call_db(action, booking_to_db);
+		data_from_db_observable.subscribe(
+			book_from_db => {
+				console.debug("201811241702", this.class_name, '.action() book_from_db =' 
+					, C.stringify(book_from_db));
+				let n = book_from_db ; // new record
+				let o = this.bookings_from_db[index] ;	//old record
+				if ( n.book.status_cd==o.book.status_cd)
+				{
+					// no status_cd change
+					o.fail_msg=C.ACTION_FAIL;
+					this.changeDetectorRef.detectChanges() ;
+				} else 
+				{
+					o.book.status_cd= n.book.status_cd;
+					this.set_button(index);
+					o.book_status_description= n.book_status_description;
+					this.changeDetectorRef.detectChanges() ;
+				}
+			},
+			error => {
+				this.error_msg=error;
+				this.bookings_from_db[index].fail_msg=C.ACTION_FAIL ;
+				this.changeDetectorRef.detectChanges() ;
+			}
+		) ;
 	}
 
-	message(form: any, index: number, action : string): void {
+	message(form: any, index: string, action : string): void {
 		this.reset_msgs(index); // remove msg and show it again, so fade would work
 		this.bookings_from_db[index].show_messaging_panel 
 			= !this.bookings_from_db[index].show_messaging_panel;
@@ -335,10 +317,10 @@ export class BookingsComponent extends BaseComponent {
 		
 		this.communicationService.send_msg(C.MSG_KEY_MAP_BODY_SHOW, {});
 
-		this.communicationService.send_msg(C.MSG_KEY_MARKER_CLEAR, {});	
-		let b = Util.deep_copy(this.bookings_from_db[index]);
-		this.mapService.mark_book( b, index, false)
-		this.mapService.fit_book( b)
+		this.mapService.clear_markers();	
+		//this.mapService.mark_book( b, index, true);
+		this.mapService.mark_books( this.bookings_from_db, index);
+		this.mapService.fit_pair( this.bookings_from_db[index].trip);
 		this.communicationService.send_msg(C.MSG_KEY_SHOW_ACTIVITY_BODY,{show_body: C.BODY_NOSHOW});
 	}
 }

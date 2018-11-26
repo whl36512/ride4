@@ -9,7 +9,9 @@
 	(change)='onChange()'
 	/>
 	<span class="validity"></span>
-	<br/>
+<div *ngIf='error_msg!=null'    class=error [innerHTML]='error_msg'></div>
+<div *ngIf='warning_msg!=null'  class=warning [innerHTML]='warning_msg'></div>
+<div *ngIf='info_msg!=null'     class=info [innerHTML]='info_msg'></div>
 	Show history for <br/>
 	<label>
 		<input type=checkbox formControlName='show_booking'		(change)='on_filter()' />Booking
@@ -21,7 +23,7 @@
 		<input type=checkbox formControlName='show_penalty'		(change)='on_filter()' />Penalty
 	</label><br/>
 	<label>
-		<input type=checkbox formControlName='show_finished'	(change)='on_filter()' />Finished
+		<input type=checkbox formControlName='show_earning'	(change)='on_filter()' />Earning
 	</label><br/>
 	<label>
 		<input type=checkbox formControlName='show_deposit'		(change)='on_filter()' />Deposit
@@ -30,11 +32,6 @@
 		<input type=checkbox formControlName='show_withdraw'	(change)='on_filter()' />Withdraw
 	</label><br/>
 </form>
-<div *ngIf='error_msg!=null'    class=error [innerHTML]='error_msg'></div>
-<div *ngIf='warning_msg!=null'  class=warning [innerHTML]='warning_msg'></div>
-<div *ngIf='info_msg!=null'     class=info [innerHTML]='info_msg'></div>
-
-<p>
-<app-thistlist *ngIf='trans_to_show.length!=0' [trnx_from_db]="trans_to_show" > 
+<app-thistlist *ngIf='trans_to_show.length!=0' [tran_from_db]="trans_to_show" > 
 </app-thistlist>
 

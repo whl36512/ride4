@@ -114,8 +114,8 @@ pub fn mybooking(req: &mut Request) -> IronResult<Response> {
 	request_sql(req, constants::SQL_MYBOOKING, 2)
 }
 
-pub fn cancel_booking(req: &mut Request) -> IronResult<Response> {
-	request_sql(req, constants::SQL_CANCEL_BOOKING, 1)
+pub fn cancel(req: &mut Request) -> IronResult<Response> {
+	request_sql(req, constants::SQL_CANCEL, 1)
 }
 pub fn finish(req: &mut Request) -> IronResult<Response> {
 	request_sql(req, constants::SQL_FINISH, 1)
@@ -123,9 +123,9 @@ pub fn finish(req: &mut Request) -> IronResult<Response> {
 pub fn confirm(req: &mut Request) -> IronResult<Response> {
 	request_sql(req, constants::SQL_CONFIRM, 1)
 }
-pub fn reject(req: &mut Request) -> IronResult<Response> {
-	request_sql(req, constants::SQL_REJECT, 1)
-}
+//pub fn reject(req: &mut Request) -> IronResult<Response> {
+	//request_sql(req, constants::SQL_REJECT, 1)
+//}
 pub fn msgs(req: &mut Request) -> IronResult<Response> {
 	request_sql(req, constants::SQL_MSGS, 2)
 }

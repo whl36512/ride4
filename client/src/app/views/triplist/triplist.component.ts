@@ -79,20 +79,19 @@ export class TriplistComponent extends BaseComponent {
 			let t = this.trips_from_db[index];
 
 			if ( ! this.is_signed_in) t.status_msg = 'Please sign in';
-			else if ( ! t.sufficient_balance && ! t.rider_ind) t.status_msg = 'Insufficient<br/>balance';
-			else if ( ! t.sufficient_balance && t.rider_ind) t.status_msg = 'Negative<br/>balance';
+			else if ( ! t.sufficient_balance && ! t.trip.rider_ind) t.status_msg = 'Insufficient<br/>balance';
+			else if ( ! t.sufficient_balance && t.trip.rider_ind) t.status_msg = 'Negative<br/>balance';
 			else t.status_msg=null ;
 
 			t.show_book_button = 	this.is_signed_in && t.sufficient_balance
 					//&& Number(this.search_criteria.distance)
 					;
 
-			if (t.rider_ind) 
-				t.google_map_url = MapService.google_map_string_from_points([ sc.p1, t.p1 , t.p2, sc.p2 ]); 
-			else 
-				t.google_map_url = MapService.google_map_string_from_points([ t.p1, sc.p1 , sc.p1, t.p2 ]); 
+			let tmp_book= Util.deep_copy(t);
+			tmp_book.book= sc;
+			t.google_map_url = MapService.google_map_string(tmp_book); 
 		}
-		this.mapService.try_mark_pairs(this.trips_from_db);
+		this.mapService.mark_books(this.trips_from_db, null);
 		this.mark_my_pair();
   	}
 
@@ -109,9 +108,9 @@ export class TriplistComponent extends BaseComponent {
 
 	book(trip: any): void {
 
-		let seats = trip.rider_ind? trip.seats	:	this.search_criteria.seats	;
+		let seats = trip.trip.rider_ind? trip.trip.seats	:	this.search_criteria.seats	;
 		let book_to_db = {
-				  trip_id	:	trip.trip_id
+				  trip_id	:	trip.trip.trip_id
 				, seats		:	seats
 				, cost		:	trip.cost
 				, p1		:	this.search_criteria.p1
@@ -145,13 +144,8 @@ export class TriplistComponent extends BaseComponent {
 		//this.communicationService.send_msg(C.MSG_KEY_MAP_BODY_SHOW, {});
 		this.communicationService.send_msg(C.MSG_KEY_MARKER_CLEAR, {});
 		this.mark_my_pair();
-		let trips = Util.deep_copy(this.trips_from_db);
-		this.mapService.try_mark_pairs(trips);
-
-		let t = trips[index];
-		this.mapService.fit_pair(t);
-		//t.line_color = C.MAP_LINE_COLOR_HIGHLIGHT;
-		t.line_weight = C.MAP_LINE_WEIGHT_HIGHLIGHT;
-		this.mapService.draw_line(t);
+		//let trips = Util.deep_copy(this.trips_from_db);
+		this.mapService.mark_books(this.trips_from_db, index);
+		this.mapService.fit_book(this.trips_from_db[index]);
 	}
 }

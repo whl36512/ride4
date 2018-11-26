@@ -23,10 +23,10 @@ export class Constants{
 	static URL_MYOFFERS 		= '/ws/myoffers'	;
 	static URL_MYBOOKING 		= '/ws/mybooking'	;
 	static URL_UPD_JOURNEY 		= '/ws/upd_journey'	;
-	static URL_CANCEL_BOOKING 	= '/ws/cancel_booking'; // cancel by rider
+	static URL_CANCEL		  	= '/ws/cancel'		; 
 	static URL_FINISH 			= '/ws/finish'		; 
 	static URL_CONFIRM 			= '/ws/confirm'		; 
-	static URL_REJECT 			= '/ws/reject'		; // reject or cancel by driver
+	//static URL_REJECT 			= '/ws/reject'		; // reject or cancel by driver
 	static URL_MSGS 			= '/ws/msgs'		; 
 	static URL_SAVE_MSG 		= '/ws/save_msg'	; 
 	static URL_WITHDRAW	 		= '/ws/withdraw'	; 

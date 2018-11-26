@@ -27,14 +27,14 @@ pub static SQL_MYOFFER 			: &str =  "select a from funcs.myoffers($1, $2) a " ;
 pub static SQL_BOOK 			: &str =  "select a from funcs.book($1, $2) a " ;
 //pub static SQL_UPD_JOURNEY 	: &str =  "select a from funcs.upd_journey($1, $2) a " ;
 pub static SQL_MYBOOKING		: &str =  "select a from funcs.mybooking($1, $2) a " ;
-pub static SQL_CANCEL_BOOKING	: &str =  "select a from funcs.cancel_booking($1, $2) a " ;
+pub static SQL_CANCEL			: &str =  "select a from funcs.cancel($1, $2) a " ;
 pub static SQL_FINISH			: &str =  "select a from funcs.finish($1, $2) a " ;
 pub static SQL_CONFIRM			: &str =  "select a from funcs.confirm($1, $2) a " ;
-pub static SQL_REJECT			: &str =  "select a from funcs.reject($1, $2) a " ;
+//pub static SQL_REJECT			: &str =  "select a from funcs.reject($1, $2) a " ;
 pub static SQL_MSGS				: &str =  "select a from funcs.msgs($1, $2) a " ;
 pub static SQL_SAVE_MSG			: &str =  "select a from funcs.save_msg($1, $2) a " ;
 pub static SQL_WITHDRAW			: &str =  "select a from funcs.withdraw($1, $2) a " ;
-pub static SQL_THIST			: &str =  "select a from funcs.get_money_trnx($1, $2) a " ;
+pub static SQL_THIST			: &str =  "select a from funcs.get_money_tran($1, $2) a " ;
 
 pub static URL_WEBSOCKET_SERVER:   &str= "0.0.0.0:4202";
 

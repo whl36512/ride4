@@ -51,7 +51,7 @@ export class ThistlistComponent extends BaseComponent {
 	// By initialize trip to an empty structure, repeated calling of constructor can be avoided
 
 	@Input()
-		trnx_from_db: any;
+		tran_from_db: any;
 
 	@Input()
 		filter: any;
@@ -78,7 +78,7 @@ export class ThistlistComponent extends BaseComponent {
   	} 
 
 	ngoninit() {
-		console.debug("201809262246 ThistlistComponent.ngOnInit() this.trnx_from_db = "
-			+ C.stringify(this.trnx_from_db) );
+		console.debug("201809262246 ThistlistComponent.ngOnInit() this.tran_from_db = "
+			+ C.stringify(this.tran_from_db) );
   	}
 }

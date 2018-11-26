@@ -3,11 +3,11 @@ import { Injectable } from "@angular/core";
 //import { Location } from "./location";
 import * as L from "leaflet";
 import * as Rx from "rxjs";
-import { Subscription           }   from 'rxjs';
+import { Subscription		   }   from 'rxjs';
 
 
 import { C } 				from "./constants";
-import { Util     }			from './gui.service';
+import { Util	 }			from './gui.service';
 
 
 @Injectable()
@@ -26,12 +26,12 @@ export class MapService {
 	geo_watcher : any;
 
 	current_loc = {lat:null,lon:null};
-    geo_watcher_sub         : Subscription |null = null;
+	geo_watcher_sub		 : Subscription |null = null;
 
 
 	constructor() {
 		this.geo_watcher = this.watchPosition(null);
-    	this.subscribe_geo_watcher();
+		this.subscribe_geo_watcher();
 		const osmAttr =
 			"&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a>, " +
 			"Tiles courtesy of <a href='http://hot.openstreetmap.org/' target='_blank'>Humanitarian OpenStreetMap Team</a>";
@@ -76,13 +76,13 @@ export class MapService {
 		};
 	}
 
-    watchPosition(geolocationOptions) {
-        // http://xgrommx.github.io/rx-book/content/how_do_i/existing_api.html
-        if (!window.navigator.geolocation) return;
-        let source =  Rx.Observable.create(
+	watchPosition(geolocationOptions) {
+		// http://xgrommx.github.io/rx-book/content/how_do_i/existing_api.html
+		if (!window.navigator.geolocation) return;
+		let source =  Rx.Observable.create(
 			function (observer) {
 				var watchId = window.navigator.geolocation.watchPosition(
-        		//var watchId = window.navigator.geolocation.getCurrentPosition(
+				//var watchId = window.navigator.geolocation.getCurrentPosition(
 					function successHandler (loc) { observer.next(loc); }
 					, function errorHandler (err) { observer.error(err); }
 					, geolocationOptions
@@ -100,37 +100,37 @@ export class MapService {
 			console.debug('201811171420 MapService.watchPosition() geolocation observable failed');
 		}
 		return source;
-    }
+	}
 
-    subscribe_geo_watcher() {
-        console.debug('201811171456' , 'GeoService.subscribe_geo_watcher enter');
-        let subscription = this.geo_watcher.subscribe(
-            position => {
-                console.debug('201811171337 GeoService.subscribe_geo_watcher'
-                    , `Next: ${position.coords.latitude}, ${position.coords.longitude}`);
-                this.current_loc.lat = Math.round(position.coords.latitude*10000000)/10000000.0;
-                this.current_loc.lon = Math.round(position.coords.longitude*10000000)/10000000.0;
-                },
+	subscribe_geo_watcher() {
+		console.debug('201811171456' , 'GeoService.subscribe_geo_watcher enter');
+		let subscription = this.geo_watcher.subscribe(
+			position => {
+				console.debug('201811171337 GeoService.subscribe_geo_watcher'
+					, `Next: ${position.coords.latitude}, ${position.coords.longitude}`);
+				this.current_loc.lat = Math.round(position.coords.latitude*10000000)/10000000.0;
+				this.current_loc.lon = Math.round(position.coords.longitude*10000000)/10000000.0;
+				},
 
-            err => {
-                var message = '';
-                switch (err.code) {
-                    case err.PERMISSION_DENIED:
-                        message = 'Permission denied';
-                        break;
-                    case err.POSITION_UNAVAILABLE:
-                        message = 'Position unavailable';
-                        break;
-                    case err.PERMISSION_DENIED_TIMEOUT:
-                        message = 'Position timeout';
-                        break;
-                }
-                console.error('ERROR: 201811171434 GeoService.subscribe_geo_watcher',  message);
-            },
-            () => console.debug('201811171343 GeoService.subscribe_geo_watcher completed')
-        );
-        this.geo_watcher_sub= subscription ;
-    }
+			err => {
+				var message = '';
+				switch (err.code) {
+					case err.PERMISSION_DENIED:
+						message = 'Permission denied';
+						break;
+					case err.POSITION_UNAVAILABLE:
+						message = 'Position unavailable';
+						break;
+					case err.PERMISSION_DENIED_TIMEOUT:
+						message = 'Position timeout';
+						break;
+				}
+				console.error('ERROR: 201811171434 GeoService.subscribe_geo_watcher',  message);
+			},
+			() => console.debug('201811171343 GeoService.subscribe_geo_watcher completed')
+		);
+		this.geo_watcher_sub= subscription ;
+	}
 
 	clear_markers(){
 		for (let index in this.marker_arr){
@@ -234,27 +234,16 @@ export class MapService {
 
 	mark_book (book, index: number, is_highlight:boolean) {
 		if (!book) return;
+		let b = Util.deep_copy(book);
 		let i= index;
-		let google_map_url = book.google_map_url;
+		let google_map_url = b.google_map_url;
 		if (!google_map_url) google_map_url= MapService.google_map_string(book);
 
-		//Util.convert_book_to_pairs(book);
-		let popup = `<div>${book.trip_date} ${book.trip_time}</div><div>${google_map_url}</div>`
+		let popup = `<div>${b.trip.trip_date} ${b.trip.trip_time}</div><div>${google_map_url}</div>`
 
-		let pair1: any = {};
-		let pair2: any = {};
-		pair1.p1	= 	book.p1d	;
-		pair1.p2 	=	book.p2d	;
-		if ( pair1.p1) pair1.p1.marker_text= 'D'+ (i+1);
-		if ( pair1.p2) pair1.p2.marker_text= 'D'+ (i+1);
-		pair2.p1	= 	book.p1r	;
-		pair2.p2 	=	book.p2r	;
-		if ( pair2.p1) pair2.p1.marker_text= 'P'+ (i+1);
-		if ( pair2.p2) pair2.p2.marker_text= 'P'+ (i+1);
-
-		if( book.rider_ind ){
-			[pair1, pair2]= [pair2, pair1];
-		}
+		let pair1	= 	b.trip	;
+		if ( pair1.p1) pair1.p1.marker_text= (book.trip.rider_ind?'P':'D') + (i+1);
+		if ( pair1.p2) pair1.p2.marker_text= (book.trip.rider_ind?'P':'D') + (i+1);
 
 		pair1.p1.icon_type= DotIcon ;
 		pair1.p2.icon_type= DotIcon ;
@@ -270,16 +259,21 @@ export class MapService {
 		this.mark_pair(pair1);
 		//this.draw_line(pair);
 
-		if(!book.skip_book_part)
+		if(!b.skip_book_part && b.book)
 		{
+			let pair2	= b.book;
 			if ( pair2.p1) {
+				pair2.p1.marker_text= (!book.trip.rider_ind?'P':'D') + (i+1);
 				pair2.p1.icon_type= PinIcon ;
 				pair2.p1.popup= popup  ;
 			}
+
 			if ( pair2.p2) {
+				pair2.p2.marker_text= (!book.trip.rider_ind?'P':'D') + (i+1);
 				pair2.p2.icon_type= PinIcon ;
 				pair2.p2.popup= popup  ;
 			}
+
 			if ( is_highlight) {
 				//pair2.line_color=C.MAP_LINE_COLOR_HIGHLIGHT;
 				pair2.line_weight=C.MAP_LINE_WEIGHT_HIGHLIGHT;
@@ -295,16 +289,16 @@ export class MapService {
 
 	mark_books (books, highlight_index: number)
 	{
-	    for ( let index in books) {
+		for ( let index in books) {
 				let i = Number(index) ;
-				books[i].skip_book_part=true;  // do not mark book rp1 and rp2
+			//	books[i].skip_book_part=true;  
 				this.mark_book(books[i], i, i == highlight_index) ;
-	     }
+		 }
 	}
 
 	try_mark_pairs (pairs)
 	{
-	    for ( let index in pairs) {
+		for ( let index in pairs) {
 				let i = Number(index) ;
 				let pair= pairs[index];
 				if ( pair.p1) {
@@ -316,22 +310,13 @@ export class MapService {
 					pair.p2.marker_text=i+1;
 				}
 				this.try_mark_pair(pairs[index]) ;
-	     }
+		 }
 	}
 
 	fit_book(book){
-		let pair1: any = {};
-		let pair2: any = {};
-		pair1.p1	= 	book.p1d	;
-		pair1.p2 	=	book.p2d	;
-		pair2.p1	= 	book.p1r	;
-		pair2.p2 	=	book.p2r	;
+		let pair = book.trip;
 
-		if( book.rider_ind ){
-			[pair1, pair2]= [pair2, pair1];
-		}
-
-		this.fit_pair(pair1);
+		this.fit_pair(pair);
 	}
 
 
@@ -339,7 +324,7 @@ export class MapService {
   		var letters = '23456789AB';
   		var color = '#';
   		for (var i = 0; i < 6; i++) {
-    		color += letters[Math.floor(Math.random() * 10)];
+			color += letters[Math.floor(Math.random() * 10)];
   		}
   		return color;
 	}
@@ -443,17 +428,17 @@ export class MapService {
 		var polyline = L.polyline
 		(
 			[
-	    			[pair.p1.lat, pair.p1.lon],
-	    			[pair.p2.lat, pair.p2.lon],
-	    		],
-	    		{
+					[pair.p1.lat, pair.p1.lon],
+					[pair.p2.lat, pair.p2.lon],
+				],
+				{
 				color: pair.line_color?pair.line_color:C.MAP_LINE_COLOR_REGULAR,
 				weight: pair.line_weight?pair.line_weight:C.MAP_LINE_WEIGHT_REGULAR,
 				opacity: 1 ,
 				//dashArray: '20,15',
 				//lineJoin: 'round'
-	    		}
-	    	).addTo(this.map);
+				}
+			).addTo(this.map);
 		this.lines.push(polyline);
 		return true;
 	}
@@ -470,14 +455,14 @@ export class MapService {
 */
 
 	static google_map_string(book): string | null {
-		if (!book) return null ;
-		//Util.convert_book_to_pairs(book);
-		let p1 = book.p1d ;
-		let p2 = book.p1r ;
-		let p3 = book.p2r ;
-		let p4 = book.p2d ;
-		
-		return MapService.google_map_string_from_points([p1, p2, p3, p4]);
+
+		let b= book;
+		if (!b) return null ;
+		let p1d = !b.trip.rider_ind?	b.trip.p1   :(b.book?b.book.p1:null);
+		let p2d = !b.trip.rider_ind?	b.trip.p2   :(b.book?b.book.p2:null);
+		let p1r =  b.trip.rider_ind?	b.trip.p1   :(b.book?b.book.p1:null);
+		let p2r =  b.trip.rider_ind?	b.trip.p2   :(b.book?b.book.p2:null);
+		return MapService.google_map_string_from_points ([ p1d ,	p1r ,   p2r , p2d ]);
 	}
 
 	static google_map_string_from_points(points): string | null {
@@ -523,20 +508,20 @@ export class MapService {
 	}
 
 	static pair_guard(pair: any): any | null {
-        if(!pair) return null;
-        if(!MapService.point_guard(pair.p1)) return null;
-        if(!MapService.point_guard(pair.p2)) return null;
+		if(!pair) return null;
+		if(!MapService.point_guard(pair.p1)) return null;
+		if(!MapService.point_guard(pair.p2)) return null;
 		return pair;
 	}
 
 	static point_guard(point: any): any | null {
-        if(!point) return null;
-        let p = point;
-        if(!p) return null;
-        if ( ! p.lat ) return null;
-        if ( ! p.lon ) return null;
-        if ( ! Number(p.lat) ) return null;
-        if ( ! Number(p.lon) ) return null;
+		if(!point) return null;
+		let p = point;
+		if(!p) return null;
+		if ( ! p.lat ) return null;
+		if ( ! p.lon ) return null;
+		if ( ! Number(p.lat) ) return null;
+		if ( ! Number(p.lon) ) return null;
 		//p.lat= Number(p.lat);
 		//p.lon= Number(p.lon);
 		return point;

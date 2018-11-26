@@ -432,30 +432,39 @@ DECLARE
 	utc_epoch				bigint	;
 	timezone_offset			real	;
 	hours_before_trip		real	;
+	distance				real	;
 	distance_time_factor	real	;
 	c						RECORD	;
 BEGIN
 	c					:=	funcs.calc_cost(0,0,0)	;
-	trip_local_epoch	:=	extract(epcho from (t.trip_date + t.trip_time ));
-	utc_epoch			:=	extract(epcho from now());
+	trip_local_epoch	:=	extract(epoch from (t.trip_date + t.trip_time ));
+	utc_epoch			:=	extract(epoch from now());
 	timezone_offset		:=	(b.p1).lon/15	;
+	distance 			:=	case when t.rider_ind then t.distance else b.distance end;
+	
 
 	-- make sure hours_before_trip is always positive
 	hours_before_trip 	:= greatest(0.1, (trip_local_epoch- utc_epoch)/3600.0 - timezone_offset + 1); 
-	distance_time_factor:= round(least(1, sqrt(distance)/hours_before_trip)	* 	0.6*100/ 10) * 10.0 /100;
+	--distance_time_factor:= round(least(1, sqrt(distance)/hours_before_trip)	* 	0.6*100/ 10) * 10.0 /100;
+	distance_time_factor:= least(1, sqrt(distance)/hours_before_trip)	;
 
 	driver	:=	0	;
 	rider	:=	0	;
 	if		new_status_cd	= 'CPD'	then
-		driver	:=	c.booking_fee	;
+		driver	:=	(b.cost).booking_fee	;
 	elsif	new_status_cd	= 'CPR'	then
-		rider	:=	c.booking_fee	* b.seats 	;
+		rider	:=	(b.cost).booking_fee	* b.seats 	;
 	elsif	new_status_cd	= 'CD'	then
-		driver	:=	b.cost_driver	* (distance_time_factor + 0.2)	; -- apply addition 20% penalty
+		driver	:=	(b.cost).cost_driver	* distance_time_factor *.7	; -- upto 70%
 	elsif	new_status_cd	= 'CR'	then
-		rider	:=	c.booking_fee * b.seats 
-					+ (b.cost_rider - c.booking_fee * b.seats)	* distance_time_factor;
+		rider	:=	(b.cost).booking_fee * b.seats 
+					+ ( (b.cost).cost_rider - (b.cost).booking_fee * b.seats )	* distance_time_factor*0.5;
+	elsif	new_status_cd	in  ('RD', 'RR')	then
+		driver	:=	0	;
+		rider	:=	0	;
 	end if;
+	driver	:= round(driver,2);
+	rider	:= round(rider,2);
 END
 $body$
 language plpgsql;
@@ -469,7 +478,9 @@ DECLARE
 	u1				usr ;
 	b0				book ;
 	t0				trip ;
+	t1				trip ;
 	b1				book ;
+	b2				RECORD ;
 	ids				RECORD ;
 	c				RECORD ;
 	m1				RECORD ;
@@ -477,27 +488,35 @@ DECLARE
 	penalty 		RECORD;
 BEGIN
 	u0	:=	funcs.json_populate_record(NULL::usr 	, in_user)	; 
-	c	:=	from funcs.clac_cost(0,0,0)	;
+	c	:=	funcs.calc_cost(0,0,0)	;
 
 	SELECT b.* into b0	
-	FROM book b, funcs.json_populate_record(NULL::trip	, in_book) b0 
-	where b.book_id=b0.book_id	;
+	FROM book b, funcs.json_populate_record(NULL::book	, in_book) bb 
+	where b.book_id=bb.book_id	;
 
 	select * into t0	from	trip t where t.trip_id	=	b0.trip_id	;
 
 	new_status_cd	:=
 		case 	
-			when b0.rider_ind 	and b0.usr_id = u0.usr_id and b0.status_cd = 'P' then 'CPR' 
-			when b0.rider_ind 	and b0.usr_id = u0.usr_id and b0.status_cd = 'C' then 'CR' 
-			when t0.rider_ind 	and t0.usr_id = u0.usr_id and b0.status_cd = 'P' then 'RR' 
-			when not b0.rider_ind 	and b0.usr_id = u0.usr_id and b0.status_cd = 'P' then 'CPD' 
-			when not b0.rider_ind 	and b0.usr_id = u0.usr_id and b0.status_cd = 'C' then 'CD' 
+			when 	 t0.rider_ind 	and t0.usr_id = u0.usr_id and b0.status_cd = 'P' then 'RR' 
+			when 	 t0.rider_ind 	and t0.usr_id = u0.usr_id and b0.status_cd = 'C' then 'CR' 
+			when 	 t0.rider_ind 	and b0.usr_id = u0.usr_id and b0.status_cd = 'P' then 'CPD' 
+			when 	 t0.rider_ind 	and b0.usr_id = u0.usr_id and b0.status_cd = 'C' then 'CD' 
 			when not t0.rider_ind 	and t0.usr_id = u0.usr_id and b0.status_cd = 'P' then 'RD' 
-			else 'ERROR 201811192123 invalid case'
+			when not t0.rider_ind 	and t0.usr_id = u0.usr_id and b0.status_cd = 'C' then 'CD' 
+			when not t0.rider_ind 	and b0.usr_id = u0.usr_id and b0.status_cd = 'P' then 'CPR' 
+			when not t0.rider_ind 	and b0.usr_id = u0.usr_id and b0.status_cd = 'C' then 'CR' 
+			else 'ERROR invalid case t0.rider_ind b0.usr_id t0.usr_id u0.usr_id b0.status_cd=' 
+					|| coalesce(t0.rider_ind::text, 'NULL')||' '
+					|| coalesce(b0.usr_id::text, 'NULL')||' '
+					|| coalesce(t0.usr_id::text, 'NULL')||' '
+					|| coalesce(u0.usr_id::text, 'NULL')||' '
+					|| coalesce(b0.status_cd, 'NULL')
+					
 		end;
 
 	if new_status_cd like 'ERROR%' then 
-		return funcs.gen_error('201811192123', 'invalid case');
+		return funcs.gen_error('201811192123', new_status_cd );
 	end if;
 
 	penalty	:=	funcs.calc_penalty(new_status_cd, t0, b0);
@@ -516,30 +535,37 @@ BEGIN
 	returning b.*, t.usr_id as trip_usr_id into b1
 	;
 
-	update 	trip
-	set 	seats		=	least (seats + b1.seats. c.max_seats)
+	update 	trip t
+	set 	seats		=	least (seats + b1.seats, c.max_seats)
 	where 	t.trip_id	=	b1.trip_id
+	returning t.* into t1
 	;
 
 	-- return money to rider and apply penalty to rider or driver
 	m1	:=	funcs.ins_money_tran(
-	 		in_usr_id 			=> case when b1.rider_ind then b1.usr_id else b1.trip_usr_id end
-		,	in_actual_amount 	=> b1.cost_rider
+	 		in_usr_id 			=> case when t1.rider_ind then t1.usr_id else b1.usr_id end
+		,	in_actual_amount 	=> (b1.cost).cost_rider
 		,	in_tran_cd 			=> 'R'
-		,	in_ref_no 			=> b1.book_id) ;
+		,	in_ref_no 			=> b1.book_id::text) ;
 	m1	:=	funcs.ins_money_tran(
-	 		in_usr_id 			=> case when b1.rider_ind then b1.usr_id else b1.trip_usr_id end
+	 		in_usr_id 			=> case when t1.rider_ind then t1.usr_id else b1.usr_id end
 		,	in_actual_amount 	=> - b1.penalty_on_rider
 		,	in_tran_cd 			=> 'P'
-		,	in_ref_no 			=> b1.book_id) ;
+		,	in_ref_no 			=> b1.book_id::text) ;
 
 	m1	:=	funcs.ins_money_tran(
-	 		in_usr_id 			=> case when not b1.rider_ind then b1.usr_id else b1.trip_usr_id end
-		,	in_actual_amount 	=> - b1.penalty_on_rider
+	 		in_usr_id 			=> case when not t1.rider_ind then t1.usr_id else b1.usr_id end
+		,	in_actual_amount 	=> - b1.penalty_on_driver
 		,	in_tran_cd 			=> 'P'
-		,	in_ref_no 			=> b1.book_id) ;
+		,	in_ref_no 			=> b1.book_id::text) ;
 
-	return row_to_json(b1);
+	select b1 book
+		, s.book_status_description
+	into b2
+	from book_status s
+	where s.status_cd = b1.status_cd
+	;
+	return row_to_json(b2);
 END
 $body$
 language plpgsql;
@@ -553,6 +579,7 @@ DECLARE
 	u0	RECORD ;
 	b0	RECORD ;
 	b1	RECORD ;
+	b2	RECORD	;
 BEGIN
 	b0 := funcs.json_populate_record(NULL::book 	, in_book) ;
 	u0 := funcs.json_populate_record(NULL::usr 		, in_user) ;
@@ -573,7 +600,13 @@ BEGIN
 	returning b.* into b1
 	;
 
-	return row_to_json(b1);
+	select b1 book
+		, s.book_status_description
+	into b2
+	from book_status s
+	where s.status_cd = b1.status_cd
+	;
+	return row_to_json(b2);
 END
 $body$
 language plpgsql;
@@ -585,20 +618,46 @@ create or replace function funcs.finish( in_book text, in_user text)
 as
 $body$
 DECLARE
-	u0 RECORD ;
-	b0 RECORD ;
-	b1 RECORD ;
+	u0 usr ;
+	b0 book ;
+	b1 book ;
+	b2 RECORD ;
+	t0 trip ;
 	t1 RECORD ;
 	m1 RECORD ;
 	driver_id	uuid;
 	driver_earning	ridemoney;
 BEGIN
-	b0 := funcs.json_populate_record(NULL::book , in_book) ;
+	select b.*
+	into b0
+	from book b, funcs.json_populate_record(NULL::book , in_book)  bb
+	where b.book_id = bb.book_id
+	;
+
+	select t.*
+	into t0
+	from trip t
+	where t.trip_id = b0.trip_id
+	;
+	
 	u0 := funcs.json_populate_record(NULL::usr  , in_user) ;
 
 	if u0.usr_id is null then
 		return funcs.gen_error('201811191940', 'user not signed in');
 	end if;
+
+	if b0.status_cd = 'C' then
+		null;
+	else
+		return funcs.gen_error('201811260058', 'Booking is not in confirmed state');
+	end if;
+
+	if u0.usr_id in (b0.usr_id, t0.usr_id)  then
+		null;
+	else
+		return funcs.gen_error('201811260103', 'User is not offerer or booker');
+	end if;
+
 
 	update 	book b
 	set 	status_cd 	= 'F'
@@ -606,7 +665,6 @@ BEGIN
 			, finish_ts	= clock_timestamp()
 	from 	trip t
 	where 	b.book_id	=	b0.book_id
-	and		t.trip_id	= 	b.book_id
 	and		b.status_cd	='C'		-- make sure the booking is in confirmed state
 	and 	u0.usr_id in ( b.usr_id, t.usr_id) 	--double sure to defeat hacking
 	returning b.* into b1
@@ -618,27 +676,33 @@ BEGIN
 	;
 
 	update usr 
-	set trips_completed =trips_completed	+ case when t.rider_ind then 1 else 0 end
-	, 	rides_completed =rides_completed	+ case when t.rider_ind then 0 else 1 end
+	set trips_completed =trips_completed	+ case when t1.rider_ind then 1 else 0 end
+	, 	rides_completed =rides_completed	+ case when t1.rider_ind then 0 else 1 end
 	where usr_id =  b1.usr_id
 	;
 
 	update usr 
-	set trips_completed =trips_completed	+ case when t.rider_ind then 0 else 1 end
-	, 	rides_completed =rides_completed	+ case when t.rider_ind then 1 else 0 end
-	, 	trips_published =trips_published	+ case when t.rider_ind then 0 else 1 end
-	, 	rides_published =rides_published	+ case when t.rider_ind then 1 else 0 end
+	set trips_completed =trips_completed	+ case when t1.rider_ind then 0 else 1 end
+	, 	rides_completed =rides_completed	+ case when t1.rider_ind then 1 else 0 end
+	, 	trips_published =trips_published	+ case when t1.rider_ind then 0 else 1 end
+	, 	rides_published =rides_published	+ case when t1.rider_ind then 1 else 0 end
 	where usr_id =  t1.usr_id
 	;
 
 	-- assign money to driver
 	m1	:=	funcs.ins_money_tran( 
 			in_usr_id => case when t1.rider_ind then b1.usr_id else t1.usr_id end
-			, in_actual_amount => b1.cost_driver
+			, in_actual_amount => (b1.cost).cost_driver
 			, in_tran_cd => 'E'
-			, in_ref_no => b1.trip_id) ;
+			, in_ref_no => b1.trip_id::text) ;
 
-	return row_to_json(b1);
+	select b1 book
+		, s.book_status_description
+	into b2
+	from book_status s
+	where s.status_cd = b1.status_cd
+	;
+	return row_to_json(b2);
 END
 $body$
 language plpgsql;
@@ -859,29 +923,18 @@ BEGIN
 	RETURN QUERY
 	with a as (
 		select 
-			  t.p1
-			, t.p2
-			--, t.p1	p1r
-			--, t.p2	p2r
-			--, t.distance 
-			, t.description
-			, t.usr_id				
- 			, t.trip_id				 
- 			, t.trip_date		
- 			, t.trip_time	
-			, t.seats
+			  t trip
 			, funcs.calc_cost_driver(t.price, t.distance , t.seats ) as cost
-			--, (funcs.calc_cost_driver(t.price, t.distance , t.seats )).cost_driver 
-			, ur.headline
-			--, c0.p1 p1d
-			--, c0.p2 p2d
-			, t.rider_ind
+			, uo.headline
+			, case when uo.profile_ind then 'LinkedIn Profile available' 
+										else 'LinkedIn Profile Opted out' 
+				end profile_available
 			, case when u0.balance is null 	then false else true end is_signed_in 
 			, case when u0.balance >= 0 	then true else false end sufficient_balance
 			, coalesce ( b.seats, 0)	seats_booked	-- should always be 0
 		from trip t
-		join usr ur on (ur.usr_id = t.usr_id) -- to get riders headline and balance
-		left outer join book b on (b.trip_id=t.trip_id and b.usr_id=u0.usr_id)
+		join usr uo on (uo.usr_id = t.usr_id) -- to get the other user's headline and balance
+		left outer join book b on (b.trip_id=t.trip_id and b.usr_id=u0.usr_id and b.status_cd in ('P', 'C'))
 		where t.status_cd = 'A'
 		and t.usr_id	!= 	u0.usr_id
 		and t.seats > 0
@@ -898,7 +951,7 @@ BEGIN
 		and (t.p1).lon between (c0.p1).lon - t.distance/60/6 and (c0.p1).lon + t.distance/60/6
 		and (t.p2).lat between c0.box_p1_lat and c0.box_p2_lat
 		and (t.p2).lon between c0.box_p1_lon and c0.box_p2_lon
-		and ur.balance >= (funcs.calc_cost_driver(t.price, t.distance , t.seats )).cost_rider
+		and uo.balance >= (funcs.calc_cost_driver(t.price, t.distance , t.seats )).cost_rider
 		order by t.trip_date, t.trip_time
 		limit 100
 	)
@@ -1262,21 +1315,10 @@ BEGIN
 	)
 	, a as (
 		select 
-			  ids.trip_id
-			, t.usr_id
-			, ids.book_id
+			t trip
+			, b book
 			, ids.my_usr_id
 			, ids.other_usr_id
-			, case when t.rider_ind then t.p1 else b.p1 end p1r
-			, case when t.rider_ind then t.p2 else b.p2 end p2r
-			, case when t.rider_ind then b.p1 else t.p1 end p1d
-			, case when t.rider_ind then b.p2 else t.p2 end p2d
-			, t.description
-			-- , t.distance
-			, t.trip_date
-			, t.trip_time
-			, b.status_cd
-			, b.cost
 			, case when b.book_id is null	then t.price	else null end price
 			, case 
 				when b.usr_id	= ids.my_usr_id and t.rider_ind 		
@@ -1290,12 +1332,12 @@ BEGIN
 				else null
 			  end unified_cost -- either driver's cost or rider's cost
 			, coalesce(b.seats , t.seats) seats	-- either seats available or seats booked
-			, coalesce( bs.description, ts.description) status_description
+			--, coalesce( bs.description, ts.description) status_description
 			, case when t.usr_id = ids.my_usr_id then t.rider_ind 	else not t.rider_ind 	end is_rider
 			, case when t.usr_id = ids.my_usr_id then false 		else true 				end is_booker
 			, uo.headline	
-			, uo.sm_link	
-			, coalesce(bs.description , 'Published') book_status_description
+			, case when uo.profile_ind then uo.sm_link	else null end sm_link
+			, coalesce(bs.book_status_description , ts.trip_status_description) book_status_description
 		from ids 
 		join trip 				t 	on ( t.trip_id=ids.trip_id )
 		join trip_status		ts 	on ( ts.status_cd=t.status_cd)
@@ -1306,7 +1348,7 @@ BEGIN
 	
 	select row_to_json(a) 
 	from a
-	order by a.trip_date , a.trip_time, a.status_cd nulls last
+	order by (a.trip).trip_date , (a.trip).trip_time, (a.book).status_cd nulls last
 	;
 END
 $body$

@@ -113,8 +113,8 @@ CREATE TABLE book
 	,	distance	decimal(8,2)	-- can be null if booker is driver
 	,	seats		smallint
 	, 	cost		cost
-	,	penalty_on_booker		ridemoney
-	,	penalty_on_offerer		ridemoney
+	,	penalty_on_rider		ridemoney
+	,	penalty_on_driver		ridemoney
 	--,	rating		smallint
 	--,	review		text
 	,	book_ts		sys_ts
@@ -175,7 +175,7 @@ create table money_tran
 );
 create index ix_money_tran_usr_id on money_tran(usr_id);
 alter table money_tran add constraint ck_money_tran_tran_cd 
-	check (tran_cd in ('D', 'W', 'P', 'F', 'B', 'R') );
+	check (tran_cd in ('D', 'W', 'P', 'E', 'B', 'R') );
 alter table money_tran add constraint ck_money_tran_status_cd 
 	check (status_cd in ('K', 'F') );
 
@@ -217,7 +217,7 @@ insert into code values
 , ('TRAN'	, 'B'	, 'Booking')
 , ('TRAN'	, 'R'	, 'Return')
 , ('TRAN'	, 'E'	, 'Earning')		-- earning from completed Trip
-, ('TRIP'	, 'A'	, 'Active')
+, ('TRIP'	, 'A'	, 'Published')
 , ('TRIP'	, 'E'	, 'Expired')
 , ('TRIP'	, 'NB'	, 'No more booking allowed')
 --, ('JN'	, 'A'	, 'Active')
@@ -236,13 +236,13 @@ insert into code values
 --alter table msg add FOREIGN KEY (book_id) REFERENCES book (book_id);
 --alter table msg add FOREIGN KEY (usr_id) REFERENCES usr (usr_id);
 
-create view trip_status as select cd status_cd, description 
+create or replace view trip_status as select cd status_cd, description trip_status_description
 from code where code_type ='TRIP';
 
-create view book_status as select cd status_cd, description 
+create or replace view book_status as select cd status_cd, description book_status_description
 from code where code_type ='BK';
 
-create view money_tran_tran_cd as select cd tran_cd , description 
+create or replace view money_tran_tran_cd as select cd tran_cd , description 
 from code where code_type='TRAN';
 
 --grant all on public.criteria to ride;

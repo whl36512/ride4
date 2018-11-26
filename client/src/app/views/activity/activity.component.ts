@@ -83,7 +83,7 @@ export class ActivityComponent extends BaseComponent {
 
 		StorageService.storeForm(C.KEY_FORM_ACTIVITY, this.form.value); 
 
-	//	this.bookings_from_db = [] ;	 //remove list of journeys
+		//this.bookings_from_db = [] ;	 //remove list of journeys
 		let bookings_from_db_observable	
 			= this.dbService.call_db(C.URL_ACTIVITY, this.form.value);
 		bookings_from_db_observable.subscribe(

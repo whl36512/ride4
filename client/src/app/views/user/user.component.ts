@@ -68,13 +68,15 @@ export class UserComponent extends BaseComponent {
 			user_from_db => {
 				console.info("201808201201 UserComponent.constructor() user_from_db =" 
 					, C.stringify(user_from_db));
-				if (!user_from_db.error )	
+				if (user_from_db.error )	
 				{
-					this.user_from_db=user_from_db;
-					this.form.value.email = this.user_from_db.email;
-					this.form.value.profile_ind = this.user_from_db.profile_ind;
-				} else {
 					this.error_msg= user_from_db.error;
+				} else {
+					this.user_from_db=user_from_db;
+					this.form.patchValue ({
+            			  email			:	user_from_db.email
+						, profile_ind	: 	user_from_db.profile_ind 
+        			});
 				}
 				this.changeDetectorRef.detectChanges();
 			},

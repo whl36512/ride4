@@ -58,9 +58,9 @@ pub fn router_setup() -> iron::Chain  {
     router.post("/ws/myoffers", handlers::myoffers, "myoffers");
     //router.post("/ws/upd_journey", handlers::upd_journey, "upd_journey");
     router.post("/ws/mybooking", handlers::mybooking, "mybooking");
-    router.post("/ws/cancel_booking", handlers::cancel_booking, "cancel_booking");
+    router.post("/ws/cancel", handlers::cancel, "cancel");
     router.post("/ws/finish", handlers::finish, "finish");
-    router.post("/ws/reject", handlers::reject, "reject");
+    //router.post("/ws/reject", handlers::reject, "reject");
     router.post("/ws/confirm", handlers::confirm, "confirm");
     router.post("/ws/msgs", handlers::msgs, "msgs");
     router.post("/ws/save_msg", handlers::save_msg, "save_msg");

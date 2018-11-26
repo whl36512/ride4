@@ -13,6 +13,10 @@ import { Router					}	from '@angular/router';
 import { NavigationEnd					}	from '@angular/router';
 //import { TimerObservable } from 'rxjs/observable/TimerObservable';
 import { map, filter, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { OnChanges				}   from '@angular/core';
+import { SimpleChanges			}   from '@angular/core';
+import { SimpleChange		   }   from '@angular/core';
+
 
 //import { EventEmitter, Input, Output} from '@angular/core';
 
@@ -39,7 +43,7 @@ import { Status					} 	from '../../models/gui.service';
 	template: '',
 	//styleUrls: ['./base.component.css']
 })
-export abstract class BaseComponent implements OnInit, OnDestroy {
+export abstract class BaseComponent implements OnChanges, OnInit, OnDestroy {
 
 	//mapService				: MapService			;
 	//storageService			: StorageService		;	
@@ -126,6 +130,14 @@ export abstract class BaseComponent implements OnInit, OnDestroy {
 		//this.subscribe_nav_end();
 		console.debug ('201810290933 ', this.class_name,'.ngOnInit() exit.');
 	}
+
+	ngOnChanges(changes: SimpleChanges) {
+		// It’s called before ngOnInit and whenever one or more data-bound input properties change.
+		console.debug("201809262246", this.class_name, ".ngOnChanges() enter");
+		this.ngonchanges(changes);
+		console.debug("201809262246", this.class_name, ".ngOnChanges() exit");
+	}
+
 
 	subscribe_form_change(){
 		if (!this.form) return;
@@ -224,6 +236,8 @@ export abstract class BaseComponent implements OnInit, OnDestroy {
 
 
 	abstract ngoninit(): void;
+	ngonchanges(changes: SimpleChanges): void {};
+
 
 	ngOnDestroy(): void {
 		console.debug ('201810290932 ', this.class_name,'.ngOnDestroy() enter.');
