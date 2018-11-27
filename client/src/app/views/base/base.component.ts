@@ -325,7 +325,7 @@ export abstract class BaseComponent implements OnChanges, OnInit, OnDestroy {
 
 		else {
 			let loc='';
-			if ( p.loc==C.LOC_CURRENT )
+			if ( p.loc==C.LOC_CURRENT1 || p.loc==C.LOC_CURRENT2)
 				loc = this.mapService.current_loc.lat + ',' + this.mapService.current_loc.lon ;
 			else loc = p.loc;
 

@@ -140,7 +140,8 @@ export class Constants{
  	static MAP_Z_INDEX_HIDE		= 100 				;	
  	static MAX_SEARCH_RESULT	= 100 				;	
 
- 	static LOC_CURRENT	= 'Current Location'		;	
+ 	static LOC_CURRENT1	= 'Current Location'		;	
+ 	static LOC_CURRENT2	= 'Current Location.'		;	
 
 	
 

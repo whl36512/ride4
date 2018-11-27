@@ -33,15 +33,15 @@ CREATE TYPE location AS
 
 create type cost as
 (
-      booking_fee   ridemoney
-    , margin_factor numeric (3,2)
-    , price_driver  ridemoney
-    , price_rider   ridemoney
+      booking_fee   real
+    , margin_factor real
+    , price_driver  real
+    , price_rider   real
     , cost_driver   ridemoney
     , cost_rider    ridemoney
-    , max_price_driver  ridemoney
-    , max_price_rider   ridemoney
-    , max_seats     integer
+    , max_price_driver  real
+    , max_price_rider   real
+    , max_seats     smallint
 );
 
 
@@ -78,16 +78,16 @@ CREATE TABLE trip
 (
 		trip_id		sys_id		not null
 	,	usr_id		sys_id		not null
-	,	rider_ind	boolean		-- Driver Rider
-	,	trip_date	date		
-	,	trip_time	time		
+	,	rider_ind	boolean		not null -- Driver Rider
+	,	trip_date	date		not null
+	,	trip_time	time		not null
 	,	p1			location	not null
 	,	p2			location	not null
-	,	dir			real
-	,	price		ridemoney
-	,	distance	decimal(8,2)	not null default 0
-	,	seats		smallint
-	,	status_cd	text 	-- for offer, Active, Expired, No more Booking
+	,	dir			real		not null
+	,	price		real		not null
+	,	distance	real		not null 
+	,	seats		smallint	not null
+	,	status_cd	text 		not null -- for offer, Active, Expired, No more Booking
 	,	description text
 	,	c_ts		sys_ts not null
 	,	m_ts		sys_ts not null
@@ -110,7 +110,7 @@ CREATE TABLE book
 	,	p1			location	not null
 	,	p2			location		-- can be null if booker is driver
 	--,	dir			decimal (6,2)
-	,	distance	decimal(8,2)	-- can be null if booker is driver
+	,	distance	real	-- can be null if booker is driver
 	,	seats		smallint
 	, 	cost		cost
 	,	penalty_on_rider		ridemoney
