@@ -7,6 +7,7 @@
 	<div *ngIf='error_msg!=null' 	class=error [innerHTML]='error_msg'></div>
 	<div *ngIf='warning_msg!=null' 	class=warning [innerHTML]='warning_msg'></div>
 	<div *ngIf='info_msg!=null' 	class=info [innerHTML]='info_msg'></div>
+	<br/>
 
 
 	<div *ngFor="let trip of trips_from_db ;let i=index;
@@ -44,31 +45,26 @@
 			</tbody>
 		</table>
 		<div *ngIf='!trip.trip.rider_ind'>
-			<span class='driver' >Driver:</span>{{trip.headline}}<br/
+			<div class='c-lightgrey' >Driver</div>
+			{{trip.headline}}<br/>
 			<span class=warning>{{trip.profile_available}}</span>
-			<div ><span (click)='show_map(i)' 
-				class='from clickable-text' >Driver from:</span>{{trip.trip.p1.display_name}}</div>
-			<div><span (click)='show_map(i)' 
-				class='to clickable-text' >Driver to:</span>{{trip.trip.p2.display_name}}</div>
-			<div ><span (click)='show_map(i)' 
-				class='from clickable-text' >Passenger(me) Pickup</span>{{search_criteria.p1.display_name}}</div>
-			<div ><span (click)='show_map(i)' 
-				class='to clickable-text' >Passenger(me) Dropoff:</span>{{search_criteria.p2.display_name}}</div>
+			<div (click)='show_map(i)' class='from clickable-text' >Driver from</div>
+			{{trip.trip.p1.display_name}}
+			<div (click)='show_map(i)' class='to clickable-text' >Driver to</div>
+			{{trip.trip.p2.display_name}}
 		</div>
 		<div *ngIf='trip.trip.rider_ind'>
-			<div ><span (click)='show_map(i)' 
-				class='from clickable-text' >Driver(me) from:</span>{{search_criteria.p1.display_name}}</div>
-			<div *ngIf='search_criteria.p2.display_name'><span (click)='show_map(i)' 
-				class='to clickable-text' >Driver(me) to:</span>{{search_criteria.p2.display_name}}</div>
-			<span class='warning' >Passenger:</span>{{trip.headline}} <br/>
+			<div class='c-lightgrey' >Passenger</div>
+			{{trip.headline}} <br/>
 			<span class=warning>{{trip.profile_available}}</span>
-			<div ><span (click)='show_map(i)' 
-				class='from clickable-text' >Passenger Pickup:</span>{{trip.trip.p1.display_name}}</div>
-			<div ><span (click)='show_map(i)' 
-				class='to clickable-text' >Passenger Dropoff:</span>{{trip.trip.p2.display_name}}</div>
+			<div (click)='show_map(i)' class='from clickable-text' >Passenger Pickup</div>
+			{{trip.trip.p1.display_name}}
+			<div (click)='show_map(i)' class='to clickable-text' >Passenger Dropoff</div>
+			{{trip.trip.p2.display_name}}
 		</div>
 		<span class='f08 button clickable-text' [innerHTML]="trip.google_map_url"></span>
-		<div>Description: {{trip.trip.description}}</div>
+		<div class='c-lightgrey'>Description</div>
+ 		<div [innerHTML]="trip.trip.description"></div>
 		<p>
 	</div>
 </div>

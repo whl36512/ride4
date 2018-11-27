@@ -932,17 +932,33 @@ $body$
 		and t.price >= c0.min_price_rider
 		and t.trip_date between c0.date1 and c0.date2
 		and t.trip_time between c0.time1 and c0.time2
+		and uo.balance >= (funcs.calc_cost_rider(t.price, t.distance , t.seats )).cost_rider
 		-- trip start and end must inside the border box defined by p1 and p2
-		and (t.p1).lat	between c0.p1_lat_bb and c0.p2_lat_bb
-		and (t.p1).lon	between c0.p1_lon_bb and c0.p2_lon_bb
-		and (t.p2).lat	between c0.p1_lat_bb and c0.p2_lat_bb
-		and (t.p2).lon	between c0.p1_lon_bb and c0.p2_lon_bb
+		--and (t.p1).lat	between c0.p1_lat_bb and c0.p2_lat_bb
+		--and (t.p1).lon	between c0.p1_lon_bb and c0.p2_lon_bb
+		--and (t.p2).lat	between c0.p1_lat_bb and c0.p2_lat_bb
+		--and (t.p2).lon	between c0.p1_lon_bb and c0.p2_lon_bb
 		and t.distance	between c0.distance/3 and c0.distance *1.1 
 		and ( 	t.dir	between c0.min_dir and c0.max_dir
 				or	t.dir	 between c0.min_dir_360 and c0.max_dir_360
 				or	t.dir	 between c0.min_dir_360_1 and c0.max_dir_360_1
 			)
-		and uo.balance >= (funcs.calc_cost_rider(t.price, t.distance , t.seats )).cost_rider
+		and ((t.p1).lat-(c0.p1).lat)*c0.cos_dir_1- ((t.p1).lon-(c0.p1).lon)	* c0.sin_dir_1 
+				> - c0.axes_move_fixed
+		and ((t.p1).lat-(c0.p1).lat)*c0.cos_dir_2- ((t.p1).lon-(c0.p1).lon)	* c0.sin_dir_2 
+				> - c0.axes_move_fixed
+		and ((t.p2).lat-(c0.p1).lat)*c0.cos_dir_1- ((t.p2).lon-(c0.p1).lon)	* c0.sin_dir_1 
+					> - c0.axes_move_fixed
+		and ((t.p2).lat-(c0.p1).lat)*c0.cos_dir_2- ((t.p2).lon-(c0.p1).lon)	* c0.sin_dir_2 
+					> - c0.axes_move_fixed
+		and ((t.p1).lat-(c0.p2).lat)*c0.cos_dir_1- ((t.p1).lon-(c0.p2).lon)	* c0.sin_dir_1 
+					<  c0.axes_move_fixed
+		and ((t.p1).lat-(c0.p2).lat)*c0.cos_dir_2- ((t.p1).lon-(c0.p2).lon)	* c0.sin_dir_2 
+					<  c0.axes_move_fixed
+		and ((t.p2).lat-(c0.p2).lat)*c0.cos_dir_1- ((t.p2).lon-(c0.p2).lon)	* c0.sin_dir_1 
+					<  c0.axes_move_fixed
+		and ((t.p2).lat-(c0.p2).lat)*c0.cos_dir_2- ((t.p2).lon-(c0.p2).lon)	* c0.sin_dir_2 
+					<  c0.axes_move_fixed
 		order by t.trip_date, t.trip_time
 		limit 100
 	)

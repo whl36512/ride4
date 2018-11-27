@@ -73,7 +73,7 @@
 	</table>
 	<button *ngIf='bookings_from_db[i].show_msg_button'
 		(click)="message(null, i, null)">
-		Message
+		Chat
 		<span *ngIf='bookings_from_db[i].show_messaging_panel' > &#xfe3f;</span>
 		<span *ngIf='!bookings_from_db[i].show_messaging_panel' > &#xfe40;</span>
 	</button>
@@ -100,65 +100,72 @@
 		{{bookings_from_db[i].fail_msg}}
 	</span>
 	<app-message *ngIf='bookings_from_db[i].show_messaging_panel'
-                        [book_id]="bookings_from_db[i].book_id"
+                        [book_id]="bookings_from_db[i].book.book_id"
                         [index]="i"
                         >
 	</app-message>
-	<div >
- 		<div *ngIf='bookings_from_db[i].book' >
- 			<span class='driver clickable-text' >
-				<a [href]='bookings_from_db[i].sm_link' target=_blank>
-					<span *ngIf='bookings_from_db[i].is_rider'>Driver:</span>
-					<span *ngIf='!bookings_from_db[i].is_rider'>Passenger:</span>
-				</a>
-			</span>
+		<div *ngIf='bookings_from_db[i].book'>
+			<div *ngIf=' bookings_from_db[i].is_rider' class='c-lightgrey '>Driver</div>
+			<div *ngIf='!bookings_from_db[i].is_rider' class='c-lightgrey '>Passenger</div>
 			{{bookings_from_db[i].headline}} <br/>
  			<span class=warning *ngIf='!(bookings_from_db[i].sm_link)'>
 				LinkedIn profile opted out
-			</span>
+			</span> 
  			<span class='button clickable-text'  *ngIf='bookings_from_db[i].sm_link'>
 				<a [href]='bookings_from_db[i].sm_link' target=_blank>LinkedIn Profile</a>
 			</span>
 		</div>
-
-		<div>
-			<span class='from clickable-text' (click)='geo_mark(i)'>
-				<span *ngIf=' bookings_from_db[i].trip.rider_ind '>Passenger </span>
-				<span *ngIf='!bookings_from_db[i].trip.rider_ind '>Driver 	 </span>
-				<span *ngIf='!bookings_from_db[i].is_booker '>(me)</span>
-				from:
-			</span>
-			{{bookings_from_db[i].trip.p1.display_name}}  <br/>
-			<span class='to clickable-text' (click)='geo_mark(i)'>
-				<span *ngIf=' bookings_from_db[i].trip.rider_ind '>Passenger </span>
-				<span *ngIf='!bookings_from_db[i].trip.rider_ind '>Driver 	 </span>
-				<span *ngIf='!bookings_from_db[i].is_booker '>(me)</span>
-				to:
-			</span>
-			{{bookings_from_db[i].trip.p2.display_name}} 
+		<div *ngIf='bookings_from_db[i].is_booker'>
+			<div *ngIf='bookings_from_db[i].trip.rider_ind'>
+				<div class='from clickable-text' (click)='geo_mark(i)'> Passenger Pickup </div>
+				{{bookings_from_db[i].trip.p1.display_name}}
+				<div class='to clickable-text' (click)='geo_mark(i)'> Passenger Dropoff </div>
+				{{bookings_from_db[i].trip.p2.display_name}}
+			</div>
+			<div *ngIf='! bookings_from_db[i].trip.rider_ind'>
+				<div class='from clickable-text' (click)='geo_mark(i)'> Driver From </div>
+				{{bookings_from_db[i].trip.p1.display_name}}
+				<div class='to clickable-text' (click)='geo_mark(i)'> Driver To </div>
+				{{bookings_from_db[i].trip.p2.display_name}}
+			</div>
 		</div>
-		<div *ngIf='bookings_from_db[i].book' >
-			<span class='from clickable-text' (click)='geo_mark(i)'>
-				<span *ngIf='!bookings_from_db[i].trip.rider_ind '>Passenger </span>
-				<span *ngIf=' bookings_from_db[i].trip.rider_ind '>Driver 	 </span>
-				<span *ngIf=' bookings_from_db[i].is_booker '>(me)</span>
-				from:
-			</span>
-			{{bookings_from_db[i].trip.p1.display_name}}  <br/>
-			<div *ngIf='bookings_from_db[i].book.p2.display_name'>
-				<span class='to clickable-text' (click)='geo_mark(i)'>
-					<span *ngIf='!bookings_from_db[i].trip.rider_ind '>Passenger </span>
-					<span *ngIf=' bookings_from_db[i].trip.rider_ind '>Driver 	 </span>
-					<span *ngIf=' bookings_from_db[i].is_booker '>(me)</span>
-					to:
-				</span>
-				{{bookings_from_db[i].book.p2.display_name}} 
+
+		<div *ngIf='!bookings_from_db[i].is_booker'>
+			<div *ngIf='bookings_from_db[i].book'>
+				<div *ngIf='!bookings_from_db[i].trip.rider_ind'>
+					<div class='from clickable-text' (click)='geo_mark(i)'> Passenger Pickup </div>
+					{{bookings_from_db[i].book.p1.display_name}}
+					<div class='to clickable-text' (click)='geo_mark(i)'> Passenger Dropoff </div>
+					{{bookings_from_db[i].book.p2.display_name}}
+				</div>
+				<div *ngIf='bookings_from_db[i].trip.rider_ind'>
+					<div class='from clickable-text' (click)='geo_mark(i)'> Driver From </div>
+					{{bookings_from_db[i].book.p1.display_name}}
+					<div *ngIf='bookings_from_db[i].book.p2.display_name'>
+						<div class='to clickable-text' (click)='geo_mark(i)'> Driver To </div>
+						{{bookings_from_db[i].book.p2.display_name}}
+					</div>
+				</div>
+			</div>
+			<div *ngIf='!bookings_from_db[i].book'>
+				<div *ngIf=' bookings_from_db[i].trip.rider_ind'>
+					<div class='from clickable-text' (click)='geo_mark(i)'> Passenger(me) Pickup </div>
+					{{bookings_from_db[i].trip.p1.display_name}}
+					<div class='to clickable-text' (click)='geo_mark(i)'> Passenger(me) Dropoff </div>
+					{{bookings_from_db[i].trip.p2.display_name}}
+				</div>
+				<div *ngIf='!bookings_from_db[i].trip.rider_ind'>
+					<div class='from clickable-text' (click)='geo_mark(i)'> Driver(me) From </div>
+					{{bookings_from_db[i].trip.p1.display_name}}
+					<div class='to clickable-text' (click)='geo_mark(i)'> Driver(me) To </div>
+					{{bookings_from_db[i].trip.p2.display_name}}
+				</div>
 			</div>
 		</div>
 
 		<span class='button clickable-text' [innerHTML]="bookings_from_db[i].google_map_url"></span>
-		<div>Description: {{bookings_from_db[i].description}}</div>
-	</div>
+		<div class='c-lightgrey' >Description:</div>
+		<div [innerHTML]="bookings_from_db[i].trip.description"></div>
     </form>
 <p>
 </div>

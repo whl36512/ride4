@@ -33,7 +33,8 @@ import { MapService             }   from '../../models/map.service';
 	selector: 'app-activity'
 	,	templateUrl: './activity.component.html'
 	,	styleUrls: ['./activity.component.css']
-	,	changeDetection: ChangeDetectionStrategy.OnPush 	// prevent change detection unless @Input reference is changed
+// prevent change detection unless @Input reference is changed
+	,	changeDetection: ChangeDetectionStrategy.OnPush 	
 })
 
 export class ActivityComponent extends BaseComponent {
@@ -79,11 +80,12 @@ export class ActivityComponent extends BaseComponent {
 	{
 		this.reset_msg();
 		this.warning_msg='loading ...' ;
+	 	//remove list of journeys. detroy subpage and completely rebuild subpage after getting data
+		this.bookings_from_db = null ;
 		this.changeDetectorRef.detectChanges();
 
 		StorageService.storeForm(C.KEY_FORM_ACTIVITY, this.form.value); 
 
-		//this.bookings_from_db = [] ;	 //remove list of journeys
 		let bookings_from_db_observable	
 			= this.dbService.call_db(C.URL_ACTIVITY, this.form.value);
 		bookings_from_db_observable.subscribe(

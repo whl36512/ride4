@@ -96,7 +96,7 @@ export class MessageComponent extends BaseComponent {
 
 	get_form(): void {
 		this.form = this.form_builder.group({
-				//book_id	: [this.book_id, []],
+				book_id	: [this.book_id, []],
 				msg	: ['', []],
 				}
 			);
@@ -111,7 +111,7 @@ export class MessageComponent extends BaseComponent {
 		let msg_to_db = form.value;
 		if(msg_to_db.msg.trim() === '' ) return ;
 		
-		msg_to_db.book_id= this.book_id;
+		//msg_to_db.book_id= this.book_id;
 
 		let data_from_db_observable	 
 			= this.dbService.call_db(C.URL_SAVE_MSG, msg_to_db);

@@ -1,4 +1,4 @@
-<div class=center>Messages</div>
+<div class=center>Chats</div>
 <div class=warning *ngIf='false'>change_detect_count={{change_detect_counter()}}</div>
 <dl *ngFor="let msg of msgs_from_db ;let i=index;
 		let even=even;let odd=odd; let first = first; let last = last; trackBy:trackByFunc"
@@ -15,10 +15,10 @@
 <form [formGroup]="form" (ngSubmit)='true' >
 	<textarea formControlName=msg  > </textarea>
 	<br/>
-	<button type=button (click)="action(form ,0, Constants.URL_SAVE_MSG)">Send Message</button>
+	<button type=button (click)="action(form ,0, C.URL_SAVE_MSG)">Send Chat</button>
 </form>
 <div *ngIf='error_msg!=null' class=error>{{error_msg}}</div>
-<div class=warning>Note: Message window will close automatically 
+<div class=warning>Note: Chat window will close automatically 
 		{{C.MSG_NO_ACTIVITY_COUNT_DOWN}} seconds 
 		after no activities. {{msg_no_activity_count_down}}</div>
 <div *ngIf='warning_msg!=null' class=warning>{{warning_msg}}</div>
