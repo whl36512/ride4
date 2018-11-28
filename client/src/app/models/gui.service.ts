@@ -72,6 +72,17 @@ export class Util {
 		}
 	}
 
+/*
+clean_json(j:any)
+    {
+
+        let js = typeof(j) == 'string'? j: C.stringyfy(j);
+
+        j.replace(/": ""/g, '" : null').replace(/": "([0-9]+)"/g,
+    }
+*/
+
+
     static TODAY() { // TODAY is browser local time and is in the form of 2018-09-11
         let utc = new Date();
         let d = new Date(utc.getTime() - utc.getTimezoneOffset() * 60000)
