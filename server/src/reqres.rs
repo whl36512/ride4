@@ -1,3 +1,4 @@
+use regex::Regex;
 use iron::request::Request ;
 use std::io::Read;
 use typemap;
@@ -45,6 +46,17 @@ pub fn session_middleware (key: [u8; 32]) -> SessionMiddleware<Session, SessionK
     let middleware = SessionMiddleware::<Session, SessionKey, ChaCha20Poly1305SessionManager<Session>>::new( manager, config);
 
     middleware
+}
+
+pub fn clean_json_string(js : &str) -> String
+{
+	lazy_static! {
+        static ref RE1: Regex = Regex::new(r#"": """#).unwrap();
+        static ref RE2: Regex = Regex::new(r#"": "(\d+)""#).unwrap();
+    }
+	let after = RE1.replace_all(js, r#"": null"#);
+	let after = RE2.replace_all(&after, r#"": $1"#);
+	after.into_owned()
 }
 
 pub struct RequestComponent {
@@ -100,9 +112,13 @@ impl<'a, 'b> RideRequest for Request<'a, 'b> {
         //let user_from_token = Usr::from_token( & params) ; // token jwt string is in params
         //debug!("201808131424 user_from_token ={:?}", user_from_token) ;
 
-	let mut payload = String::new();
-	self.body.read_to_string(&mut payload).unwrap();
-	debug!("201808131424 request payload ={}", &payload) ;
+		let mut payload = String::new();
+		self.body.read_to_string(&mut payload).unwrap();
+		//debug!("201808131424 request payload ={}", &payload) ;
+		let payload = clean_json_string(&payload);
+		debug!("201808131424 request payload ={}", &payload) ;
+
+		
 	
         let user_from_cookie = Usr::from_js_string( & Some(payload.clone())) ;
         debug!("201808131424 user_from_cookie ={:?}", user_from_cookie) ;

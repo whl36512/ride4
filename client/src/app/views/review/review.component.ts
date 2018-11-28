@@ -64,16 +64,13 @@ export class ReviewComponent extends BaseComponent {
 	set_form(): void {
 		if(! this.form) {
 			this.form = this.form_builder.group({
-				book_id	: [this.book_id, []],
-				review	: [null, []],
-				rating	: [null, []],
+					book_id	: [this.book_id, []]
+				,	review	: ['', []]
+				,	rating	: [5, []]
 			});
 		}
-		if (this.review_from_db.review){
-			this.form.patchValue ({
-					reivew: this.review_from_db.review.review
-				, 	rating: this.review_from_db.review.rating
-			});
+		if (this.review_from_db){
+			this.form.patchValue (this.review_from_db);
 			
 		}
 		this.changeDetectorRef.detectChanges() ;
@@ -89,6 +86,8 @@ export class ReviewComponent extends BaseComponent {
 	//override the same function in base
 	on_get_data_from_wservice(review_from_db:any)
 	{
+		//console.debug('201811281120', this.class_name, '.on_get_data_from_wservice() review_from_db=\n'
+			//,C.stringify(review_from_db));
 		this.reset_msg();
 		this.review_from_db = review_from_db;
 		this.set_form();

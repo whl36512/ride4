@@ -830,7 +830,7 @@ BEGIN
 		--return query select funcs.gen_error('dshasd','called no_p2');
 		return query select * from funcs.search_region_no_p2(cr, u0);
 	elsif cr.rider_ind and (cr.p1).lat is not null and (cr.p2).lat is not null then
-		return query select funcs.gen_error('dshasd','called funcs.search_by_rider');
+		--return query select funcs.gen_error('dshasd','called funcs.search_by_rider');
 		return query select * from funcs.search_by_rider(cr, u0);
 	elsif not cr.rider_ind and (cr.p1).lat is not null and (cr.p2).lat is not null then
 		--return query select funcs.gen_error('dshasd','called funcs.search_by_driver');

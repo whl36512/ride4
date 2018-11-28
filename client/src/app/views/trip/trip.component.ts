@@ -148,7 +148,7 @@ export class TripComponent extends BaseComponent {
 	create_empty_trip () : any{
 		let trip =	{
 			  version			: 	C.VERSION_FORM_SEARCH
-			, rider_ind			: 	'false'
+			, rider_ind			: 	false
 			, trip_date			: 	this.today
 			, date1				:	this.today
 			, date2				:	this.today
@@ -175,13 +175,13 @@ export class TripComponent extends BaseComponent {
 	form_change_action(){
 		this.reset_msg() ;
 		let f= this.form.value;
-		if (f.rider_ind=='true') 	this.max_price	=	C.MAX_PRICE_RIDER;
+		if (f.rider_ind==true) 	this.max_price	=	C.MAX_PRICE_RIDER;
 		else				this.max_price = C.MAX_PRICE;
 
-		if (f.rider_ind=='true' ) 	this.from 	= 'Pickup Location';
+		if (f.rider_ind==true ) 	this.from 	= 'Pickup Location';
 		else				this.from	= 'Departure Location';
 
-		if (f.rider_ind=='true' ) 	this.to		= 'Dropoff Location';
+		if (f.rider_ind==true ) 	this.to		= 'Dropoff Location';
 		else				this.to		= 'Arrival Location';
 		console.debug("201808201534", this.class_name, "form_change_action() this.from" , this.from);
 
@@ -250,7 +250,7 @@ export class TripComponent extends BaseComponent {
 				validation_error = 'Please sign in to post a trip' ;
 			}
 			else if ( this.trip.distance == C.ERROR_NO_ROUTE) validation_error='ERROR: Trip not routable';
-			else if ( f.rider_ind =='true' 
+			else if ( f.rider_ind ==true 
 					&& this.trip.distance != C.ERROR_NO_ROUTE
 					&& this.user_from_db.balance < this.estimate_cost()
 					) 
@@ -263,13 +263,13 @@ export class TripComponent extends BaseComponent {
 
 		else if (this.form_key == C.KEY_FORM_SEARCH )	{
 			if ( this.trip.p1.lat == null )  {
-				if (f.rider_ind=='true') validation_error 	= 'Please enter Pickup Location';
-				else if (f.rider_ind=='false') validation_error 	= 'Please enter Departure Location';
+				if (f.rider_ind==true) validation_error 	= 'Please enter Pickup Location';
+				else if (f.rider_ind==false) validation_error 	= 'Please enter Departure Location';
 			}
 			else if (!this.trip.p2.lat)  {
-				if (f.rider_ind=='true') validation_error 	= 'Please enter Dropoff Location';
+				if (f.rider_ind==true) validation_error 	= 'Please enter Dropoff Location';
 			}
-			else if (f.rider_ind=='true' && this.trip.distance == C.ERROR_NO_ROUTE) 
+			else if (f.rider_ind==true && this.trip.distance == C.ERROR_NO_ROUTE) 
 				validation_error = 'ERROR: Trip not routable';
 			else if (f.date2<f.date1) validation_error= 'ERROR: Invalid date range';
 		}

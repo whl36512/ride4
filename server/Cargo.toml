@@ -39,8 +39,9 @@ iron-cors ="*"
 unicase = "*"
 chrono = "*"
 jsonwebtoken ="*"
-#regex = "1"
+regex = "1"
 websocket = "0.21.1"
+lazy_static ="*"
 
 
 

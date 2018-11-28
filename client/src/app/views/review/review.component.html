@@ -4,16 +4,16 @@
 	<dl>
 		<dt>Rating (anything other than 5 means you are somewhat unsatisfied) </dt>
 		<dd>
-			<label><input formControlName='rating' type="radio"  value=1 />1</label> 
-			<label><input formControlName='rating' type="radio"  value=2 />2</label> 
-			<label><input formControlName='rating' type="radio"  value=3 />3</label> 
-			<label><input formControlName='rating' type="radio"  value=4 />4</label> 
-			<label><input formControlName='rating' type="radio"  value=5 />5 satisfied</label> 
+			<label><input formControlName='rating' type="radio"  [value]='1' />1</label> 
+			<label><input formControlName='rating' type="radio"  [value]='2' />2</label> 
+			<label><input formControlName='rating' type="radio"  [value]='3' />3</label> 
+			<label><input formControlName='rating' type="radio"  [value]='4' />4</label> 
+			<label><input formControlName='rating' type="radio"  [value]='5' />5 satisfied</label> 
 		<dd>
 	</dl>
 	Review <br/>
-	<textarea class=review formControlName='review' [innerHTML]='review_from_db.review' 
-			placeholder='Your opinion counts'> 
+	<textarea class=review formControlName='review' 
+			placeholder='Your opinion counts'>
 	</textarea>
 	<br/>
 	<button type=submit >Save Rating and Review</button>
