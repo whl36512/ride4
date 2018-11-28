@@ -35,6 +35,9 @@ pub static SQL_MSGS				: &str =  "select a from funcs.msgs($1, $2) a " ;
 pub static SQL_SAVE_MSG			: &str =  "select a from funcs.save_msg($1, $2) a " ;
 pub static SQL_WITHDRAW			: &str =  "select a from funcs.withdraw($1, $2) a " ;
 pub static SQL_THIST			: &str =  "select a from funcs.get_money_tran($1, $2) a " ;
+pub static SQL_SAVE_REVIEW		: &str =  "select a from funcs.save_review($1, $2) a " ;
+pub static SQL_GET_REVIEW		: &str =  "select a from funcs.get_review($1, $2) a " ;
+pub static SQL_GET_REVIEWS		: &str =  "select a from funcs.get_reviews($1, $2) a " ;
 
 pub static URL_WEBSOCKET_SERVER:   &str= "0.0.0.0:4202";
 

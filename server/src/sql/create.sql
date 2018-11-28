@@ -253,6 +253,7 @@ grant all on public.book to ride;
 grant all on public.money_tran to ride;
 grant all on public.msg to ride;
 grant all on public.code to ride;
+grant all on public.review to ride;
 grant all on public.trip_status to ride;
 grant all on public.book_status to ride;
 grant all on public.money_tran_tran_cd to ride;

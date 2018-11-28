@@ -31,6 +31,9 @@ export class Constants{
 	static URL_SAVE_MSG 		= '/ws/save_msg'	; 
 	static URL_WITHDRAW	 		= '/ws/withdraw'	; 
 	static URL_THIST			= '/ws/thist'		; 
+	static URL_SAVE_REVIEW		= '/ws/save_review'	; 
+	static URL_GET_REVIEW		= '/ws/get_review'	; 
+	static URL_GET_REVIEWS		= '/ws/get_reviews'	; 
 	static URL_WEBS				= '/websocket'		; 
 	static URL_ROUTING			= '//router.project-osrm.org/route/v1/driving/' 	;
 	static URL_GEOCODE			= '//nominatim.openstreetmap.org/search/' 			;

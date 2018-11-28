@@ -425,21 +425,25 @@ export abstract class BaseComponent implements OnChanges, OnInit, OnDestroy {
 
 	call_wservice(url, payload)
 	{
-		let data_from_db_observable  = this.dbService.call_db(url, payload);
+		this.reset_msg();
+		this.changeDetectorRef.detectChanges() ;
+		let payload1 = Util.deep_copy(payload);
+		let data_from_db_observable  = this.dbService.call_db(url, payload1);
 		data_from_db_observable.subscribe(
 			data_from_db => {
 				console.info("201808201201", this.class_name, ".call_wservice() data_from_db ="
 					, C.stringify(data_from_db));
 				if (data_from_db.error_desc) {
+					this.reset_msg();
 					this.error_msg = C.stringify(data_from_db) ;
-					this.changeDetectorRef.detectChanges() ;
 				}
 				else {
 					this.on_get_data_from_wservice(data_from_db);
-					this.changeDetectorRef.detectChanges() ;
 					}
+				this.changeDetectorRef.detectChanges() ;
 			},
 			error => {
+				this.reset_msg();
 				this.error_msg=error;
 				this.changeDetectorRef.detectChanges() ;
 			}

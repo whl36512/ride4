@@ -71,6 +71,12 @@
 			</tr>
 		</tbody>
 	</table>
+	<button *ngIf='bookings_from_db[i].show_review_button'
+		(click)="review(null, i, null)">
+		Review
+		<span *ngIf='bookings_from_db[i].show_review_panel' > &#xfe3f;</span>
+		<span *ngIf='!bookings_from_db[i].show_review_panel' > &#xfe40;</span>
+	</button>
 	<button *ngIf='bookings_from_db[i].show_msg_button'
 		(click)="message(null, i, null)">
 		Chat
@@ -96,14 +102,19 @@
 	<button *ngIf='bookings_from_db[i].show_finish_button'
 		(click)="action(booking,i, C.URL_FINISH)">Finish
 	</button>
-	<span *ngIf='bookings_from_db[i].fail_msg!=null' class='error fade'>
+	<div *ngIf='bookings_from_db[i].fail_msg!=null' class='error fade'>
 		{{bookings_from_db[i].fail_msg}}
-	</span>
+	</div>
 	<app-message *ngIf='bookings_from_db[i].show_messaging_panel'
                         [book_id]="bookings_from_db[i].book.book_id"
                         [index]="i"
                         >
 	</app-message>
+	<app-review *ngIf='bookings_from_db[i].show_review_panel'
+                        [book_id]="bookings_from_db[i].book.book_id"
+                        [index]="i"
+                        >
+	</app-review>
 		<div *ngIf='bookings_from_db[i].book'>
 			<div *ngIf=' bookings_from_db[i].is_rider' class='c-lightgrey '>Driver</div>
 			<div *ngIf='!bookings_from_db[i].is_rider' class='c-lightgrey '>Passenger</div>

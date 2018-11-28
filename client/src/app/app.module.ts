@@ -52,6 +52,7 @@ import { MapControllerComponent } from './views/map-controller/map-controller.co
 import { SearchSettingComponent } from './views/search-setting/search-setting.component';
 import { AppRoutingModule } from './app-routing.module';
 import { MiscComponent } from './views/misc/misc.component';
+import { ReviewComponent } from './views/review/review.component';
 //import { BaseComponent } from './views/base/base.component' ;
 
 
@@ -81,6 +82,7 @@ import { MiscComponent } from './views/misc/misc.component';
 		MapControllerComponent,
 		SearchSettingComponent,
 		MiscComponent,
+		ReviewComponent,
 		//BaseComponent,
 	],
 	imports: [

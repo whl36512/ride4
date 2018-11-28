@@ -1456,3 +1456,94 @@ BEGIN
 END
 $body$
 language plpgsql;
+
+create or replace function funcs.get_review(in_review text, in_user text)
+	returns json
+as
+$body$
+DECLARE
+	r0	review	;
+	r1	RECORD	;
+	u0	usr ;
+BEGIN
+	r0	:= funcs.json_populate_record(NULL::review	, in_review)	;
+	u0	:= funcs.json_populate_record(NULL::usr 	, in_user)		;
+
+	select	b.book_id
+		,	case when t.usr_id = u0.usr_id then b.usr_id else t.usr_id end usr_id 
+		,	r.rating
+		,	r.review
+	into r1
+	from	book 	b	
+	join	trip	t	on	(t.trip_id	=	b.trip_id)
+	left outer join	review	r	on	(r.book_id	=	b.book_id and r.usr_id    <>  u0.usr_id)
+	where 	b.book_id	=	r0.book_id 
+	;
+	return row_to_json(r1);
+END
+$body$
+language plpgsql;
+
+create or replace function funcs.save_review(in_review text, in_user text)
+	returns json
+as
+$body$
+DECLARE
+	r0	review	;
+	u0	usr 	;
+	r1	json	;
+	r11	review	;
+	r2	review	;
+BEGIN
+	u0	:= funcs.json_populate_record(NULL::usr , in_user)		;
+	r0	:= funcs.json_populate_record(NULL::review , in_review)	;
+
+	r1	:= funcs.get_review(in_review, in_user);
+	r11	:= funcs.json_populate_record(NULL::review , r1::text)	;
+
+	if r11.review is null then
+		insert into review (book_id, usr_id, rating, review)
+		values (r11.book_id, r11.usr_id, r0.rating, r0.review)
+		returning * into r2
+		;
+	else
+		update review r
+		set rating	=	r0.rating
+		,	review	=	r0.review
+		where	r.book_id	=	r11.book_id
+		and		r.usr_id	=	r11.usr_id
+		returning r.* into r2
+		;
+	end if;
+
+	return row_to_json(r2);
+END
+$body$
+language plpgsql;
+
+create or replace function funcs.get_reviews(in_review text, in_user text)
+	returns setof json
+as
+$body$
+DECLARE
+	r0	review	;
+	r1	RECORD	;
+	u0	usr ;
+BEGIN
+	r0	:= funcs.json_populate_record(NULL::review	, in_review)	;
+	u0	:= funcs.json_populate_record(NULL::usr 	, in_user)		;
+	
+	if u0.usr_id is null then
+		return query select * from funcs.gen_error('201811272200', 'You must sign in to see reviews');
+	end if
+	;
+	
+	return query
+	select row_to_json(a)
+	from review a
+	where usr_id =	r0.usr_id
+	order by rating , m_ts desc
+	;
+END
+$body$
+language plpgsql;

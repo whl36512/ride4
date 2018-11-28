@@ -66,6 +66,9 @@ pub fn router_setup() -> iron::Chain  {
     router.post("/ws/save_msg", handlers::save_msg, "save_msg");
     router.post("/ws/withdraw", handlers::withdraw, "withdraw");
     router.post("/ws/thist", handlers::thist, "thist");
+    router.post("/ws/get_review", handlers::get_review, "get_review");
+    router.post("/ws/get_reviews", handlers::get_reviews, "get_reviews");
+    router.post("/ws/save_review", handlers::save_review, "save_review");
 
     let chain = iron::Chain::new(router);
     return chain ;

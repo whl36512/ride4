@@ -138,6 +138,15 @@ pub fn withdraw(req: &mut Request) -> IronResult<Response> {
 pub fn thist(req: &mut Request) -> IronResult<Response> {
 	request_sql(req, constants::SQL_THIST, 2)
 }
+pub fn get_review(req: &mut Request) -> IronResult<Response> {
+	request_sql(req, constants::SQL_GET_REVIEW, 1)
+}
+pub fn get_reviews(req: &mut Request) -> IronResult<Response> {
+	request_sql(req, constants::SQL_GET_REVIEWS, 2)
+}
+pub fn save_review(req: &mut Request) -> IronResult<Response> {
+	request_sql(req, constants::SQL_SAVE_REVIEW, 1)
+}
 
 pub fn echo(request: &mut Request) -> IronResult<Response> {
     let request_dump  = format!("{:?}", request);

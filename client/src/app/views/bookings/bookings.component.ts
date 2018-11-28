@@ -218,6 +218,7 @@ export class BookingsComponent extends BaseComponent {
 		this.bookings_from_db[index].show_confirm_button=false;
 		this.bookings_from_db[index].show_finish_button=false;
 		this.bookings_from_db[index].show_msg_button=false;
+		this.bookings_from_db[index].show_review_button=false;
 	}
 
 	set_button (index: string) : void{
@@ -230,7 +231,8 @@ export class BookingsComponent extends BaseComponent {
 				b.show_reject_button	= bb.status_cd == 'P' && ! b.is_booker ;
 				b.show_cancel_button	= bb.status_cd == 'C' || bb.status_cd == 'P' && b.is_booker;
 				b.show_finish_button	= bb.status_cd == 'C' && b.is_rider ;
-				b.show_msg_button 		= bb.status_cd != 'P' ;
+				b.show_msg_button 		= bb.status_cd == 'C';
+				b.show_review_button	= bb.status_cd.match(/^(F|CD|CR)$/);
 			}
 		}
 	}
@@ -310,6 +312,18 @@ export class BookingsComponent extends BaseComponent {
 		this.reset_msgs(index); // remove msg and show it again, so fade would work
 		this.bookings_from_db[index].show_messaging_panel 
 			= !this.bookings_from_db[index].show_messaging_panel;
+		if(this.bookings_from_db[index].show_messaging_panel) 
+			this.bookings_from_db[index].show_review_panel = false;
+		this.changeDetectorRef.detectChanges();	
+	}
+
+	review(form: any, index: string, action : string): void {
+		this.reset_msgs(index); // remove msg and show it again, so fade would work
+		this.bookings_from_db[index].show_review_panel 
+			= !this.bookings_from_db[index].show_review_panel;
+
+		if(this.bookings_from_db[index].show_review_panel) 
+			this.bookings_from_db[index].show_messaging_panel=false;
 		this.changeDetectorRef.detectChanges();	
 	}
 	
