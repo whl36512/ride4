@@ -189,7 +189,7 @@ END
 $body$
 language plpgsql;
 
-create or replace function funcs.get_usr( in_user1 text, in_user text)
+create or replace function funcs.get_usr( dummy text, in_user text)
 	returns json
 as
 $body$
@@ -197,14 +197,35 @@ DECLARE
 	u0	usr;
 	u1	usr;
 BEGIN
-	u0	:=	funcs.json_populate_record(NULL::usr, in_user1) ;
-	if u0.usr_id	then
-		NULL;
-	else
-		u0	:=	funcs.json_populate_record(NULL::usr, in_user) ;
-	end if;
+	u0	:=	funcs.json_populate_record(NULL::usr, in_user) ;
 
 	SELECT u.*
+	into u1
+	from usr u 
+	where u.usr_id	=	u0.usr_id
+	;
+	return row_to_json(u1);
+END
+$body$
+language plpgsql;
+
+create or replace function funcs.get_other_usr( in_user1 text, in_user text)
+	returns json
+as
+$body$
+DECLARE
+	u0	usr;
+	u1	RECORD;
+BEGIN
+	u0	:=	funcs.json_populate_record(NULL::usr, in_user1) ;
+
+	SELECT	u.usr_id
+		,	u.headline
+		,	u.member_since::date
+		,	u.trips_published  
+		,	u.rides_published  
+		,	u.trips_completed  
+		,	u.rides_completed  
 	into u1
 	from usr u 
 	where u.usr_id	=	u0.usr_id
@@ -1558,10 +1579,19 @@ BEGIN
 	;
 	
 	return query
+	with a as (
+		select	r.*
+		,	r.m_ts::date review_date
+		,	ur.headline  -- to get reviewer
+		from review r
+		join book b on (b.book_id=r.book_id)
+		join trip t on (t.trip_id=b.trip_id)
+		join usr ur on (ur.usr_id in (b.usr_id, t.usr_id) and ur.usr_id<>r0.usr_id) -- the reviewer
+		where r.usr_id =	r0.usr_id
+	)
 	select row_to_json(a)
-	from review a
-	where usr_id =	r0.usr_id
-	order by rating , m_ts desc
+	from a
+	order by a.rating , a.m_ts desc
 	;
 END
 $body$

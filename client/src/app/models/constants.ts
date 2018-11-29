@@ -12,6 +12,7 @@ export class Constants{
 
 	static URL_SAVE_USER 		= '/ws/save_user'	;
 	static URL_GET_USER 		= '/ws/get_user'	;
+	static URL_GET_OTHER_USER 	= '/ws/get_other_user'	;
 	static URL_UPD_USER 		= '/ws/upd_user'	;
 	static URL_INS_TRIP 		= '/ws/ins_trip'	;
 	static URL_UPD_TRIP 		= '/ws/upd_trip'	;

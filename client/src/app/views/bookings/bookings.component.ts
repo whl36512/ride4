@@ -117,6 +117,7 @@ export class BookingsComponent extends BaseComponent {
 			this.reset_button(index);
 
 			b.google_map_url = MapService.google_map_string(b) ;
+			b.reviews_url	='/reviews/'+ b.other_usr_id
 			b.stars = Util.get_stars(b.rating);
 			this.add_form(b);
 			this.set_button(index);
@@ -342,5 +343,8 @@ export class BookingsComponent extends BaseComponent {
 		this.mapService.mark_books( this.bookings_from_db, index);
 		this.mapService.fit_pair( this.bookings_from_db[index].trip);
 		this.communicationService.send_msg(C.MSG_KEY_SHOW_ACTIVITY_BODY,{show_body: C.BODY_NOSHOW});
+	}
+	show_reviews(other_usr_id: string){
+		this.router.navigate(['/reviews',  other_usr_id]);
 	}
 }

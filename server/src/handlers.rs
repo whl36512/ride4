@@ -83,6 +83,9 @@ pub fn get_session (req : &mut Request) -> IronResult<Response> {
 pub fn get_user(req: &mut Request) -> IronResult<Response> {
 	request_sql(req, constants::SQL_GET_USER, 1)
 }
+pub fn get_other_user(req: &mut Request) -> IronResult<Response> {
+	request_sql(req, constants::SQL_GET_OTHER_USER, 1)
+}
 
 pub fn upd_user(req: &mut Request) -> IronResult<Response> {
 	request_sql(req, constants::SQL_UPD_USER, 1)

@@ -1,20 +1,68 @@
+<div class='title'>Ratings and Reviews</div>
 <div *ngIf='error_msg!=null'    class=error [innerHTML]='error_msg'></div>
 <div *ngIf='warning_msg!=null'  class=warning [innerHTML]='warning_msg'></div>
 <div *ngIf='info_msg!=null'     class=info [innerHTML]='info_msg'></div>
+for {{user_from_db.headline}}
+<table>
+	<tbody>
+		<tr>
+			<td>Reviews</td>
+			<td>{{total_cnt}}</td>
+		</tr>
+		<tr>
+			<td>Average Rating</td>
+			<td>
+				<span class=star [innerHtml]='average_star'> </span>
+				{{average_rating}}
+			</td>
+		</tr>
+		<tr>
+			<td>Member since</td>
+			<td>{{user_from_db.member_since}}</td>
+		</tr>
+		<tr>
+			<td>Trips published as Driver</td>
+			<td>{{user_from_db.trips_published}}</td>
+		</tr>
+		<tr>
+			<td>Trips published as Rider</td>
+			<td>{{user_from_db.rides_published}}</td>
+		</tr>
+		<tr>
+			<td>Trips completed as Driver</td>
+			<td>{{user_from_db.trips_completed}}</td>
+		</tr>
+		<tr>
+			<td>Trips completed as Rider</td>
+			<td>{{user_from_db.rides_completed}}</td>
+		</tr>
+	</tbody>
+</table>
 
-<div class='title center'>Ratings and Reviews<div>
-
-<dl>
-	<dt>
-		{{this.total_cnt}} reviews. Average <span [innerHTML]='average_star'></span> {{average_rating}}
+<div *ngIf='!reviews_from_db' class=warning>
+	This user has not been reviewed, yet
+</div>
+<dl *ngIf='reviews_from_db'>
+	<dt *ngFor="let rating_cnt of rating_cnts ;let i=index;
+		let even=even;let odd=odd; let first = first; let last = last; trackBy:trackByFunc"
+		>
+		<span *ngIf='i>0'>
+			<span class=star [innerHTML]='rating_title[i]'></span>
+			<hr class=bar [ngStyle]="rating_style[i]">
+			{{rating_cnts[i]}}
+			( {{rating_pct[i]}}% )
+		</span>
 	</dt>
-	<dt *ngFor="let tran of rating_cnts ;let i=index;
+</dl>
+<p>
+<dl>
+	<dt *ngFor="let r of reviews_from_db ;let i=index;
 		let even=even;let odd=odd; let first = first; let last = last; trackBy:trackByFunc"
 		[ngClass]="{ odd: odd, even: even }">
-		<span *ngIf='i>0'>
-			<span innerHTML]='rating_title[i]'></span>
-			{{rating_cnts[i]}}
-			({{rating_pct[i]}}%)
-		</span>
+		<div class=f08>
+			<span class=star [innerHTML]='r.stars'></span> 
+			on {{r.review_date}} by {{r.headline}} 
+		</div>
+		<div class=data >{{r.review}}</div>
 	</dt>
 </dl>

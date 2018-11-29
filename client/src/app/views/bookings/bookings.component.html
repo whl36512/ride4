@@ -120,8 +120,10 @@
 		<div class='c_lightgrey'>
 			<span *ngIf=' bookings_from_db[i].is_rider' > Driver </span>
 			<span *ngIf='!bookings_from_db[i].is_rider' > Passenger </span>
-			<span class='clickable-text star' [innerHTML]='bookings_from_db[i].stars'
-				(click)='show_reviews(i)'>
+			<span class='clickable-text star' 
+				[innerHTML]='bookings_from_db[i].stars'
+				(click)='show_reviews(bookings_from_db[i].other_usr_id)'
+				>
 			</span>
 		</div>
 		{{bookings_from_db[i].headline}} <br/>
@@ -175,6 +177,6 @@
 
 	<span class='button clickable-text' [innerHTML]="bookings_from_db[i].google_map_url"></span>
 	<div class='c_lightgrey' >Description:</div>
-	<div [innerHTML]="bookings_from_db[i].trip.description"></div>
+	<div class=data [innerHTML]="bookings_from_db[i].trip.description"></div>
 <p>
 </div>
