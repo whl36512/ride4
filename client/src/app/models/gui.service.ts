@@ -168,6 +168,13 @@ export class Util {
 */
 
 
+	static get_stars(rating : number): string {
+		if(rating) {
+			return C.ICON_STAR.repeat(Math.round(rating)) + C.ICON_STAR_WHITE.repeat(5-Math.round(rating));
+		} else {
+			return 'not yet rated';
+		}
+	}
 	static hide_map() {
 		let map = document.getElementById('map');
 	let button = document.getElementById('map-close-button');

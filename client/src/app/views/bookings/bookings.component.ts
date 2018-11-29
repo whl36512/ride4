@@ -117,11 +117,17 @@ export class BookingsComponent extends BaseComponent {
 			this.reset_button(index);
 
 			b.google_map_url = MapService.google_map_string(b) ;
+			b.stars = Util.get_stars(b.rating);
 			this.add_form(b);
 			this.set_button(index);
 		}
 		this.set_filter();
 		
+	}
+	on_star_click(index: string) {
+		let b = this.bookings_from_db[index];
+		let usr_id =	b.is_booker?b.trip.usr_id:b.book.usr_id	;
+		this.router.navigate(['/reviews', usr_id]);	
 	}
 
 	set_filter()

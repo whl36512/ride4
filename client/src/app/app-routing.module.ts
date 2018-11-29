@@ -26,6 +26,7 @@ import { ThistComponent } from './views/thist/thist.component';
 import { MapControllerComponent } from './views/map-controller/map-controller.component';
 import { SearchSettingComponent } from './views/search-setting/search-setting.component';
 import { MiscComponent } from './views/misc/misc.component';
+import { ReviewsComponent } from './views/reviews/reviews.component';
 
 const appRoutes: Routes = [
 /*
@@ -102,6 +103,11 @@ const appRoutes: Routes = [
 		  path: 'misc'
 		, component: MiscComponent
 		, data: { title: 'Miscellaneous' }
+	},
+	{
+		  path: 'reviews/:usr_id'
+		, component: ReviewsComponent
+		, data: { title: 'Reviews' }
 	},
 	{ 
 		path: ''

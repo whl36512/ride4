@@ -189,15 +189,30 @@ END
 $body$
 language plpgsql;
 
-create or replace function funcs.get_usr( dummy text, in_user text)
+create or replace function funcs.get_usr( in_user1 text, in_user text)
 	returns json
 as
 $body$
-	SELECT row_to_json(u)
-	from funcs.json_populate_record(NULL::usr, in_user) s0
-	join usr u on ( u.usr_id= s0.usr_id);
+DECLARE
+	u0	usr;
+	u1	usr;
+BEGIN
+	u0	:=	funcs.json_populate_record(NULL::usr, in_user1) ;
+	if u0.usr_id	then
+		NULL;
+	else
+		u0	:=	funcs.json_populate_record(NULL::usr, in_user) ;
+	end if;
+
+	SELECT u.*
+	into u1
+	from usr u 
+	where u.usr_id	=	u0.usr_id
+	;
+	return row_to_json(u1);
+END
 $body$
-language sql;
+language plpgsql;
 
 create or replace function funcs.upd_usr( data text, in_user text)
 	returns json
@@ -857,6 +872,7 @@ $body$
 				then true else false 
 				end sufficient_balance
 			, uo.headline
+			, uo.rating
 			, case when uo.profile_ind then 'LinkedIn Profile available' 
 										else 'LinkedIn Profile Opted out' 
 				end profile_available
@@ -913,6 +929,7 @@ $body$
 			, case when u0.balance is null 	then false else true end is_signed_in 
 			, case when u0.balance >= 0 	then true else false end sufficient_balance
 			, uo.headline
+			, uo.rating
 			, case when uo.profile_ind then 'LinkedIn Profile available' 
 										else 'LinkedIn Profile Opted out' 
 				end profile_available
@@ -981,6 +998,7 @@ BEGIN
 			  t trip
 			, funcs.calc_cost_rider(t.price, t.distance , t.seats ) as cost
 			, uo.headline
+			, uo.rating
 			, case when uo.profile_ind then 'LinkedIn Profile available' 
 										else 'LinkedIn Profile Opted out' 
 				end profile_available
@@ -1389,6 +1407,7 @@ BEGIN
 			, case when t.usr_id = ids.my_usr_id then t.rider_ind 	else not t.rider_ind 	end is_rider
 			, case when t.usr_id = ids.my_usr_id then false 		else true 				end is_booker
 			, uo.headline	
+			, uo.rating	
 			, case when uo.profile_ind then uo.sm_link	else null end sm_link
 			, coalesce(bs.book_status_description , ts.trip_status_description) book_status_description
 		from ids 

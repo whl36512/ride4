@@ -99,6 +99,10 @@ export class Constants{
 	static ICON_ARROW_UP		= '\ufe3f'			;
  	//static ICON_ARROW_DOWN		= &#xfe40		;
  	static ICON_ARROW_DOWN		= '\ufe40'			;
+ 	static ICON_STAR			= '&starf;'			;
+ 	static ICON_STAR_WHITE			= '&star;'			;
+ 	static ICON_FISHEYE			= '&#9673;'			;
+
 
  	static EMAIL_DEPOSIT		= 'deposit@beegrove.com' ;
 

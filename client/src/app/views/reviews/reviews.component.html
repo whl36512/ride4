@@ -1,0 +1,20 @@
+<div *ngIf='error_msg!=null'    class=error [innerHTML]='error_msg'></div>
+<div *ngIf='warning_msg!=null'  class=warning [innerHTML]='warning_msg'></div>
+<div *ngIf='info_msg!=null'     class=info [innerHTML]='info_msg'></div>
+
+<div class='title center'>Ratings and Reviews<div>
+
+<dl>
+	<dt>
+		{{this.total_cnt}} reviews. Average <span [innerHTML]='average_star'></span> {{average_rating}}
+	</dt>
+	<dt *ngFor="let tran of rating_cnts ;let i=index;
+		let even=even;let odd=odd; let first = first; let last = last; trackBy:trackByFunc"
+		[ngClass]="{ odd: odd, even: even }">
+		<span *ngIf='i>0'>
+			<span innerHTML]='rating_title[i]'></span>
+			{{rating_cnts[i]}}
+			({{rating_pct[i]}}%)
+		</span>
+	</dt>
+</dl>

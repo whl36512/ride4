@@ -8,6 +8,8 @@ import { ChangeDetectionStrategy } from '@angular/core';
 import { ChangeDetectorRef } from '@angular/core';
 import { Input} from '@angular/core';
 //import { Output} from '@angular/core';
+import { Validators } from '@angular/forms';
+
 
 import { AppComponent } from '../../app.component';
 import { C } from '../../models/constants';
@@ -64,9 +66,9 @@ export class ReviewComponent extends BaseComponent {
 	set_form(): void {
 		if(! this.form) {
 			this.form = this.form_builder.group({
-					book_id	: [this.book_id, []]
-				,	review	: ['', []]
-				,	rating	: [5, []]
+					book_id	: [this.book_id, [Validators.required]]
+				,	review	: ['',[Validators.required]]
+				,	rating	: ['', [Validators.required]]
 			});
 		}
 		if (this.review_from_db){
@@ -79,7 +81,7 @@ export class ReviewComponent extends BaseComponent {
 	action(form: any, index: number, action : string): void {
 		if(form.value.review.trim() === '' ) return ;
 		this.call_wservice(action, form.value);
-		this.warning_msg	=	' Saving ...' ;
+		this.warning_msg	=	' Saving review ...' ;
 		this.changeDetectorRef.detectChanges() ;
 	}
 
@@ -89,7 +91,19 @@ export class ReviewComponent extends BaseComponent {
 		//console.debug('201811281120', this.class_name, '.on_get_data_from_wservice() review_from_db=\n'
 			//,C.stringify(review_from_db));
 		this.reset_msg();
-		this.review_from_db = review_from_db;
-		this.set_form();
+		if(review_from_db.book_id==this.book_id) {
+			if (this.review_from_db.book_id) {
+				this.info_msg='Review saved';
+			}
+			this.review_from_db = review_from_db;
+			this.set_form();
+		} else {
+			this.error_msg ='ERROR: Something wrong';
+		}
+
 	}
+    // the getter is required for reactive form validation to work
+    get review() { return this.form.get('review'  ); }
+    get rating() { return this.form.get('rating'  ); }
+
 }

@@ -53,6 +53,7 @@ import { SearchSettingComponent } from './views/search-setting/search-setting.co
 import { AppRoutingModule } from './app-routing.module';
 import { MiscComponent } from './views/misc/misc.component';
 import { ReviewComponent } from './views/review/review.component';
+import { ReviewsComponent } from './views/reviews/reviews.component';
 //import { BaseComponent } from './views/base/base.component' ;
 
 
@@ -83,6 +84,7 @@ import { ReviewComponent } from './views/review/review.component';
 		SearchSettingComponent,
 		MiscComponent,
 		ReviewComponent,
+		ReviewsComponent,
 		//BaseComponent,
 	],
 	imports: [

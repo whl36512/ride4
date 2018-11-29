@@ -58,7 +58,7 @@ export abstract class BaseComponent implements OnChanges, OnInit, OnDestroy {
 	error_msg				: string|null	= null;
 	warning_msg 			: string|null	= null;
 	info_msg				: string|null	= null;
-	validation_error			: string|null	= null;
+	validation_error		: string|null	= null;
 	change_detect_count		: number 		= 0;
 	show_body				: string|null	= C.BODY_SHOW ;
 	is_signed_in			: boolean 		= false;

@@ -34,20 +34,25 @@
         margin: 0rem;
 }
 input:invalid+span:after {
-	content: 'X';
+	content: '\2717';
 	padding-left: 5px;
 	color: red;
 }
 
 input:valid+span:after {
-	content: '✓';
+	content: '\2713' ;
 	padding-left: 5px;
 	color: green;
 }
 
-textarea#description {
-	width: 100%;
-	height: 5rem;
+textarea {
+	width: 95%;
+	&#description {
+		height: 5rem;
+	}
+	&.review {
+		height: 10rem;
+	}
 }
 
 input[type="time"] {
@@ -115,13 +120,8 @@ th {
 	background-color: #99ff99;
 }
 
-.from {
-	background-color: #99ff99;
-}
-.to {
-	background-color: #ff9999;
-}
-.c-lightgrey {
+.c_lightgrey {
+	width:	70%;
 	background-color: lightgrey;
 }
 .mapicon {
@@ -262,5 +262,31 @@ user-select: none;
 	color: white;
 	& a {
 		color: white;
+	}
+}
+
+.star {
+        font-size: 0.8rem;
+		color: red;
+}
+
+.from {
+	background-color: lightgrey;
+	width:	70%;
+	&:before {
+		content: '\25c9' ;
+		padding-left: 0.3rem;
+		color: green;
+    	font-size: 0.8rem;
+	}
+}
+.to {
+	background-color: lightgrey;
+	width:	70%;
+	&:before {
+		content: '\25c9';
+		padding-left: 0.3rem;
+		color: red;
+    	font-size: 0.8rem;
 	}
 }

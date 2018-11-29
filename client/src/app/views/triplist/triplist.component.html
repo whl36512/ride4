@@ -44,24 +44,23 @@
 				</tr>
 			</tbody>
 		</table>
-		<div *ngIf='!trip.trip.rider_ind'>
-			<div class='c-lightgrey' >Driver</div>
-			{{trip.headline}}<br/>
-			<span class=warning>{{trip.profile_available}}</span>
-			<div (click)='show_map(i)' class='from clickable-text' >Driver from</div>
-			{{trip.trip.p1.display_name}}
-			<div (click)='show_map(i)' class='to clickable-text' >Driver to</div>
-			{{trip.trip.p2.display_name}}
+		<div class='c-lightgrey' >
+			<span *ngIf=' trip.trip.rider_ind' > Passenger </span>
+			<span *ngIf='!trip.trip.rider_ind' > Driver </span>
+			<span class='clickable-text star' [innerHTML]='trip.stars' (click)='show_review(i)'> </span>
 		</div>
-		<div *ngIf='trip.trip.rider_ind'>
-			<div class='c-lightgrey' >Passenger</div>
-			{{trip.headline}} <br/>
-			<span class=warning>{{trip.profile_available}}</span>
-			<div (click)='show_map(i)' class='from clickable-text' >Passenger Pickup</div>
-			{{trip.trip.p1.display_name}}
-			<div (click)='show_map(i)' class='to clickable-text' >Passenger Dropoff</div>
-			{{trip.trip.p2.display_name}}
+		{{trip.headline}}<br/>
+		<span class=warning>{{trip.profile_available}}</span>
+		<div (click)='show_map(i)' class='from clickable-text' >
+			<span *ngIf=' trip.trip.rider_ind'> Passenger Pickup </span>
+			<span *ngIf='!trip.trip.rider_ind'> Driver from  </span>
 		</div>
+		{{trip.trip.p1.display_name}}
+		<div (click)='show_map(i)' class='to clickable-text' >
+			<span *ngIf=' trip.trip.rider_ind'> Passenger Dropoff </span>
+			<span *ngIf='!trip.trip.rider_ind'> Driver to  </span>
+		</div>
+		{{trip.trip.p2.display_name}}
 		<span class='f08 button clickable-text' [innerHTML]="trip.google_map_url"></span>
 		<div class='c-lightgrey'>Description</div>
  		<div [innerHTML]="trip.trip.description"></div>
