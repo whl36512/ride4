@@ -143,6 +143,7 @@ export class TripComponent extends BaseComponent {
 		);
 	
 		this.show_map();
+		this.show_body=C.BODY_SHOW;
   	}
 
 	create_empty_trip () : any{
@@ -230,6 +231,7 @@ export class TripComponent extends BaseComponent {
 		this.communicationService.send_msg(C.MSG_KEY_MARKER_CLEAR, {});
 		this.communicationService.send_msg(C.MSG_KEY_MARKER_PAIR, pair);
 		this.communicationService.send_msg(C.MSG_KEY_MARKER_FIT, pair);
+		this.show_body=C.BODY_NOSHOW;
 	};
 
 	estimate_cost(){

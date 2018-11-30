@@ -8,41 +8,13 @@
         overflow: visible;
         z-index:250;
         border: 0px solid #AAA;
-        font-size: 1rem;
-        background-color: #eee;
+        background-color: #fff;
         border-radius: 4px 4px 4px 4px;
         padding: 0.20rem;
         margin: 0.0rem, 0rem;
 		&.map-controller {
         	background-color: rgba(0,0,0,0);
 		}
-}
-
-.signinout {
-        cursor: pointer;
-        position: fixed;
-        width: auto;
-        top: 0.5rem;
-        right: 3rem;
-        overflow: visible;
-        z-index:200;
-        border: 1px solid #AAA;
-        font-size: 1rem;
-        background-color: #eee;
-        border-radius: 4px 4px 4px 4px;
-        padding: 0.2rem;
-        margin: 0rem;
-}
-input:invalid+span:after {
-	content: '\2717';
-	padding-left: 5px;
-	color: red;
-}
-
-input:valid+span:after {
-	content: '\2713' ;
-	padding-left: 5px;
-	color: green;
 }
 
 textarea {
@@ -55,11 +27,27 @@ textarea {
 	}
 }
 
-input[type="time"] {
-	width: 8rem;
-}
-input[type="date"] {
-	width: 8rem;
+input {
+	&[type="time"] {
+		width: 8rem;
+	}
+	&[type="date"] {
+		width: 8rem;
+	}
+	&[type="range"] {
+		width : 4rem;
+	}
+	&:invalid+span:after {
+		content: '\2717';
+		padding-left: 0.2rem;
+		color: red;
+	}
+
+	&:valid+span:after {
+		content: '\2713' ;
+		padding-left: 0.2rem;
+		color: green;
+	}
 }
 
 .rTable {
@@ -89,10 +77,10 @@ input[type="date"] {
 }
 
 .odd {
-        background-color: #eef;
+        background-color: #fff;
 }
 .even {
-        background-color: #efe;
+        background-color: #fff;
 }
 
 
@@ -101,7 +89,7 @@ table {
     border-collapse: collapse;
 }
 table, th, td {
-   border: 1px solid #ccc;
+   border: 1px solid #0cf;
    text-align: center; 
    vertical-align: middle;
 }
@@ -120,9 +108,9 @@ th {
 	background-color: #99ff99;
 }
 
-.c_lightgrey {
+.stitle {
 	width:	70%;
-	background-color: lightgrey;
+	background-color: #00ccff;
 }
 .mapicon {
 	text-align:center;
@@ -131,25 +119,19 @@ th {
 
 .clickable-text {
   	cursor: pointer;
-  	border-radius: 0.3rem;
-        &:hover {
-        	background-color: #888;
-			color:white;
-        }
+  	border-radius: 0.5rem;
+	padding:0.0rem 0.2rem;
+	position: relative;
+	left: 0rem;
+    &:hover {
+		filter: hue-rotate(30deg);
+		left: .1rem;
+    }
+    &:active {
+		filter: hue-rotate(45deg);
+    }
 }
 
-button.close-button {
-        /* use absolute to position child relative to its parent. 
-	parent must have absolue of fixed position */
-        position: fixed;
-        width: auto;
-        top: 0.5rem;
-        right: 4rem;
-	font-size: 1.5rem;
-	margin:0px;
-	padding:0.3rem;
-  	border-radius: 0.3rem;
-}
 .hide-unhide {
         //use absolute to position child relative to its parent. 
 		//parent must have absolue of fixed position */
@@ -163,27 +145,26 @@ button {
 	background-color: #44e;
 	color: white;
 	border: 0 none;
-  	border-radius: 0.3rem;
+  	border-radius: 1rem;
 	margin:0.1rem;
 	padding:0.3rem;
-
-
+	position: relative;
 
 	&:hover {
     	transition: all 150ms linear;
-	
-    	opacity: .85;
+		left: .1rem;
+		filter: hue-rotate(20deg);
   	}
   
   	&:active {
-    		transition: all 150ms linear;
-    		opacity: .75;
+    	transition: all 150ms linear;
+		filter: hue-rotate(40deg);
   	}
+	&[disabled] {
+		opacity: .5;
+	}
 }
 
-button[disabled] {
-	opacity: .5;
-}
 
 @keyframes fadeInOut {
   0% {
@@ -206,9 +187,6 @@ button[disabled] {
   animation-duration: 9s;
 }
 
-input[type="range"] {
-	width : 4rem;
-}
 
 span.popup {
   height: 0;
@@ -238,7 +216,7 @@ span.popup {
 }
 
 /*disable copy for buttons and menus*/
-button, .topnav {
+button, .topnav , .clickable-text , .button {
 -webkit-user-select: none;
 -khtml-user-select: none;
 -moz-user-select: none;
@@ -271,46 +249,49 @@ user-select: none;
 }
 
 .from {
-	background-color: lightgrey;
+	background-color: #00ccff;
 	width:	70%;
+	line-height	:1.2rem;  /* make bullseye bigger without changing line height*/
 	&:before {
 		content: '\25c9' ;
 		padding-left: 0.3rem;
 		color: green;
-    	font-size: 0.8rem;
+    	font-size: 1.3rem;  /* make bullseye bigger */
 	}
 }
 .to {
-	background-color: lightgrey;
+	background-color: #00ccff;
 	width:	70%;
+	line-height	:1.2rem;  /* make bullseye bigger without changing line height*/
 	&:before {
 		content: '\25c9';
 		padding-left: 0.3rem;
 		color: red;
-    	font-size: 0.8rem;
+    	font-size: 1.3rem;  /* make bullseye bigger */
 	}
 }
 
 .data  { white-space: pre; }
+
 .title  { 
-	background-color: lightgrey;
-    font-size: 1.1rem;
+	background-color: #00ccff;
+    font-size: 1.2rem;
 	text-align:center;
 }
 
-hr.bar {
-       display: inline-block;
-       position: relative;
-       padding: 0;
-       margin: 0rem 0.5rem ;
-       height: 0.2rem;
-       width: 100%;
-       max-height: 0.2rem;
-       font-size: 1px;
-       line-height: 0;
-       clear: both;
-       border: none;
-       border-top: 1px solid #aaaaaa;
-       border-bottom: 1px solid #ffffff;
-		background-color: red;
-    }
+div.bar {
+	display: inline-block;
+	position: relative;
+	padding: 0;
+	margin: 0rem 0rem ;
+	height: 2px;
+	width: 100%;
+	max-height: 2px;
+	font-size: 1px;
+	line-height: 0;
+	clear: both;
+	border: none;
+	border-top: 2px solid blue;
+	border-bottom: 1px solid #ffffff;
+	background-color: #00ccff;
+}

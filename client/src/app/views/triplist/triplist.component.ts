@@ -90,6 +90,7 @@ export class TriplistComponent extends BaseComponent {
 			let tmp_book= Util.deep_copy(t);
 			tmp_book.book= sc;
 			t.google_map_url = MapService.google_map_string(tmp_book); 
+			t.stars = Util.get_stars(t.rating);
 		}
 		this.mapService.mark_books(this.trips_from_db, null);
 		this.mark_my_pair();

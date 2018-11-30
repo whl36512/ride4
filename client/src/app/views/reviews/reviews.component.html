@@ -48,7 +48,7 @@ for {{user_from_db.headline}}
 		>
 		<span *ngIf='i>0'>
 			<span class=star [innerHTML]='rating_title[i]'></span>
-			<hr class=bar [ngStyle]="rating_style[i]">
+			<div class=bar [ngStyle]="rating_style[i]"></div>
 			{{rating_cnts[i]}}
 			( {{rating_pct[i]}}% )
 		</span>

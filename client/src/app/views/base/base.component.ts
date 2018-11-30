@@ -452,6 +452,10 @@ export abstract class BaseComponent implements OnChanges, OnInit, OnDestroy {
 
 	on_get_data_from_wservice(data_from_db: any) { };
 	validate_form(){}
+    show_reviews(other_usr_id: string){
+        this.router.navigate(['/reviews',  other_usr_id]);
+    }
+
 
 
 /*

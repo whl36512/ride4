@@ -2,15 +2,21 @@ html, body {
 	height: 100%;
 	margin: 0;
 	padding: 0;
-	font-family: helvetica, roboto, tahoma, arial, sans-serif;
+	font-family: helvetica, roboto, sans-serif;
 	color: black;
 	font-size: 1rem;
+	/*line-height: 1.3rem;*/
 }
 
 
 dl, dt, dd , div, span, a {
 	margin: 0rem;
 	padding: 0rem;
+}
+
+span {
+/* needed for line-height to work */
+	/*display:inline-block;*/
 }
 
 dd {
@@ -22,9 +28,9 @@ a {
 	text-decoration: none;
 	font-weight: normal;
 	color: black;
-}
-a:hover {
-	color: blue;
+	&:hover {
+		color: blue;
+	}
 }
 
 div.toggle, *[show=false] {
@@ -62,12 +68,3 @@ div.f15 {
 div.f18 {
 	font-size: 1.8rem;
 }
-
-input {
-	font-size: 1rem;
-}
-textarea {
-	font-size: 1rem;
-	width: 100%;
-}
-

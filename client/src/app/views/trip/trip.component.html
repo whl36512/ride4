@@ -4,8 +4,8 @@
 	<button (click)='show_body=C.BODY_SHOW'   *ngIf='show_body==C.BODY_NOSHOW' > {{C.ICON_ARROW_DOWN}}</button>
 </div>
 
-<div class="center f12" *ngIf='form_key==C.KEY_FORM_TRIP' >Publish my Trip</div>
-<div class="center f12" *ngIf='form_key==C.KEY_FORM_SEARCH' >Search Settings</div>
+<div class="title" *ngIf='form_key==C.KEY_FORM_TRIP' >Publish my Trip</div>
+<div class="title" *ngIf='form_key==C.KEY_FORM_SEARCH' >Search Settings</div>
 <div class={{show_body}} >
 	<form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf='show_form==C.BODY_SHOW'>
 		<dl> 
@@ -27,7 +27,6 @@
 			</dd>
 
 	  		<dd  class="f08 clickable-text" (click)='show_map()' > 
-				{{trip.p1.lat}}  {{trip.p1.lon}} <br/>
 				 {{trip.p1.display_name}}
 			</dd>
 		</dl>
@@ -46,7 +45,6 @@
 				</span>
 			</dd>
 			<dd class="f08 clickable-text" (click)='show_map()' >
-				{{trip.p2.lat}} {{trip.p2.lon}} <br/>
 				{{trip.p2.display_name	}}
 			</dd>
 			<dt>

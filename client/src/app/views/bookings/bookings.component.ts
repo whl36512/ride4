@@ -344,7 +344,4 @@ export class BookingsComponent extends BaseComponent {
 		this.mapService.fit_pair( this.bookings_from_db[index].trip);
 		this.communicationService.send_msg(C.MSG_KEY_SHOW_ACTIVITY_BODY,{show_body: C.BODY_NOSHOW});
 	}
-	show_reviews(other_usr_id: string){
-		this.router.navigate(['/reviews',  other_usr_id]);
-	}
 }

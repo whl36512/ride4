@@ -38,6 +38,7 @@
 <div *ngFor="let booking of forms ;let i=index;
 		let even=even;let odd=odd; let first = first; let last = last; trackBy:trackByFunc"
 		[ngClass]="{ odd: odd, even: even }">
+	<div class=bar></div>
 	<form [formGroup]="booking" (ngSubmit)='onSubmit()'
 		*ngIf='bookings_from_db[i].show_booking'>
       	<table>
@@ -117,7 +118,7 @@
                         >
 	</app-review>
 	<div *ngIf='bookings_from_db[i].book'>
-		<div class='c_lightgrey'>
+		<div class='stitle'>
 			<span *ngIf=' bookings_from_db[i].is_rider' > Driver </span>
 			<span *ngIf='!bookings_from_db[i].is_rider' > Passenger </span>
 			<span class='clickable-text star' 
@@ -176,7 +177,7 @@
 	</div>
 
 	<span class='button clickable-text' [innerHTML]="bookings_from_db[i].google_map_url"></span>
-	<div class='c_lightgrey' >Description:</div>
+	<div class='stitle' >Description:</div>
 	<div class=data [innerHTML]="bookings_from_db[i].trip.description"></div>
 <p>
 </div>
