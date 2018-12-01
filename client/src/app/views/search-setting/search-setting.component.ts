@@ -68,8 +68,9 @@ export class SearchSettingComponent extends BaseComponent {
 	ngoninit():void {
 		let today = C.TODAY();
 		let trip = StorageService.getForm(C.KEY_FORM_SEARCH);
-		if ( !trip || trip.version != C.VERSION_FORM_SEARCH ||  trip.distance <=0) { 
-			trip = this.Util.create_rider_criteria();
+		if ( !trip || trip.version != C.VERSION_FORM_TRIP ||  trip.distance <=0) { 
+			//trip = this.Util.create_rider_criteria();
+			trip = this.Util.create_empty_trip();
 		}
 		console.debug("201810291814 SearchSettingComponent.ngOnInit() trip=",
 			C.stringify(trip));

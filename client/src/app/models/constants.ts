@@ -88,8 +88,7 @@ export class Constants{
 	static KEY_FORM_ACTIVITY_FILTER	= 'form_activity_filter'	;
 	static KEY_FORM_THIST		= 'form_thist'		;
 
-	static VERSION_FORM_SEARCH	= 2					;
-	static VERSION_FORM_TRIP	= 1					;
+	static VERSION_FORM_TRIP	= 3					;
 
 	// timer is in miliseconds. So need * 1000 when set up timer
 	static TIMER_INTERVAL		= 200				; //milisecond

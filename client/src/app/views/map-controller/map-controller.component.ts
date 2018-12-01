@@ -66,8 +66,10 @@ export class MapControllerComponent extends BaseComponent {
         let serach_criteria = StorageService.getForm(C.KEY_FORM_SEARCH) ;
 		let sc	= serach_criteria;
 
-		if (! sc || (sc.distance== C.ERROR_NO_ROUTE && sc.rider_ind=='true')
-			||sc.version != C.VERSION_FORM_SEARCH) {
+		if (! sc 
+			||!sc.p1.lat
+			|| (sc.distance== C.ERROR_NO_ROUTE && sc.rider_ind)
+			||sc.version != C.VERSION_FORM_TRIP) {
 			this.router.navigate(['/Trip/'+ C.KEY_FORM_SEARCH]);
 		}
 

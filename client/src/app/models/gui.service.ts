@@ -229,55 +229,36 @@ export class Util {
 		return Status.is_in_map_search ;
 	}
 
-	static create_rider_criteria () : any{
+    static create_empty_trip () : any{
+		let [today, current_time] = Util.current_time();
 
-			return	{
-			  version				: C.VERSION_FORM_SEARCH
-			, departure_time		: ''
-			, distance				: C.ERROR_NO_ROUTE
-			, seats		 			: 1
-			, price		 			: C.MAX_PRICE_RIDER
-			, search_tightness		: 0
-			, p1:	{ loc			: ''
-					, lat			: null
-					, lon			: null
-					, display_name	: null
-				}
-			, p2:	{ loc			: ''
-					, lat			: null
-					, lon			: null
-					, display_name	: null
-				}
-			, date1		 			: C.TODAY()
-			, date2		 			: C.TODAY()
-			}
-	}
+        let trip =  {
+              version           :   C.VERSION_FORM_TRIP
+            , rider_ind         :   false
+            , trip_date         :   today
+            , date1             :   today			//for search
+            , date2             :   today			//for search
+            , trip_time         :   current_time
+            , distance          :   C.ERROR_NO_ROUTE
+            , seats             :   1
+            , price             :   C.MAX_PRICE
+            , p1    :{      loc     : ''
+                        ,   lat     : null
+                        ,   lon     : null
+                        ,   display_name: null
+                    }
+            , p2:   {       loc     : ''
+                        ,   lat     : null
+                        ,   lon     : null
+                        ,   display_name: null
+                    }
+            , description          : ''			//for publish
+            , search_tightness    : 3			//for search
+            }
+        return trip;
+    }
 
-	static create_empty_trip () : any{
-			let [today, current_time ] = Util.current_time();
 
-			return	{
-			  version 				: 1
-			, rider_ind 			: 'false'
-			, trip_date	 			: today
-			, trip_time				: current_time
-			, distance				: C.ERROR_NO_ROUTE
-			, seats		 			: 1
-			, price		 			: C.MAX_PRICE
-			, p1	:{ 	loc			: ''
-					, 	lat			: null
-					, 	lon			: null
-					, 	display_name: null
-				}
-			, p2:	{ 	loc			: ''
-					, 	lat			: null
-					, 	lon			: null
-					, 	display_name: null
-				}
-			, description			: ''
-			}
-	}
-	
 
 	static onError(error) {
 			console.log(`Error: ${error}`);

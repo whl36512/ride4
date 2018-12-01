@@ -112,8 +112,8 @@ export class TripComponent extends BaseComponent {
 	{
 
 		let trip = StorageService.getForm(this.form_key);
-		if ( !trip ) {
-			trip = this.create_empty_trip();
+		if ( !trip || trip.version !=C.VERSION_FORM_TRIP) { // both search and trip use the same version
+			trip = Util.create_empty_trip();
 		}
 		if (trip.trip_date) trip.trip_date 	=  this.today > trip.trip_date ? this.today: trip.trip_date ;
 		if (trip.date1) 	trip.date1 		=  this.today > trip.date1 ? this.today: trip.date1 ;
@@ -145,33 +145,6 @@ export class TripComponent extends BaseComponent {
 		this.show_map();
 		this.show_body=C.BODY_SHOW;
   	}
-
-	create_empty_trip () : any{
-		let trip =	{
-			  version			: 	C.VERSION_FORM_SEARCH
-			, rider_ind			: 	false
-			, trip_date			: 	this.today
-			, date1				:	this.today
-			, date2				:	this.today
-			, trip_time			: 	this.current_time
-			, distance			: 	C.ERROR_NO_ROUTE
-			, seats				:	1
-			, price				:	C.MAX_PRICE
-			, p1	:{  	loc		: ''
-						,   lat		: null
-						,   lon		: null
-						,   display_name: null
-					}
-			, p2:   {   	loc		: ''
-						,   lat		: null
-						,   lon		: null
-						,   display_name: null
-					}
-			, description		   : ''
-			, search_tightness	  : 3
-			}
-		return trip;
-	}
 
 	form_change_action(){
 		this.reset_msg() ;
