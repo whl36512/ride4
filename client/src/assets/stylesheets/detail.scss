@@ -17,6 +17,10 @@
 		}
 }
 
+body.flash {
+	ackground-image: url("https://eoimages.gsfc.nasa.gov/images/imagerecords/57000/57723/globe_west_540.jpg");
+}
+
 textarea {
 	width: 95%;
 	&#description {
@@ -256,7 +260,7 @@ user-select: none;
 		content: '\25c9' ;
 		padding-left: 0.3rem;
 		color: green;
-    	font-size: 1.3rem;  /* make bullseye bigger */
+    	font-size: 1.2rem;  /* make bullseye bigger */
 	}
 }
 .to {
@@ -267,7 +271,7 @@ user-select: none;
 		content: '\25c9';
 		padding-left: 0.3rem;
 		color: red;
-    	font-size: 1.3rem;  /* make bullseye bigger */
+    	font-size: 1.2rem;  /* make bullseye bigger */
 	}
 }
 

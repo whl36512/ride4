@@ -159,12 +159,14 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 
 	form_change_action() {};
 
-	form_loc_change_detect(): string | null {
+	form_loc_change_detect(): any {
 		let o = this.form_values_old;
 		let n = this.form_values_new;
-		if (n.p1_loc != o.p1_loc) return 'p1_loc';
-		if (n.p2_loc != o.p2_loc) return 'p2_loc';
-		return null
+		let l1: string =null;
+		let l2: string =null;
+		if (n.p1_loc != o.p1_loc) l1='p1_loc';
+		if (n.p2_loc != o.p2_loc) l2='p2_loc';
+		return [l1, l2];
 	}	
 
 	
@@ -393,6 +395,9 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 					pair.distance= Math.round(distance /160)/10;
 					//this.validate_form();
 					//this.changeDetectorRef.detectChanges();
+				}
+				else if ( body.error) {
+					this.error_msg='Error from routing service: ' + body.error.message;
 				}
 				else {
 					pair.distance=C.ERROR_NO_ROUTE ;

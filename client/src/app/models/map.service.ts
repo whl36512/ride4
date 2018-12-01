@@ -30,8 +30,7 @@ export class MapService {
 
 
 	constructor() {
-		this.geo_watcher = this.watchPosition(null);
-		this.subscribe_geo_watcher();
+		//this.subscribe_geo_watcher();  
 		const osmAttr =
 			"&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a>, " +
 			"Tiles courtesy of <a href='http://hot.openstreetmap.org/' target='_blank'>Humanitarian OpenStreetMap Team</a>";
@@ -104,7 +103,9 @@ export class MapService {
 
 	subscribe_geo_watcher() {
 		console.debug('201811171456' , 'GeoService.subscribe_geo_watcher enter');
-		let subscription = this.geo_watcher.subscribe(
+		if(!this.geo_watcher) this.geo_watcher = this.watchPosition(null);
+		if(!this.geo_watcher_sub) 
+			this.geo_watcher_sub = this.geo_watcher.subscribe(
 			position => {
 				console.debug('201811171337 GeoService.subscribe_geo_watcher'
 					, `Next: ${position.coords.latitude}, ${position.coords.longitude}`);
@@ -129,7 +130,6 @@ export class MapService {
 			},
 			() => console.debug('201811171343 GeoService.subscribe_geo_watcher completed')
 		);
-		this.geo_watcher_sub= subscription ;
 	}
 
 	clear_markers(){

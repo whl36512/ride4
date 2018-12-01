@@ -1,6 +1,6 @@
 <div *ngIf="false"> https://material.angular.io/components/menu/overview </div>
 <div class=hide-unhide>
-	<button (click)='show_body=C.BODY_NOSHOW' *ngIf='show_body==C.BODY_SHOW' > Map {{C.ICON_ARROW_UP}}  </button>
+	<button (click)='show_map()' *ngIf='show_body==C.BODY_SHOW' > Map {{C.ICON_ARROW_UP}}  </button>
 	<button (click)='show_body=C.BODY_SHOW'   *ngIf='show_body==C.BODY_NOSHOW' > {{C.ICON_ARROW_DOWN}}</button>
 </div>
 
@@ -36,13 +36,17 @@
 				{{to}}
 			</dt>
 	  		<dd>
-	   			<input  type="text"  id="p2_loc" formControlName="p2_loc" 
-					placeholder="To" required
-					pattern=".{3,}"
-				/>
-				<span class="validity" 
-					*ngIf='this.form_key==C.KEY_FORM_TRIP || this.form.value.rider_ind=="true"'>
+				<span>
+	   				<input  type="text"  id="p2_loc" formControlName="p2_loc" 
+						placeholder="To" required
+						pattern=".{3,}"
+					/>
+					<span class="validity" 
+						*ngIf='this.form_key==C.KEY_FORM_TRIP || this.form.value.rider_ind'>
+					</span>
 				</span>
+				<span class='clickable-text button' (click)='switch_loc()' 
+				[innerHTML]='C.ICON_UPDOWN_ARROW'></span>
 			</dd>
 			<dd class="f08 " >
 				{{trip.p2.display_name	}}
@@ -79,6 +83,7 @@
 					<span class="validity"></span>
 					<input type="date" formControlName="date2" 
 						pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" min={{this.form.value.date1}} 
+						required 
 					/>
 					<span class="validity"></span>
 				</dd>
@@ -106,17 +111,17 @@
 			<dt *ngIf='!this.form.value.rider_ind'>Available Seats: {{this.form.value.seats}} </dt>
 			<dt *ngIf='this.form.value.rider_ind' >Requested Seats: {{this.form.value.seats}} </dt>
 	  		<dd>
-				<input type="range" formControlName="seats" value="{{form.value.seats}}" 
+				<input type="range" formControlName="seats" value="{{form.value.seats}}"  claas='zoom'
 					min="1" max="{{C.MAX_SEATS}}" step=1 /> 
 	  		</dd>
 
 			<dt>Price: ${{this.form.value.price}} per mile per passenger.
-				<span *ngIf='this.form.value.rider_ind=="true" && this.form_key==C.KEY_FORM_TRIP'> Estimated cost: 
+				<span *ngIf='this.form.value.rider_ind && this.form_key==C.KEY_FORM_TRIP'> Estimated cost: 
 					$ {{this.estimate_cost()}}
 				</span>
 			</dt>
 	  		<dd>
-				<input type="range" formControlName="price" value="0" step=0.01 min="0" 
+				<input type="range" class='zoom' formControlName="price" value="0" step=0.01 min="0" 
 					max="{{max_price}}"  required
 				/>
 				<span class="validity" ></span>

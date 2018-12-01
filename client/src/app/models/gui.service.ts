@@ -72,62 +72,62 @@ export class Util {
 		}
 	}
 
-    static TODAY() { // TODAY is browser local time and is in the form of 2018-09-11
-        let utc = new Date();
-        let d = new Date(utc.getTime() - utc.getTimezoneOffset() * 60000)
-        let s = d.toJSON() ;
-        console.debug ( '201810142022 Util.TODAY()=', s    );
+	static TODAY() { // TODAY is browser local time and is in the form of 2018-09-11
+		let utc = new Date();
+		let d = new Date(utc.getTime() - utc.getTimezoneOffset() * 60000)
+		let s = d.toJSON() ;
+		console.debug ( '201810142022 Util.TODAY()=', s	);
 
-        return s.slice(0,10) ;
-    } ;
+		return s.slice(0,10) ;
+	} ;
 
 	static current_time() {
 		return Util.current_time_and_minutes(0);
 	}
 
 	static current_time_and_minutes(minutes: number) {
-        let utc = new Date();
-        let d = new Date(utc.getTime() - utc.getTimezoneOffset() * 60000 + minutes*60000);
-        let s = d.toJSON() ;
+		let utc = new Date();
+		let d = new Date(utc.getTime() - utc.getTimezoneOffset() * 60000 + minutes*60000);
+		let s = d.toJSON() ;
 
-        return [s.slice(0,10), s.slice(11,16)] ;
+		return [s.slice(0,10), s.slice(11,16)] ;
 	}
 
 	static now_ts ()
 	{
 		let utc = new Date();
-        return utc.getTime() ;
+		return utc.getTime() ;
 	}
 
-    static to_local_time(date : string) : string {
-        let since_epoch = Date.parse(date);
-        let utc = new Date();
+	static to_local_time(date : string) : string {
+		let since_epoch = Date.parse(date);
+		let utc = new Date();
 
-        let d = new Date(since_epoch - utc.getTimezoneOffset() * 60000);
-        let s = d.toJSON() ;
-        return s;
-    }
+		let d = new Date(since_epoch - utc.getTimezoneOffset() * 60000);
+		let s = d.toJSON() ;
+		return s;
+	}
 
-    static up_to_minutes( date: string) : string {
-        let local_time = Util.to_local_time(date);
-        return local_time.slice(0,10) + ' ' + local_time.slice(11,16);
-    }
+	static up_to_minutes( date: string) : string {
+		let local_time = Util.to_local_time(date);
+		return local_time.slice(0,10) + ' ' + local_time.slice(11,16);
+	}
 
-    static elapsed_time ( date: string) : string {
-        let since_epoch = Date.parse(date);
-        let utc = new Date();
-        let minutes = Math.floor(( utc.getTime() -since_epoch + 10000)/60000);
+	static elapsed_time ( date: string) : string {
+		let since_epoch = Date.parse(date);
+		let utc = new Date();
+		let minutes = Math.floor(( utc.getTime() -since_epoch + 10000)/60000);
 
-        let days = Math.floor(minutes/60/24) ;
-        let hours = Math.floor(minutes % (60*24)/60);
-        let minutes2 = minutes % (60);
-        let elapsed_time='';
-        if (days!=0) { elapsed_time = elapsed_time+ days + ' days ago' ; }
-        else if (hours!=0) { elapsed_time = elapsed_time+ hours + ' hr ago'; }
-        else if (minutes2!=0) { elapsed_time = elapsed_time+ minutes2 + ' min ago';}
-        else { elapsed_time= 'now'; }
-        return elapsed_time;
-    }
+		let days = Math.floor(minutes/60/24) ;
+		let hours = Math.floor(minutes % (60*24)/60);
+		let minutes2 = minutes % (60);
+		let elapsed_time='';
+		if (days!=0) { elapsed_time = elapsed_time+ days + ' days ago' ; }
+		else if (hours!=0) { elapsed_time = elapsed_time+ hours + ' hr ago'; }
+		else if (minutes2!=0) { elapsed_time = elapsed_time+ minutes2 + ' min ago';}
+		else { elapsed_time= 'now'; }
+		return elapsed_time;
+	}
 
 
 
@@ -229,34 +229,33 @@ export class Util {
 		return Status.is_in_map_search ;
 	}
 
-    static create_empty_trip () : any{
+	static create_empty_location () : any{
+		return	  {			loc	 : ''
+						,   lat	 : null
+						,   lon	 : null
+						,   display_name: null
+					}
+	}
+	static create_empty_trip () : any{
 		let [today, current_time] = Util.current_time();
 
-        let trip =  {
-              version           :   C.VERSION_FORM_TRIP
-            , rider_ind         :   false
-            , trip_date         :   today
-            , date1             :   today			//for search
-            , date2             :   today			//for search
-            , trip_time         :   current_time
-            , distance          :   C.ERROR_NO_ROUTE
-            , seats             :   1
-            , price             :   C.MAX_PRICE
-            , p1    :{      loc     : ''
-                        ,   lat     : null
-                        ,   lon     : null
-                        ,   display_name: null
-                    }
-            , p2:   {       loc     : ''
-                        ,   lat     : null
-                        ,   lon     : null
-                        ,   display_name: null
-                    }
-            , description          : ''			//for publish
-            , search_tightness    : 3			//for search
-            }
-        return trip;
-    }
+		let trip =  {
+			  version			:   C.VERSION_FORM_TRIP
+			, rider_ind			:   false
+			, trip_date			:   today
+			, date1				:   today			//for search
+			, date2				:   today			//for search
+			, trip_time			:   current_time
+			, distance			:   C.ERROR_NO_ROUTE
+			, seats				:   1
+			, price				:   C.MAX_PRICE
+			, p1				:	Util.create_empty_location()
+			, p2				:	Util.create_empty_location()
+			, description		:	''			//for publish
+			, search_tightness	:	3			//for search
+			}
+		return trip;
+	}
 
 
 
@@ -336,54 +335,54 @@ export class Util {
 		return pair;
 	}
 
-    static convert_book_to_pairs(book: any): any|null {
-        if(!book) return null;
+	static convert_book_to_pairs(book: any): any|null {
+		if(!book) return null;
 		if (!book.p1 || ! book.p1.lat) {
-        	book.p1 ={
-                  loc      : book.start_loc
-                , lat      : book.start_lat
-                , lon      : book.start_lon
-                , display_name  : book.start_display_name
-                //, marker_text   : book.pickup_marker_text
-                //, icon_type     : book.pickup_icon_type
-                //, color    : book.pickup_color
-            };
+			book.p1 ={
+				  loc	  : book.start_loc
+				, lat	  : book.start_lat
+				, lon	  : book.start_lon
+				, display_name  : book.start_display_name
+				//, marker_text   : book.pickup_marker_text
+				//, icon_type	 : book.pickup_icon_type
+				//, color	: book.pickup_color
+			};
 		}
 		if (!book.p2 || ! book.p2.lat) {
-        	book.p2 ={
-                  loc      : book.end_loc
-                , lat      : book.end_lat
-                , lon      : book.end_lon
-                , display_name  : book.end_display_name
-                //, marker_text   : book.dropoff_marker_text
-                //, icon_type     : book.dropoff_icon_type
-                //, color    : book.dropoff_color
-            };
+			book.p2 ={
+				  loc	  : book.end_loc
+				, lat	  : book.end_lat
+				, lon	  : book.end_lon
+				, display_name  : book.end_display_name
+				//, marker_text   : book.dropoff_marker_text
+				//, icon_type	 : book.dropoff_icon_type
+				//, color	: book.dropoff_color
+			};
 		}
 		if (!book.rp1 || ! book.rp1.lat) {
-        	book.rp1 ={
-                  loc      : book.pickup_loc
-                , lat      : book.pickup_lat
-                , lon      : book.pickup_lon
-                , display_name  : book.pickup_display_name
-                //, marker_text   : book.pickup_marker_text
-                //, icon_type     : book.pickup_icon_type
-                //, color    : book.pickup_color
-            };
+			book.rp1 ={
+				  loc	  : book.pickup_loc
+				, lat	  : book.pickup_lat
+				, lon	  : book.pickup_lon
+				, display_name  : book.pickup_display_name
+				//, marker_text   : book.pickup_marker_text
+				//, icon_type	 : book.pickup_icon_type
+				//, color	: book.pickup_color
+			};
 		}
 		if (!book.rp2 || ! book.rp2.lat) {
-        	book.rp2 ={
-                  loc      : book.dropoff_loc
-                , lat      : book.dropoff_lat
-                , lon      : book.dropoff_lon
-                , display_name  : book.dropoff_display_name
-                //, marker_text   : book.dropoff_marker_text
-                //, icon_type     : book.dropoff_icon_type
-                //, color    : book.dropoff_color
-            };
+			book.rp2 ={
+				  loc	  : book.dropoff_loc
+				, lat	  : book.dropoff_lat
+				, lon	  : book.dropoff_lon
+				, display_name  : book.dropoff_display_name
+				//, marker_text   : book.dropoff_marker_text
+				//, icon_type	 : book.dropoff_icon_type
+				//, color	: book.dropoff_color
+			};
 		}
-        return book;
-    }
+		return book;
+	}
 }
 
 /*

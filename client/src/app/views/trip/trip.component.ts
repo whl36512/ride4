@@ -122,6 +122,11 @@ export class TripComponent extends BaseComponent {
 		StorageService.storeForm(this.form_key, trip);
 		this.trip=trip;
 
+		if (this.trip.p1.loc == C.LOC_CURRENT1 || this.trip.p1.loc == C.LOC_CURRENT2 ) 
+			this.trip.p1	= Util.create_empty_location();
+		if (this.trip.p2.loc == C.LOC_CURRENT1 || this.trip.p2.loc == C.LOC_CURRENT2 )
+			this.trip.p2	= Util.create_empty_location();
+
 		this.form= this.form_builder.group(
 			{
 				//sync validators must be in an array
@@ -149,23 +154,29 @@ export class TripComponent extends BaseComponent {
 	form_change_action(){
 		this.reset_msg() ;
 		let f= this.form.value;
-		if (f.rider_ind==true) 	this.max_price	=	C.MAX_PRICE_RIDER;
-		else				this.max_price = C.MAX_PRICE;
+		if (f.rider_ind) 	this.max_price	=	C.MAX_PRICE_RIDER;
+		else				this.max_price	=	C.MAX_PRICE;
 
-		if (f.rider_ind==true ) 	this.from 	= 'Pickup Location';
+		if (f.rider_ind ) 	this.from 	= 'Pickup Location';
 		else				this.from	= 'Departure Location';
 
-		if (f.rider_ind==true ) 	this.to		= 'Dropoff Location';
+		if (f.rider_ind ) 	this.to		= 'Dropoff Location';
 		else				this.to		= 'Arrival Location';
 		console.debug("201808201534", this.class_name, "form_change_action() this.from" , this.from);
 
-		let changed_loc=this.form_loc_change_detect();
-		if ( changed_loc) this.geocode(changed_loc, this.trip, this.form) ;
+		let [changed_loc1, changed_loc2]=this.form_loc_change_detect();
+		if ( changed_loc1) this.geocode(changed_loc1, this.trip, this.form) ;
+		if ( changed_loc2) this.geocode(changed_loc2, this.trip, this.form) ;
 	}
 
 	onSubmit() {
 		this.reset_msg() ;
         this.changeDetectorRef.detectChanges();
+		let error= this.validate_form() ;
+		if( error) {
+			this.error_msg=error;
+			return;
+		}
 
 		// save trip to db
 		// combining data
@@ -189,9 +200,9 @@ export class TripComponent extends BaseComponent {
 	on_get_data_from_wservice(data){
 		if (data.trip_id) {
 			//this.form_saved_to_db=true;
-			this.info_msg ='The trip is published. Riders can start to book the trip.';
+			this.info_msg ='The trip is published. Riders can start to book the trip. Click My Activities menu to make changes';
 			if (data.rider_ind) this.warning_msg 
-			= ' You MUST maintain your balance over Estimated Cost. Otherwise othes cannot find your trip.'
+			= ' You MUST maintain your balance over Estimated Cost. Otherwise drivers cannot find your trip.'
 			this.button_label='Publish Another Trip';
 		}
 		else this.error_msg = C.ACTION_FAIL;
@@ -229,12 +240,16 @@ export class TripComponent extends BaseComponent {
 				else if (!f.rider_ind) validation_error 	= 'Please enter Departure Location';
 			}
 			else if (!this.trip.p2.lat)  {
-				if (f.rider_ind==true) validation_error 	= 'Please enter Dropoff Location';
+				if (f.rider_ind) validation_error 	= 'Please enter Dropoff Location';
 				else if (!f.rider_ind) validation_error 	= 'Please enter Arrival Location';
 			}
 			else if ( this.trip.distance == C.ERROR_NO_ROUTE) 
 				validation_error='Trip is not routable. Please fix it';
-			else if ( f.rider_ind ==true 
+			else if ( f.rider_ind  && f.price> C.MAX_PRICE_RIDER ) 
+				validation_error = 'Price must be less than ' + C.MAX_PRICE_RIDER;
+			else if ( !f.rider_ind  && f.price> C.MAX_PRICE ) 
+				validation_error = 'Price must be less than ' + C.MAX_PRICE;
+			else if ( f.rider_ind  
 					&& this.trip.distance != C.ERROR_NO_ROUTE
 					&& this.user_from_db.balance < this.estimate_cost()
 					) 
@@ -247,16 +262,21 @@ export class TripComponent extends BaseComponent {
 		}
 
 		else if (this.form_key == C.KEY_FORM_SEARCH )	{
-			if ( this.trip.p1.lat == null )  {
-				if (f.rider_ind==true) validation_error 	= 'Please enter Pickup Location';
-				else if (f.rider_ind==false) validation_error 	= 'Please enter Departure Location';
+			if ( ! this.trip.p1.lat )  {
+				if (f.rider_ind) validation_error 	= 'Please enter Pickup Location';
+				else if (!f.rider_ind) validation_error 	= 'Please enter Departure Location';
 			}
 			else if (!this.trip.p2.lat)  {
-				if (f.rider_ind==true) validation_error 	= 'Please enter Dropoff Location';
+				if (f.rider_ind) validation_error 	= 'Please enter Dropoff Location';
 			}
-			else if (f.rider_ind==true && this.trip.distance == C.ERROR_NO_ROUTE) 
+			else if (f.rider_ind && this.trip.distance == C.ERROR_NO_ROUTE) 
 				validation_error = 'Trip not routable';
+			else if (!f.date2 || f.date2=='') validation_error= 'Please enter date';
 			else if (f.date2<f.date1) validation_error= 'Please enter valid date range';
+			else if ( f.rider_ind  && f.price> C.MAX_PRICE_RIDER ) 
+				validation_error = 'Price must be less than ' + C.MAX_PRICE_RIDER;
+			else if ( !f.rider_ind  && f.price> C.MAX_PRICE ) 
+				validation_error = 'Price must be less than ' + C.MAX_PRICE;
 		}
 		//console.debug('201811232324', this.class_name, 'validate_form() validation_error='
 			//, validation_error
@@ -266,7 +286,10 @@ export class TripComponent extends BaseComponent {
 	current_location()
 	{
 		let cl = this.mapService.current_loc
-		if (! cl.lat) this.error_msg='Location service is not enabled';
+		if (! cl.lat) {
+			this.warning_msg='Location service is not enabled. Try again';
+			this.mapService.subscribe_geo_watcher();
+		}
 		else {
 			if(this.form.value.p1_loc==C.LOC_CURRENT1)
 			{	
@@ -280,6 +303,14 @@ export class TripComponent extends BaseComponent {
 				});
 			}
 		}
+	}
+
+	switch_loc()
+	{
+		this.form.patchValue ({
+			p1_loc: this.form.value.p2_loc
+			, p2_loc: this.form.value.p1_loc
+		});
 	}
 
 	set_time(minutes: number)
