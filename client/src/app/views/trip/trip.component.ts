@@ -216,7 +216,7 @@ export class TripComponent extends BaseComponent {
 	on_get_data_from_wservice(data){
 		if (data.trip_id) {
 			//this.form_saved_to_db=true;
-			this.info_msg ='The trip is published. Other users can start to book the trip.';
+			this.info_msg ='The trip is published. Riders can start to book the trip.';
 			if (data.rider_ind) this.warning_msg 
 			= ' You MUST maintain your balance over Estimated Cost. Otherwise othes cannot find your trip.'
 			this.button_label='Publish Another Trip';
@@ -251,14 +251,24 @@ export class TripComponent extends BaseComponent {
 			if ( this.user_from_db.balance == null ) {
 				validation_error = 'Please sign in to post a trip' ;
 			}
-			else if ( this.trip.distance == C.ERROR_NO_ROUTE) validation_error='ERROR: Trip not routable';
+			else if ( !this.trip.p1.lat  )  {
+				if (f.rider_ind) validation_error 			= 'Please enter Pickup Location';
+				else if (!f.rider_ind) validation_error 	= 'Please enter Departure Location';
+			}
+			else if (!this.trip.p2.lat)  {
+				if (f.rider_ind==true) validation_error 	= 'Please enter Dropoff Location';
+				else if (!f.rider_ind) validation_error 	= 'Please enter Arrival Location';
+			}
+			else if ( this.trip.distance == C.ERROR_NO_ROUTE) 
+				validation_error='Trip is not routable. Please fix it';
 			else if ( f.rider_ind ==true 
 					&& this.trip.distance != C.ERROR_NO_ROUTE
 					&& this.user_from_db.balance < this.estimate_cost()
 					) 
-				validation_error = 'ERROR: You MUST maintain a balance above Estimated Cost to publish a trip as rider';
+				validation_error 
+					= 'You MUST maintain a balance above Estimated Cost to publish a trip as rider';
 			else if ( this.user_from_db.balance < 0)
-				validation_error = 'ERROR: You cannot publish trip with a negative account balance';
+				validation_error = 'You cannot publish trip with a negative account balance';
 			else if ( !f.trip_time )
 				validation_error = 'Please enter Departure Time';
 		}
@@ -272,8 +282,8 @@ export class TripComponent extends BaseComponent {
 				if (f.rider_ind==true) validation_error 	= 'Please enter Dropoff Location';
 			}
 			else if (f.rider_ind==true && this.trip.distance == C.ERROR_NO_ROUTE) 
-				validation_error = 'ERROR: Trip not routable';
-			else if (f.date2<f.date1) validation_error= 'ERROR: Invalid date range';
+				validation_error = 'Trip not routable';
+			else if (f.date2<f.date1) validation_error= 'Please enter valid date range';
 		}
 		//console.debug('201811232324', this.class_name, 'validate_form() validation_error='
 			//, validation_error

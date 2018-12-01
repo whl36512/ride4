@@ -10,6 +10,13 @@ import { AppInjector } from './app/models/app-injector.service';
 
 if (environment.production) {
   enableProdMode();
+	if(window){
+		// disbale console in prod mode
+    	//window.console.log=function(){};
+    	//window.console.debug=function(){};
+    	//window.console.info=function(){};
+    	//window.console.error=function(){};
+  }
 }
 
 //platformBrowserDynamic().bootstrapModule(AppModule)

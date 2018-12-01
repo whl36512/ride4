@@ -13,6 +13,7 @@ export	class	Usr{
 	public	oauth_id		:	string	;
 	public	oauth_host		:	string	;
 	public	deposit_id		:	string	;
+	public	sm_link			:	string	;
 	public	c_ts			:	Date	;
 	public	m_ts			:	Date	;
 	public	profile_ind		:	boolean	;

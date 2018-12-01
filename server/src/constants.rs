@@ -9,7 +9,8 @@ pub static ERROR_NOT_SIGNED_IN: &str = r##"{"error":"not signed in"}"## ;
 pub static ERROR_TRIP_VALIDATION: &str = r##"{"error":"trip validation failed"}"## ;
 
 pub static PG_PORT 	: &str ="5432";
-pub static PG_HOST 	: &str ="10.1.0.110" ;
+//pub static PG_HOST 	: &str ="127.0.0.1" ;
+pub static PG_HOST 	: &str ="10.0.0.2" ;  // avoid ident login to postgres
 pub static PG_USER 	: &str ="ride"    ;
 pub static PG_PASSWD 	: &str ="ride" ;
 pub static PG_DATABASE 	: &str ="ride" ;
@@ -43,7 +44,7 @@ pub static SQL_GET_REVIEWS		: &str =  "select a from funcs.get_reviews($1, $2) a
 pub static URL_WEBSOCKET_SERVER:   &str= "0.0.0.0:4202";
 
 
-pub static CORS_ALLOWED_HOSTS : [&str; 13] 
+pub static CORS_ALLOWED_HOSTS : [&str; 14] 
 	= [
 			"http://rideshare.beegrove.com:4200"
 		,	"http://rideshare.beegrove.com:4210"
@@ -58,6 +59,7 @@ pub static CORS_ALLOWED_HOSTS : [&str; 13]
 		,	"http://10.0.0.110:4200"
 		,	"10.0.0.110:4200"
 		,	"10.0.0.110"
+		,	"https://ride.beegrove.com"
 	] ;
 
 

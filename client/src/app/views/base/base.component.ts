@@ -43,7 +43,8 @@ import { Status					} 	from '../../models/gui.service';
 	template: '',
 	//styleUrls: ['./base.component.css']
 })
-export abstract class BaseComponent implements OnChanges, OnInit, OnDestroy {
+//export abstract class BaseComponent implements OnChanges, OnInit, OnDestroy {
+export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 
 	//mapService				: MapService			;
 	//storageService			: StorageService		;	
@@ -235,7 +236,8 @@ export abstract class BaseComponent implements OnChanges, OnInit, OnDestroy {
 
 
 
-	abstract ngoninit(): void;
+	//abstract ngoninit(): void;
+	ngoninit(): void{};
 	ngonchanges(changes: SimpleChanges): void {};
 
 

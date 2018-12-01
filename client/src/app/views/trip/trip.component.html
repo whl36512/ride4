@@ -1,6 +1,6 @@
 <div *ngIf="false"> https://material.angular.io/components/menu/overview </div>
 <div class=hide-unhide>
-	<button (click)='show_body=C.BODY_NOSHOW' *ngIf='show_body==C.BODY_SHOW' > {{C.ICON_ARROW_UP}}  </button>
+	<button (click)='show_body=C.BODY_NOSHOW' *ngIf='show_body==C.BODY_SHOW' > Map {{C.ICON_ARROW_UP}}  </button>
 	<button (click)='show_body=C.BODY_SHOW'   *ngIf='show_body==C.BODY_NOSHOW' > {{C.ICON_ARROW_DOWN}}</button>
 </div>
 
@@ -26,7 +26,7 @@
 				<span class="validity"></span>
 			</dd>
 
-	  		<dd  class="f08 clickable-text" (click)='show_map()' > 
+	  		<dd  class="f08 "  > 
 				 {{trip.p1.display_name}}
 			</dd>
 		</dl>
@@ -44,7 +44,7 @@
 					*ngIf='this.form_key==C.KEY_FORM_TRIP || this.form.value.rider_ind=="true"'>
 				</span>
 			</dd>
-			<dd class="f08 clickable-text" (click)='show_map()' >
+			<dd class="f08 " >
 				{{trip.p2.display_name	}}
 			</dd>
 			<dt>
@@ -86,23 +86,25 @@
 
 
 	  		<dt>Departure Time
-					<label><input name=set_time type="radio" (click)='set_time(0)' />Now</label> 
-					, In 
-					<label><input name=set_time type="radio" (click)='set_time(5)'  />5</label>
-					<label><input name=set_time type="radio" (click)='set_time(10)'  />10</label>
-					<label><input name=set_time type="radio" (click)='set_time(15)'  />15</label>
-					munites
 			</dt>
 	  		<dd>
 				<input type="time" formControlName="trip_time" step="60" 
 					required />
 				<span class="validity"></span>
 	  		</dd>
+			<dt>
+					Or in 
+					<label><input name=set_time type="radio" (click)='set_time(5)'  />5</label>
+					<label><input name=set_time type="radio" (click)='set_time(10)'  />10</label>
+					<label><input name=set_time type="radio" (click)='set_time(15)'  />15</label>
+					<label><input name=set_time type="radio" (click)='set_time(30)'  />30</label>
+					munites
+			</dt>
 		</dl>
-
+		<p>
 		<dl >
-			<dt *ngIf='this.form.value.rider_ind=="false"'>Availabel Seats: {{this.form.value.seats}} </dt>
-			<dt *ngIf='this.form.value.rider_ind=="true"' >Requested Seats: {{this.form.value.seats}} </dt>
+			<dt *ngIf='!this.form.value.rider_ind'>Available Seats: {{this.form.value.seats}} </dt>
+			<dt *ngIf='this.form.value.rider_ind' >Requested Seats: {{this.form.value.seats}} </dt>
 	  		<dd>
 				<input type="range" formControlName="seats" value="{{form.value.seats}}" 
 					min="1" max="{{C.MAX_SEATS}}" step=1 /> 
@@ -138,6 +140,10 @@
             </dd>
 
         </dl>
+		<div *ngIf='error_msg'      class=error 	[innerHTML]='error_msg' ></div>
+		<div *ngIf='info_msg'       class='info' 	[innerHTML]='info_msg' ></div>
+		<div *ngIf='warning_msg'    class='warning' [innerHTML]='warning_msg' ></div>
+		<div *ngIf='validation_error'    class='error' [innerHTML]='validation_error' ></div>
 
 		<button  type="submit" [disabled]="validation_error" *ngIf='form_key==C.KEY_FORM_TRIP' >
 			{{button_label}}
@@ -149,7 +155,3 @@
 
       </form>
 </div>
-<div *ngIf='error_msg'      class=error 	[innerHTML]='error_msg' ></div>
-<div *ngIf='info_msg'       class='info' 	[innerHTML]='info_msg' ></div>
-<div *ngIf='warning_msg'    class='warning' [innerHTML]='warning_msg' ></div>
-<div *ngIf='validation_error'    class='error' [innerHTML]='validation_error' ></div>

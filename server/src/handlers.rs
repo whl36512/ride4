@@ -158,7 +158,7 @@ pub fn echo(request: &mut Request) -> IronResult<Response> {
 }
 
 pub fn post_page(_: &mut Request) -> IronResult<Response> {
-    Ok(Response::with((status::Ok, "{'page':'not found'}")))
+    Ok(Response::with((status::Ok, r#"{"page":"not found"}"#)))
 }
 
 pub fn redi(_: &mut Request) -> IronResult<Response> {
