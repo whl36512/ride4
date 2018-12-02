@@ -54,7 +54,8 @@ import { AppRoutingModule } from './app-routing.module';
 import { MiscComponent } from './views/misc/misc.component';
 import { ReviewComponent } from './views/review/review.component';
 import { ReviewsComponent } from './views/reviews/reviews.component';
-import { BaseComponent } from './views/base/base.component' ;
+import { BaseComponent } from './views/base/base.component';
+import { FlashComponent } from './views/flash/flash.component' ;
 
 
 //const appRoutes: Routes = [ ]
@@ -86,6 +87,7 @@ import { BaseComponent } from './views/base/base.component' ;
 		ReviewComponent,
 		ReviewsComponent,
 		BaseComponent,
+		FlashComponent,
 	],
 	imports: [
 		//RouterModule.forRoot(

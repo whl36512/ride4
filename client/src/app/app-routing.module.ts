@@ -27,6 +27,7 @@ import { MapControllerComponent } from './views/map-controller/map-controller.co
 import { SearchSettingComponent } from './views/search-setting/search-setting.component';
 import { MiscComponent } from './views/misc/misc.component';
 import { ReviewsComponent } from './views/reviews/reviews.component';
+import { FlashComponent } from './views/flash/flash.component';
 
 const appRoutes: Routes = [
 /*
@@ -44,6 +45,11 @@ const appRoutes: Routes = [
   },
   { path: '**', component: PageNotFoundComponent }
   */
+	{
+		  path: 'home'
+		, component: FlashComponent
+		, data: { title: 'Home' }
+	},
 	{
 		  path: 'Nav'
 		, component: NavComponent

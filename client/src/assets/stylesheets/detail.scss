@@ -91,11 +91,18 @@ input {
 
 table {
     border-collapse: collapse;
+	&.no_border   {
+		 border: none;
+	}
+
 }
-table, th, td {
+table, tr, th, td {
    border: 1px solid #0cf;
    text-align: center; 
    vertical-align: middle;
+	&.no_border	{
+		 border: none;
+	}
 }
 
 th {
@@ -281,6 +288,29 @@ user-select: none;
 	background-color: #00ccff;
     font-size: 1.2rem;
 	text-align:center;
+}
+
+.flash{
+	background-color: #0088dd;
+	text-align:right;
+	color: white;
+	padding: 0.5rem  1rem;
+    border-radius: 1rem;
+}
+
+.flash_check {
+	color: green;
+	font-size :3rem;
+	padding	:0 1rem;
+}
+
+.centerFlex {
+  align-items: center;
+  display: flex;
+	flex-direction: column;
+
+  justify-content: center;
+	height:100%;
 }
 
 div.bar {
