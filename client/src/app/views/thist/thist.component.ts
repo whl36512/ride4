@@ -15,6 +15,7 @@ import  {   Validators  }		from    '@angular/forms';
 import	{	AppComponent	}	from	'../../app.component';
 import	{	C				}	from	'../../models/constants';
 import	{	StorageService	}	from	'../../models/gui.service';
+import	{	Status			}	from	'../../models/gui.service';
 import	{	BaseComponent	}	from	'../base/base.component'	;
 
 
@@ -85,16 +86,22 @@ export	class	ThistComponent	extends	BaseComponent	{
 			show_earning	:	[fv.show_earning,	[]	],
 			show_pending	:	[fv.show_pending,	[]	],
 		});
-		this.onChange();
+
+		this.tran_from_db = Status.tran_from_db;
+	
+		if( ! this.tran_from_db) this.onChange();
+		else( this.on_filter())
 	}
 
 	onChange()
 	{
 		this.reset_msg();
 		this.warning_msg='Loading ...'	;
-
+		this.tran_from_db	=	null	;	
+		Status.tran_from_db	=	null	;	
 		StorageService.storeForm(C.KEY_FORM_THIST,	this.form.value);	
 		this.changeDetectorRef.detectChanges();
+
 		let	data_from_db_observable	
 			=	this.dbService.call_db(C.URL_THIST,	this.form.value);
 		data_from_db_observable.subscribe(
@@ -103,6 +110,7 @@ export	class	ThistComponent	extends	BaseComponent	{
 				console.debug("201810071557	ThistComponent.onChange()	tran_from_db	="	
 					,	C.stringify(tran_from_db));
 				this.tran_from_db	=	tran_from_db	;	
+				Status.tran_from_db	=	tran_from_db	;	
 				this.info_msg =`Found ${this.tran_from_db.length} transactions before filtering`;
 				this.on_filter();
 				this.changeDetectorRef.detectChanges();

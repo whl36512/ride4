@@ -317,9 +317,9 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 			p.lat = null;
 			p.lon = null;
 			p.display_name= null;
-			this.communicationService.send_msg(C.MSG_KEY_MARKER_CLEAR, {});
-			this.communicationService.send_msg(C.MSG_KEY_MARKER_PAIR, pair);
-			this.communicationService.send_msg(C.MSG_KEY_MARKER_FIT, pair);
+			//this.communicationService.send_msg(C.MSG_KEY_MARKER_CLEAR, {});
+			//this.communicationService.send_msg(C.MSG_KEY_MARKER_PAIR, pair);
+			//this.communicationService.send_msg(C.MSG_KEY_MARKER_FIT, pair);
 
 			//this.validate_form();
 			//this.changeDetectorRef.detectChanges();
@@ -348,9 +348,9 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 						p.lon = null;
 						p.display_name= null;
 					}
-					this.communicationService.send_msg(C.MSG_KEY_MARKER_CLEAR, {});
-					this.communicationService.send_msg(C.MSG_KEY_MARKER_PAIR, pair);
-					this.communicationService.send_msg(C.MSG_KEY_MARKER_FIT, pair);
+					//this.communicationService.send_msg(C.MSG_KEY_MARKER_CLEAR, {});
+					//this.communicationService.send_msg(C.MSG_KEY_MARKER_PAIR, pair);
+					//this.communicationService.send_msg(C.MSG_KEY_MARKER_FIT, pair);
 					//this.validate_form();
 					//this.changeDetectorRef.detectChanges();
 					this.routing(pair, pair_before_geocode);
@@ -366,7 +366,7 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 		if ( !pair.p1.display_name || ! pair.p2.display_name) {
 			pair.distance=C.ERROR_NO_ROUTE ;
 			//this.validate_form();
-			this.changeDetectorRef.detectChanges();
+			//this.changeDetectorRef.detectChanges();
 			return;
 		}
 		else if (	pair.p1.lat == pair_before_geocode.p1.lat
@@ -376,7 +376,7 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 			// no change of latlon. Skip routing
 			//pair.distance= oair_before_geocode.distance;
 			//this.validate_form();
-			this.changeDetectorRef.detectChanges();
+			//this.changeDetectorRef.detectChanges();
 			return;
 		}
 
@@ -394,7 +394,7 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 					let distance=body.routes[0].distance ;
 					pair.distance= Math.round(distance /160)/10;
 					//this.validate_form();
-					this.changeDetectorRef.detectChanges();
+					//this.changeDetectorRef.detectChanges();
 				}
 				else if ( body.error) {
 					this.error_msg='Error from routing service: ' + body.error.message;
@@ -402,13 +402,13 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 				else {
 					pair.distance=C.ERROR_NO_ROUTE ;
 					//this.validate_form();
-					this.changeDetectorRef.detectChanges();
+					//this.changeDetectorRef.detectChanges();
 				}
 			},
 			error => {
 				pair.distance=C.ERROR_NO_ROUTE ;
 				//this.validate_form();
-				this.changeDetectorRef.detectChanges();
+				//this.changeDetectorRef.detectChanges();
 			}
 		);
 	}

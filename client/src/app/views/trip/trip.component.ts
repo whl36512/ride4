@@ -55,6 +55,7 @@ export class TripComponent extends BaseComponent {
 	form_key		=	C.KEY_FORM_SEARCH // or C.KEY_FORM_TRIP
 	from		:string;
 	to			:string;
+	current_location_msg: string = null;
 
 	constructor( public changeDetectorRef   : ChangeDetectorRef
 				, public mapService			 : MapService
@@ -171,12 +172,11 @@ export class TripComponent extends BaseComponent {
 
 	onSubmit() {
 		this.reset_msg() ;
-        this.changeDetectorRef.detectChanges();
-		let error= this.validate_form() ;
-		if( error) {
-			this.error_msg=error;
+		this.validation_error = this.validate_form() ;
+		if( this.validation_error) {
 			return;
 		}
+        //this.changeDetectorRef.detectChanges();
 
 		// save trip to db
 		// combining data
@@ -312,6 +312,9 @@ export class TripComponent extends BaseComponent {
 			p1_loc: this.form.value.p2_loc
 			, p2_loc: this.form.value.p1_loc
 		});
+		let tmp= this.trip.p1;
+		this.trip.p1 = this.trip.p2;
+		this.trip.p2 = tmp;
 	}
 
 	set_time(minutes: number)

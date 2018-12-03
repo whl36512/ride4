@@ -1,14 +1,28 @@
 <div class="title">Transaction History</div>
 
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
-	<label for="date1">From: </label>
-	<input  type="date"  formControlName="date1" (change)='onChange()' />
-	<br/>
-	<label for="date2">To:</label>
-	<input  type="date" formControlName="date2" min={{form.value.date1}}
-	(change)='onChange()'
-	/>
-	<span class="validity"></span>
+	<table class=no_border>
+		<tr>
+			<td>
+				From
+			</td>
+			<td>
+				To
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<input  type="date"  formControlName="date1" (change)='onChange()' />
+			</td>
+			<td>
+				<input  type="date" formControlName="date2" [min]='form.value.date1'
+					(change)='onChange()'
+				/>
+				<span class="validity"></span>
+			</td>
+		</tr>
+	</table>
+
 <div *ngIf='error_msg!=null'    class=error [innerHTML]='error_msg'></div>
 <div *ngIf='warning_msg!=null'  class=warning [innerHTML]='warning_msg'></div>
 <div *ngIf='info_msg!=null'     class=info [innerHTML]='info_msg'></div>

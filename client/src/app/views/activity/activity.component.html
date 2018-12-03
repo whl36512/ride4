@@ -3,23 +3,27 @@
 <div class={{show_body}} >
 
 <form [formGroup]="form" >
-	<dl>
-		<dt>
-			<label for="date1">From: </label>
-		</dt>
-		<dd>
-			<input type="date"	formControlName="date1" (change)='onChange()' />
-		</dd>
-		<dt>
-			<label for="date2">To:</label>
-		</dt>
-		<dd>
-			<input	type="date" formControlName="date2" min={{form.value.date1}}
-				(change)='onChange()'
-			/>
-			<span class="validity"></span>
-		</dd>
-	</dl>
+    <table class=no_border>
+        <tr>
+            <td>
+                From
+            </td>
+            <td>
+                To
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input  type="date"  formControlName="date1" (change)='onChange()' />
+            </td>
+            <td>
+                <input  type="date" formControlName="date2" [min]='form.value.date1'
+                    (change)='onChange()'
+                />
+                <span class="validity"></span>
+            </td>
+        </tr>
+    </table>
 </form>
 <div *ngIf='error_msg!=null' class=error>{{error_msg}}</div>
 <div *ngIf='warning_msg!=null' class=warning>{{warning_msg}}</div>

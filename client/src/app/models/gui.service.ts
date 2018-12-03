@@ -22,6 +22,8 @@ export class Status {
 	static search_result = [];
 	static search_criteria :any|null = null;
 	static rider_criteria : any | null = null
+	static bookings_from_db : any | null = null  // for activity page
+	static tran_from_db : any | null = null  // for transaction history page
 }
 
 export class UserService {

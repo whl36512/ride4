@@ -66,7 +66,7 @@ export class Constants{
 		= String.raw`^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-]{1,30}\.){1,4}([a-zA-Z]{2,5})$` ;
 
 	static MAX_PRICE 			= 0.54 				;
-	static MAX_PRICE_RIDER 		= 0.54* 1.2 				;
+	static MAX_PRICE_RIDER 		= Math.round(0.54* 1.2*100)/100.0 		;
 	static MAX_SEATS 			= 6					;
 	static MAX_SEARCH_TIGHTNESS = 5					;
 	static BOOKING_FEE 			= 0.2				;

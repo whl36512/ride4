@@ -8,12 +8,10 @@
 		<tr >
 			<th>#</th>
 			<th>Date</th>
-			<th>Description</th>
 			<th>Credit</th>
 			<th>Debit</th>
-			<th>Pending<br/>Credit</th>
-			<th>Pending<br/>Debit</th>
 			<th>Balance</th>
+			<th>Note</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -22,25 +20,25 @@
 			[ngClass]="{ odd: odd, even: even }">
 			<td>{{i+1}}</td>
 			<td>{{tran.date.slice(0,10)}} </td>
-			<td>{{tran.description}}</td>
 			<td> 
 				<span *ngIf='tran.actual_amount > 0' > {{tran.actual_amount}}</span>
+				<span *ngIf='tran.actual_amount ==null && tran.requested_amount> 0' > 
+					{{tran.requested_amount}} 
+				</span>
 			</td>
 			<td>
 				<span *ngIf='tran.actual_amount < 0' > {{-tran.actual_amount}}</span>
-			</td>
-			<td>
-				<span *ngIf='tran.actual_amount ==null && tran.requested_amount> 0' > 
-					{{tran.requested_amount}}
-				</span>
-			</td>
-			<td> 
 				<span *ngIf='tran.actual_amount ==null && tran.requested_amount< 0' > 
 						{{-tran.requested_amount}}
 				</span>
 			</td>
 			<td>
 				{{tran.balance}}
+			</td>
+			<td>{{tran.description}} 
+				<span *ngIf='tran.actual_amount ==null && tran.requested_amount ' >
+					<br/>Pending
+				</span>
 			</td>
 		</tr>
 	</tbody>

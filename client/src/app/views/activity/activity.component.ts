@@ -20,6 +20,7 @@ import { EventEmitter, Input, Output} from '@angular/core';
 import { AppComponent } from '../../app.component';
 import { C } from '../../models/constants';
 //import { UserService } from '../../models/gui.service';
+import { Status } from '../../models/gui.service';
 import { Util } from '../../models/gui.service';
 import { StorageService } from '../../models/gui.service';
 import { BaseComponent } from '../base/base.component';
@@ -73,7 +74,8 @@ export class ActivityComponent extends BaseComponent {
 		,	date2					: [f.date2, [Validators.min] ]
 		});
 
-		this.onChange();
+		this.bookings_from_db = Status.bookings_from_db;
+		if ( !this.bookings_from_db) this.onChange();
 	}
 
 	onChange()
@@ -82,6 +84,7 @@ export class ActivityComponent extends BaseComponent {
 		this.warning_msg='loading ...' ;
 	 	//remove list of journeys. detroy subpage and completely rebuild subpage after getting data
 		this.bookings_from_db = null ;
+		Status.bookings_from_db = null ;
 		this.changeDetectorRef.detectChanges();
 
 		StorageService.storeForm(C.KEY_FORM_ACTIVITY, this.form.value); 
@@ -94,6 +97,7 @@ export class ActivityComponent extends BaseComponent {
 					 , C.stringify(bookings_from_db));
 				this.reset_msg();
 				this.bookings_from_db = bookings_from_db ;	
+				Status.bookings_from_db = bookings_from_db ;	
 				if (this.bookings_from_db.length==0) this.warning_msg='Nothing found' ; 
 				else this.info_msg =`Found ${this.bookings_from_db.length} activities.`	;
 				this.changeDetectorRef.detectChanges();

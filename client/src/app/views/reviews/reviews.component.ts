@@ -108,7 +108,7 @@ export class ReviewsComponent extends BaseComponent {
 				this.total_rating	+= r.rating ;
 				this.rating_pct[r.rating] = Math.round(this.rating_cnts[r.rating]*1.0/this.total_cnt*100 );
 				//to use with ngStyle. Must be a json object
-				this.rating_style[r.rating]	= {width: String(this.rating_pct[r.rating]*0.3)+ '%' } 
+				this.rating_style[r.rating]	= {width: String(this.rating_pct[r.rating])+ '%' } 
 			}
 			this.average_rating = this.total_rating/this.total_cnt;
 			this.average_star	= Util.get_stars(Math.round(this.average_rating));

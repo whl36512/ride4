@@ -42,23 +42,28 @@ for {{user_from_db.headline}}
 <div *ngIf='!reviews_from_db' class=warning>
 	This user has not been reviewed, yet
 </div>
-<dl *ngIf='reviews_from_db'>
-	<dt *ngFor="let rating_cnt of rating_cnts ;let i=index;
+<table *ngIf='reviews_from_db' class=no_border style='width:95%'>
+	<tr *ngFor="let rating_cnt of rating_cnts ;let i=index;
 		let even=even;let odd=odd; let first = first; let last = last; trackBy:trackByFunc"
 		>
-		<span *ngIf='i>0'>
+			<td *ngIf='i>0'>
 			<span class=star [innerHTML]='rating_title[i]'></span>
+			</td>
+			<td *ngIf='i>0' style='width:50%'>
 			<div class=bar [ngStyle]="rating_style[i]"></div>
+			</td>
+			<td *ngIf='i>0'>
 			{{rating_cnts[i]}}
 			( {{rating_pct[i]}}% )
-		</span>
-	</dt>
-</dl>
+			</td>
+	</tr>
+</table>
 <p>
 <dl>
 	<dt *ngFor="let r of reviews_from_db ;let i=index;
 		let even=even;let odd=odd; let first = first; let last = last; trackBy:trackByFunc"
 		[ngClass]="{ odd: odd, even: even }">
+		<div class=bar></div>
 		<div class=f08>
 			<span class=star [innerHTML]='r.stars'></span> 
 			on {{r.review_date}} by {{r.headline}} 
