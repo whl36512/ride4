@@ -18,6 +18,8 @@
 				{{from}}
 				<span class='clickable-text button' (click)='current_location()'>Current Location</span>
 			</dt>
+			<div *ngIf='current_location_msg'    class='warning' [innerHTML]='current_location_msg' ></div>
+			
 	  		<dd>
 	   			<input  type="text"  id="p1_loc" formControlName="p1_loc" 
 					placeholder="From" required
@@ -44,9 +46,9 @@
 					<span class="validity" 
 						*ngIf='this.form_key==C.KEY_FORM_TRIP || this.form.value.rider_ind'>
 					</span>
-				</span>
+				</span>&nbsp;
 				<span class='clickable-text button' (click)='switch_loc()' 
-				[innerHTML]='C.ICON_UPDOWN_ARROW'></span>
+					[innerHTML]='C.ICON_UPDOWN_ARROW'></span>
 			</dd>
 			<dd class="f08 " >
 				{{trip.p2.display_name	}}
@@ -70,33 +72,46 @@
 				</dd>
 			</div>
 			<div *ngIf='form_key==C.KEY_FORM_SEARCH'>
-				<dt>Search Dates between</dt>
-				<dd>
-					<input type="date" formControlName="date1" 
-						pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" min={{today}} 
-						required 
-					/>
-					<span class="validity"></span>
-				</dd>
-				<dt>And</dt>
-				<dd>
-					<span class="validity"></span>
-					<input type="date" formControlName="date2" 
-						pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" min={{this.form.value.date1}} 
-						required 
-					/>
-					<span class="validity"></span>
-				</dd>
+				<table class=no_border *ngIf='form_key==C.KEY_FORM_SEARCH'>
+					<tr>
+						<td>
+							Dates between
+						</td>
+						<td>
+							and	
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type="date" formControlName="date1" 
+								pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" min={{today}} 
+								required 
+							/>
+							<span class="validity"></span>
+						</td>
+						<td>
+							<span class="validity"></span>
+							<input type="date" formControlName="date2" 
+								pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" min={{this.form.value.date1}} 
+								required 
+							/>
+							<span class="validity"></span>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							Departure Time
+						</td>
+						<td>
+							<input type="time" formControlName="trip_time" step="60" 
+								required />
+							<span class="validity"></span>
+						</td>
+					</tr>
+				</table>
 			</div>
 
 
-	  		<dt>Departure Time
-			</dt>
-	  		<dd>
-				<input type="time" formControlName="trip_time" step="60" 
-					required />
-				<span class="validity"></span>
-	  		</dd>
 			<dt>
 					Or in 
 					<label><input name=set_time type="radio" (click)='set_time(5)'  />5</label>
@@ -108,12 +123,14 @@
 		</dl>
 		<p>
 		<dl >
-			<dt *ngIf='!this.form.value.rider_ind'>Available Seats: {{this.form.value.seats}} </dt>
-			<dt *ngIf='this.form.value.rider_ind' >Requested Seats: {{this.form.value.seats}} </dt>
-	  		<dd>
-				<input type="range" formControlName="seats" value="{{form.value.seats}}"  claas='zoom'
+			<dt>
+			<span *ngIf='!this.form.value.rider_ind'>Available Seats: </span>
+			<span *ngIf='this.form.value.rider_ind' >Requested Seats: </span>
+	  		<span>
+				{{this.form.value.seats}} <input type="range" formControlName="seats" value="{{form.value.seats}}"  claas='zoom'
 					min="1" max="{{C.MAX_SEATS}}" step=1 /> 
-	  		</dd>
+	  		</span>
+			</dt>
 
 			<dt>Price: ${{this.form.value.price}} per mile per passenger.
 				<span *ngIf='this.form.value.rider_ind && this.form_key==C.KEY_FORM_TRIP'> Estimated cost: 
@@ -137,11 +154,11 @@
 	  		</dd>
 		</dl>
 		<dl *ngIf='form_key==C.KEY_FORM_SEARCH'>
-            You can reduce number of search results by tightening searches.
-            <dt><label for="seats">Tightness Level: {{this.form.value.search_tightness}}  </label></dt>
+            You can reduce number of search results by narrowing down searches.
+            <dt><label for="seats">Narrowing Level: {{this.form.value.search_tightness}}  </label></dt>
             <dd>
-            <input type="range" formControlName="search_tightness" 
-				min="0" max="{{C.MAX_SEARCH_TIGHTNESS}}" step=1 />
+            wide <input type="range" formControlName="search_tightness" 
+				min="0" max="{{C.MAX_SEARCH_TIGHTNESS}}" step=1 /> narrow
             </dd>
 
         </dl>

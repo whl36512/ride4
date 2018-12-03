@@ -95,7 +95,7 @@ export class Constants{
 	static MSG_TIMER_WAIT		= 5					; // seconds
 	static MSG_NO_ACTIVITY_COUNT_DOWN	= 30		; // close msg window afer n seconds of no activity
 
-	//static ICON_ARROW_UP		= &#xfe3f			;
+	static ICON_RIGHT_DOUBLE_ARROW		= '\u21d2'			;
 	static ICON_ARROW_UP		= '\ufe3f'			;
  	//static ICON_ARROW_DOWN		= &#xfe40		;
  	static ICON_ARROW_DOWN		= '\ufe40'			;

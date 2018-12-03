@@ -248,7 +248,7 @@ export class Util {
 			, trip_time			:   current_time
 			, distance			:   C.ERROR_NO_ROUTE
 			, seats				:   1
-			, price				:   C.MAX_PRICE
+			, price				:   C.MAX_PRICE/2
 			, p1				:	Util.create_empty_location()
 			, p2				:	Util.create_empty_location()
 			, description		:	''			//for publish

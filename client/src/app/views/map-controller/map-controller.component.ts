@@ -152,7 +152,7 @@ export class MapControllerComponent extends BaseComponent {
 				this.Status.search_criteria= search_criteria;
 				let rows_found = trips_from_db.length ;
 
-				if(rows_found == 0 ) this.warning_msg = 'Nothing found in the map region';
+				if(rows_found == 0 ) this.warning_msg = 'Nothing found in the map region.<br/> Please adjust Search Settings '+ C.ICON_RIGHT_DOUBLE_ARROW+C.ICON_RIGHT_DOUBLE_ARROW;
 				else if(rows_found >= C.MAX_SEARCH_RESULT ) 
 					this.warning_msg = 'Found more than ' + C.MAX_SEARCH_RESULT 
 						+ ' offers. Showing ' + C.MAX_SEARCH_RESULT

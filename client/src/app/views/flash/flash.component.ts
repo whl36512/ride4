@@ -56,4 +56,8 @@ export class FlashComponent extends BaseComponent {
 
 	ngoninit():void {
 	}
+
+	start(){
+		this.router.navigate(['/Trip/', C.KEY_FORM_SEARCH]);
+	}
 }
