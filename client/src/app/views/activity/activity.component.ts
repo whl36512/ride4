@@ -51,6 +51,16 @@ export class ActivityComponent extends BaseComponent {
         super(changeDetectorRef,mapService, communicationService, dbService
                 , geoService, form_builder, router );
 		this.page_name=C.PAGE_ACTIVITY;
+/*
+        this.router.routeReuseStrategy.shouldReuseRoute = function() {
+            // force recreate of component, so this.route.snapshot.paramMap.get will work
+            return true;
+        };
+        this.router.routeReuseStrategy.shouldDetach = function() {
+            // force recreate of component, so this.route.snapshot.paramMap.get will work
+            return true;
+        };
+*/
 	}
 
 
