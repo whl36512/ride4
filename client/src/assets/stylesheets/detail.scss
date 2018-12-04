@@ -275,6 +275,19 @@ user-select: none;
 	font-size: 0.8rem;
 	color: red;
 	float:right;
+	background-color: white;
+	margin: 0.2rem 0.2rem;
+	line-height	:0.8rem;  
+}
+
+.map_clickable {
+	font-size: 0.8rem;
+	color: $primary-color;
+	float:right;
+	background-color: white;
+	margin: 0.2rem 0.2rem;
+	padding: 0rem 0.2rem;
+	line-height	:0.8rem;  
 }
 
 .from {

@@ -57,11 +57,13 @@
 		<div (click)='show_map(i)' class='from clickable-text' >
 			<span *ngIf=' trip.trip.rider_ind' > Passenger Pickup </span>
 			<span *ngIf='!trip.trip.rider_ind' > Driver from  </span>
+			<span class='clickable-text map_clickable'>map</span>
 		</div>
 		{{trip.trip.p1.display_name}}
 		<div (click)='show_map(i)' class='to clickable-text' >
 			<span *ngIf=' trip.trip.rider_ind' > Passenger Dropoff </span>
 			<span *ngIf='!trip.trip.rider_ind' > Driver to  </span>
+			<span class='clickable-text map_clickable'>map</span>
 		</div>
 		{{trip.trip.p2.display_name}}<br/>
 		<span class='f08 button clickable-text' [innerHTML]="trip.google_map_url"></span>

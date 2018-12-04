@@ -139,11 +139,13 @@
 		<div class='clickable-text from' (click)='geo_mark(i)'> 
 			<span *ngIf=' bookings_from_db[i].trip.rider_ind'>Passenger Pickup </span>
 			<span *ngIf='!bookings_from_db[i].trip.rider_ind'>Driver from </span>
+			<span class='clickable-text map_clickable'>map</span>
 		</div>
 		{{bookings_from_db[i].trip.p1.display_name}}
 		<div class='clickable-text to' (click)='geo_mark(i)'> 
 			<span *ngIf=' bookings_from_db[i].trip.rider_ind'>Passenger Dropoff </span>
 			<span *ngIf='!bookings_from_db[i].trip.rider_ind'>Driver to </span>
+			<span class='clickable-text map_clickable'>map</span>
 		</div>
 		{{bookings_from_db[i].trip.p2.display_name}}
 	</div>
@@ -151,12 +153,14 @@
 		<div class='clickable-text from' (click)='geo_mark(i)'> 
 			<span *ngIf='!bookings_from_db[i].trip.rider_ind'> Passenger Pickup </span>
 			<span *ngIf=' bookings_from_db[i].trip.rider_ind'> Driver from</span>
+			<span class='clickable-text map_clickable'>map</span>
 		</div>
 		{{bookings_from_db[i].book.p1.display_name}}
 		<div *ngIf='bookings_from_db[i].book.p2.display_name'> 
 			<div class='clickable-text to' (click)='geo_mark(i)' >
 				<span *ngIf='!bookings_from_db[i].trip.rider_ind'> Passenger Dropoff </span>
 				<span *ngIf=' bookings_from_db[i].trip.rider_ind'> Driver to</span>
+				<span class='clickable-text map_clickable'>map</span>
 			</div>
 			{{bookings_from_db[i].book.p2.display_name}}
 		</div>
@@ -166,17 +170,19 @@
 		<div class='clickable-text from' (click)='geo_mark(i)'> 
 			<span *ngIf=' bookings_from_db[i].trip.rider_ind'> Passenger(me) Pickup </span>
 			<span *ngIf='!bookings_from_db[i].trip.rider_ind'> Driver(me) from </span>
+			<span class='clickable-text map_clickable'>map</span>
 		</div>
 		{{bookings_from_db[i].trip.p1.display_name}}
 		<div class='clickable-text to' (click)='geo_mark(i)'> 
 			<span *ngIf=' bookings_from_db[i].trip.rider_ind'> Passenger(me) Dropoff </span>
 			<span *ngIf='!bookings_from_db[i].trip.rider_ind'> Driver(me) to </span>
+			<span class='clickable-text map_clickable'>map</span>
 		</div>
 		{{bookings_from_db[i].trip.p2.display_name}}
 	</div>
 
 	<span class='button clickable-text' [innerHTML]="bookings_from_db[i].google_map_url"></span>
-	<div class='stitle' >Description:</div>
+	<div class='stitle' >Description</div>
 	<div class=data [innerHTML]="bookings_from_db[i].trip.description"></div>
 	</form>
 </div>
