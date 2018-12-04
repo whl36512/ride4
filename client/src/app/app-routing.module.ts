@@ -61,9 +61,9 @@ const appRoutes: Routes = [
 		, data: { title: 'Search Setting' }
 	},
 	{
-		  path: 'map_search_start'
+		  path: 'map/:perform'
 		, component: MapControllerComponent
-		, data: { title: 'Map Search' }
+		, data: { title: 'Map' }
 	},
 	{
 		  path: 'map_search_stop'
@@ -117,12 +117,12 @@ const appRoutes: Routes = [
 	},
 	{ 
 		path: ''
-		, redirectTo: '/map_search_start'
+		, redirectTo: '/home'
 		, pathMatch: 'full'
 	},
 	{ 
 		path: '**'
-		, redirectTo: '/map_search_start'
+		, redirectTo: '/home'
 		//, pathMatch: 'full'
 	},
 
@@ -134,7 +134,11 @@ const appRoutes: Routes = [
 		//CommonModule,
 		RouterModule.forRoot(
 			appRoutes,
-    			{ enableTracing: true } // <-- debugging purposes only
+    			{ 	
+					scrollPositionRestoration: 'enabled'
+					,	anchorScrolling: 'enabled'
+					,	enableTracing: true // <-- debugging purposes only
+				} 
     		),
   	],
 	exports: [

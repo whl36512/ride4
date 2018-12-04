@@ -334,8 +334,10 @@ export class BookingsComponent extends BaseComponent {
 		this.changeDetectorRef.detectChanges();	
 	}
 	
-	geo_mark(index: number) : void {
-		
+	geo_mark(index: string) : void {
+
+		this.router.navigate([C.ROUTE_MAP, C.ROUTE_MAP_ACTIVITIES, {index:index}]);
+/*
 		this.communicationService.send_msg(C.MSG_KEY_MAP_BODY_SHOW, {});
 
 		this.mapService.clear_markers();	
@@ -343,5 +345,6 @@ export class BookingsComponent extends BaseComponent {
 		this.mapService.mark_books( this.bookings_from_db, index);
 		this.mapService.fit_pair( this.bookings_from_db[index].trip);
 		this.communicationService.send_msg(C.MSG_KEY_SHOW_ACTIVITY_BODY,{show_body: C.BODY_NOSHOW});
+*/
 	}
 }

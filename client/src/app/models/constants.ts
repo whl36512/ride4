@@ -154,6 +154,11 @@ export class Constants{
  	static LOC_CURRENT1	= 'Current Location'		;	
  	static LOC_CURRENT2	= 'Current Location.'		;	
 
+ 	static ROUTE_MAP					= 'map'				;	
+ 	static ROUTE_MAP_SEARCH				= 'search'				;	
+ 	static ROUTE_MAP_ACTIVITIES			= 'activities'			;	
+ 	static ROUTE_MAP_SEARCH_RESULTES	= 'search_resultes'		;	
+
 	
 
 	constructor (){} 

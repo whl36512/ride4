@@ -27,9 +27,8 @@
 				Search Settings
 			</li>			
 		</a>
-		<a routerLink='/map_search_start' 		
+		<a routerLink='/map/search' 		
 			routerLinkActive='active' 
-			*ngIf="true||!Status.is_in_map_search" 
 			(click)="nav_menu_off(); map_search_start()">
 			<li>
 				Search on Map

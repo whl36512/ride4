@@ -3,10 +3,9 @@ import { OnDestroy } 		from '@angular/core';
 import { Subscription }   	from 'rxjs';
 import { ChangeDetectionStrategy } from '@angular/core';
 import { ChangeDetectorRef } from '@angular/core';
-import { FormBuilder            }   from '@angular/forms';
-import { Router             }   from '@angular/router';
-
-
+import { FormBuilder			}   from '@angular/forms';
+import { Router			 }   from '@angular/router';
+import { ActivatedRoute				 }   from '@angular/router';
 
 import * as L from "leaflet";
 
@@ -16,12 +15,12 @@ import {C} 			from "../../models/constants"
 import {Util} 		from "../../models/gui.service"
 //import {DBService} 	from '../../models/remote.service' ;
 import {Status} 	from "../../models/gui.service"
-import { StorageService     } from '../../models/gui.service';
-import { BaseComponent      } from '../base/base.component' ;
+import { StorageService	 } from '../../models/gui.service';
+import { BaseComponent	  } from '../base/base.component' ;
 import { CommunicationService   }   from '../../models/communication.service' ;
-import { DBService              }   from '../../models/remote.service' ;
-import { GeoService             }   from '../../models/remote.service' ;
-import { MapService             }   from '../../models/map.service';
+import { DBService			  }   from '../../models/remote.service' ;
+import { GeoService			 }   from '../../models/remote.service' ;
+import { MapService			 }   from '../../models/map.service';
 
 
 
@@ -41,29 +40,102 @@ export class MapControllerComponent extends BaseComponent {
 	search_is_running: boolean;
 	map_is_moving:boolean ;
 
-    constructor( public changeDetectorRef       : ChangeDetectorRef
-                , public mapService             : MapService
-                , public communicationService   : CommunicationService
-                , public dbService              : DBService
-                , public geoService             : GeoService
-                , public form_builder           : FormBuilder
-                , public router                 : Router )  {
-        super(changeDetectorRef,mapService, communicationService, dbService
-                , geoService, form_builder, router );
 
-		this.region_search_criteria = {} ;
-		this.map_region 			= {} ;
-		this.map_move_time			= 0;
-		this.search_is_running		= false
-		this.map_is_moving			= true;
+	constructor( public changeDetectorRef	   : ChangeDetectorRef
+				, public mapService			 : MapService
+				, public communicationService   : CommunicationService
+				, public dbService			  : DBService
+				, public geoService			 : GeoService
+				, public form_builder		   : FormBuilder
+				, public router				 : Router 
+				, public route					: ActivatedRoute
+
+				)  {
+		super(changeDetectorRef,mapService, communicationService, dbService
+				, geoService, form_builder, router );
+		this.router.routeReuseStrategy.shouldReuseRoute = function() {
+			// force recreate of component, so this.route.snapshot.paramMap.get will work
+			return false;
+		};
+
+
 	}
 		
 	ngoninit() {
 		//change class of the div#main to change style
 		let element = document.getElementById("main");
-    	if(element) element.classList.add("map-controller"); // for changing style
+		if(element) element.classList.add("map-controller"); // for changing style
 
-        let serach_criteria = StorageService.getForm(C.KEY_FORM_SEARCH) ;
+		let perform = this.route.snapshot.paramMap.get('perform');
+		let index = this.route.snapshot.paramMap.get('index');
+
+		console.debug('201112031831', this.class_name, '.ngoninit() perform index=' , perform, index);
+		if (		perform	==	C.ROUTE_MAP_SEARCH			) this.do_search();
+		else if (	perform ==	C.ROUTE_MAP_ACTIVITIES		) this.do_activities(index);
+		else if (	perform ==	C.ROUTE_MAP_SEARCH_RESULTES	) this.do_search_result(index) ;
+		else this.router.navigate(['/home']);
+	}
+
+	do_activities(index: string){ // show activites on map
+		let i = Number(index);
+		
+		let b = Status.bookings_from_db;
+		if (!b || b.length ==0 ) {
+			console.debug('201112031832', this.class_name
+			, '.do_activities() no data in Status.bookings_from_db');
+			return;
+			
+		}
+		if (b.length < i+1 ) {
+			console.debug('201112031832', this.class_name
+			, '.do_activities() index out of range. length index=', b.length, i);
+			return;
+			
+		}
+		console.debug('201112031832', this.class_name, '.do_activities() b.length index=' , b.length,  i);
+
+
+		this.mapService.clear_markers();
+		this.mapService.mark_books( b, i);
+		this.mapService.fit_pair( b[i].trip);
+	}
+
+	do_search_result(index: string){ // show search result on map
+		let i= Number(index);
+		let t =	Status.search_result;
+		if (! t || t.length==0) {
+			console.debug('201112031832', this.class_name
+			, '.do_search_result() no data in Status.bookings_from_db');
+			return;
+			
+		}
+		if (t.length < i+1 ) {
+			console.debug('201112031832', this.class_name
+			, '.do_activities() index out of range. length index=', t.length, i);
+			return;
+			
+		}
+		this.mapService.clear_markers();
+        if(Status.search_criteria){
+            let pair = this.Util.deep_copy ( Status.search_criteria);
+            pair.p1.icon_type=PinIcon;
+            pair.p2.icon_type=PinIcon;
+            pair.line_color =C.MAP_LINE_COLOR_RIDER;
+            this.mapService.try_mark_pair(pair);
+        }
+        this.mapService.mark_books(t, i);
+        this.mapService.fit_book(t[i]);
+	}
+
+
+	do_search(){
+		this.region_search_criteria = {} ;
+		this.map_region 			= {} ;
+		this.map_move_time			= 0;
+		this.search_is_running		= false
+		this.map_is_moving			= true;
+
+		let serach_criteria = StorageService.getForm(C.KEY_FORM_SEARCH) ;
 		let sc	= serach_criteria;
 
 		if (! sc 
@@ -77,18 +149,18 @@ export class MapControllerComponent extends BaseComponent {
 
 		//move map viewport to contain rider_criteria
 		let viewport= MapService.map_viewport_with_margin(sc, C.MAP_VIEWPORT_MARGIN);
-        this.communicationService.send_msg(C.MSG_KEY_MARKER_FIT, viewport);
+		this.communicationService.send_msg(C.MSG_KEY_MARKER_FIT, viewport);
 
  		this.timer_sub = BaseComponent.timer.subscribe(
-            // val will be 0, 1,2,3,...
-            val => {
+			// val will be 0, 1,2,3,...
+			val => {
 				//console.debug('201811041948', this.class_name, 'timer val=', val);
 				if(val>2){ // avoid initial double search
 					this.set_map_move(val);
 					this.search();
 				}
-            },
-        );
+			},
+		);
 		Util.map_search_start();
 		
 		//Util.show_map();
@@ -122,22 +194,22 @@ export class MapControllerComponent extends BaseComponent {
 		console.debug ('201811041111 MapControllerComponent.search() perform map searching.') ;
 
 		this.reset_msg();
-        this.changeDetectorRef.detectChanges() ;
+		this.changeDetectorRef.detectChanges() ;
 		this.warning_msg 			= 'Searching ...';
 		this.search_is_running		= true;
 		this.region_search_criteria = region_search_criteria;
 		this.communicationService.send_msg(C.MSG_KEY_MARKER_CLEAR, {});
 		
-        this.changeDetectorRef.detectChanges() ;
+		this.changeDetectorRef.detectChanges() ;
 
 
-        let search_criteria = StorageService.getForm(C.KEY_FORM_SEARCH) ;
+		let search_criteria = StorageService.getForm(C.KEY_FORM_SEARCH) ;
 		// region p1,p2 overwrite rider_criteria.p1,p2
 		let search_criteria_combined = {...search_criteria, ... JSON.parse(region_search_criteria)};
 		
 		console.debug ('201810270146 MapControllerComponent.search() search_criteria_combined=\n'
 					, search_criteria_combined);
-		let data_from_db_observable     
+		let data_from_db_observable	 
 			= this.dbService.call_db(C.URL_SEARCH, search_criteria_combined);
 		
 		data_from_db_observable.subscribe(
@@ -224,7 +296,7 @@ export class MapControllerComponent extends BaseComponent {
 	//	this.mapService.map.off('moveend' );
 		
 		let element = document.getElementById("main");
-    	if(element) element.classList.remove("map-controller");
+		if(element) element.classList.remove("map-controller");
 		
 	}
 }

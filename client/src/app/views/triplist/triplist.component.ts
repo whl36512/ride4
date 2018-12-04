@@ -92,8 +92,8 @@ export class TriplistComponent extends BaseComponent {
 			t.google_map_url = MapService.google_map_string(tmp_book); 
 			t.stars = Util.get_stars(t.rating);
 		}
-		this.mapService.mark_books(this.trips_from_db, null);
-		this.mark_my_pair();
+		//this.mapService.mark_books(this.trips_from_db, null);
+		//this.mark_my_pair();
   	}
 
 	mark_my_pair(){
@@ -141,6 +141,8 @@ export class TriplistComponent extends BaseComponent {
 	}
 
 	show_map(index: number){
+		this.router.navigate([C.ROUTE_MAP, C.ROUTE_MAP_SEARCH_RESULTES, {index:index}]);
+/*
 		this.show_body =	C.BODY_NOSHOW;
 		//this.communicationService.send_msg(C.MSG_KEY_MAP_BODY_SHOW, {});
 		this.communicationService.send_msg(C.MSG_KEY_MARKER_CLEAR, {});
@@ -148,5 +150,6 @@ export class TriplistComponent extends BaseComponent {
 		//let trips = Util.deep_copy(this.trips_from_db);
 		this.mapService.mark_books(this.trips_from_db, index);
 		this.mapService.fit_book(this.trips_from_db[index]);
+*/
 	}
 }

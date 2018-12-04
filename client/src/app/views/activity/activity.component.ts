@@ -50,9 +50,7 @@ export class ActivityComponent extends BaseComponent {
                 , public router                 : Router )  {
         super(changeDetectorRef,mapService, communicationService, dbService
                 , geoService, form_builder, router );
-		console.debug("201809262245 ActivityComponent.constructor() enter")	;
 		this.page_name=C.PAGE_ACTIVITY;
-		console.debug("201809262245 ActivityComponent.constructor() exit")	;
 	}
 
 
@@ -74,8 +72,8 @@ export class ActivityComponent extends BaseComponent {
 		,	date2					: [f.date2, [Validators.min] ]
 		});
 
+		if ( !Status.bookings_from_db) this.onChange();
 		this.bookings_from_db = Status.bookings_from_db;
-		if ( !this.bookings_from_db) this.onChange();
 	}
 
 	onChange()

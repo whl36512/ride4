@@ -89,6 +89,10 @@ export class TripComponent extends BaseComponent {
 
 	ngoninit():void {
   		this. form_key = this.route.snapshot.paramMap.get('form_key');
+		if ( ! (this.form_key == C.KEY_FORM_TRIP || this.form_key==C.KEY_FORM_SEARCH)) {
+			this.router.navigate(['/home']);
+		}
+		
 
 		this.setup_form();
 		this.form_change_action();
@@ -192,8 +196,8 @@ export class TripComponent extends BaseComponent {
 			let trip_from_db_observable	 = this.call_wservice(C.URL_INS_TRIP, trip_to_db);
 		}
 		else if (this.form_key == C.KEY_FORM_SEARCH) {
-            let url = '/map_search_start';
-            this.router.navigate([url]);
+            let url = '/map';
+            this.router.navigate([url, 'search']);
 		}
 	}
 

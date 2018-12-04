@@ -1,6 +1,6 @@
 <div class=hide-unhide>
-	<button (click)='show_body=C.BODY_NOSHOW' *ngIf='show_body==C.BODY_SHOW'> {{C.ICON_ARROW_UP}}  </button>
-	<button (click)='show_body=C.BODY_SHOW'   *ngIf='show_body==C.BODY_NOSHOW'> {{C.ICON_ARROW_DOWN}}</button>
+	<button (click)='show_body=C.BODY_NOSHOW' *ngIf='false && show_body==C.BODY_SHOW'> {{C.ICON_ARROW_UP}}  </button>
+	<button (click)='show_body=C.BODY_SHOW'   *ngIf='false && show_body==C.BODY_NOSHOW'> {{C.ICON_ARROW_DOWN}}</button>
 </div>
 <div class='title'>Available Trips</div>
 <div class={{show_body}} >
