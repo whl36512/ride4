@@ -16,6 +16,8 @@ import { map, filter, debounceTime, distinctUntilChanged, switchMap } from 'rxjs
 import { OnChanges				}   from '@angular/core';
 import { SimpleChanges			}   from '@angular/core';
 import { SimpleChange		   }   from '@angular/core';
+import { HostListener }					 from '@angular/core';
+
 
 
 //import { EventEmitter, Input, Output} from '@angular/core';
@@ -94,6 +96,15 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 
 	//protected logError(errorMessage: string) { . . . }	
 	//private logNavigation() { . . . }
+	@HostListener('window:scroll', ['$event'])
+	on_window_scroll(e) {
+		console.debug('201810131753', this.class_name, '.on_window_scroll() event=', e);
+		Status.scroll_position[this.class_name] = window.pageYOffset ;
+		console.debug('201810131753', this.class_name
+			, '.on_window_scroll() Status.scroll_position[this.class_name]=' 
+			, Status.scroll_position[this.class_name]);
+	}
+
 
 	constructor(public changeDetectorRef		: ChangeDetectorRef
 				, public mapService				: MapService			
@@ -459,9 +470,9 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 
 	on_get_data_from_wservice(data_from_db: any) { };
 	validate_form(){}
-    show_reviews(other_usr_id: string){
-        this.router.navigate(['/reviews',  other_usr_id]);
-    }
+	show_reviews(other_usr_id: string){
+		this.router.navigate(['/reviews',  other_usr_id]);
+	}
 
 
 

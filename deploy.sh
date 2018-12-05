@@ -12,3 +12,6 @@ ssh ubuntu@$TAGRET_SERVER  'rm -rf ~ubuntu/ride/*'
 #scp -p 2222 -r ./server/src/sql ./html ./client/dist/ride/* ./server/target/release/server_all root@$TAGRET_SERVER:/var/www/$TARGET_SERVER/.
 scp -r ./server/src/sql ./client/dist/ride3/* ./server/target/release/server_all ubuntu@$TAGRET_SERVER:/home/ubuntu/ride/.
 
+
+#login as ubuntu and then root. run
+#scp -r /home/ubuntu/ride/* root@10.0.0.2:/var/www/ride/.

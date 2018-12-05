@@ -135,7 +135,9 @@ const appRoutes: Routes = [
 		RouterModule.forRoot(
 			appRoutes,
     			{ 	
-					scrollPositionRestoration: 'enabled'
+					// scrollPositionRestoration cannot handle dynamic contents because
+					// contents are (generally) generated in ngInit while scrolling happens before ngInit.
+					scrollPositionRestoration: 'enabled'  
 					,	anchorScrolling: 'enabled'
 					,	enableTracing: true // <-- debugging purposes only
 				} 

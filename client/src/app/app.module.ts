@@ -11,6 +11,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 //import { ChangeDetectorRef }		from '@angular/core';
 //import { NgZone }		from '@angular/core';
+import { RouteReuseStrategy                 }   from '@angular/router';
+
 
 
 //import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -36,6 +38,7 @@ import { GeoService } 		from './models/remote.service';
 import { DBService } 		from './models/remote.service';
 import { HttpService } 		from './models/remote.service';
 import {CommunicationService} 	from './models/communication.service';
+import {CustomReuseStrategy} 	from './models/routeReuse.service';
 //import { SearchComponent } 	from './views/search/search.component' ;
 import { TriplistComponent } 	from './views/triplist/triplist.component';
 //import { TouComponent } from './views/tou/tou.component';
@@ -115,6 +118,8 @@ import { FlashComponent } from './views/flash/flash.component' ;
 		DBService,
 		HttpService,
 		CommunicationService,
+		// https://www.softwarearchitekt.at/post/2016/12/02/sticky-routes-in-angular-2-3-with-routereusestrategy.aspx
+		//{provide: RouteReuseStrategy, useClass: CustomReuseStrategy} 
 		//Router,
 	],
 

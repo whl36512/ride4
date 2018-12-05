@@ -19,7 +19,7 @@ import { Subscription }						from 'rxjs';
 import { Input} 							from '@angular/core';
 //import { Output} 							from '@angular/core';
 import { Router				 }   			from '@angular/router';
-import { SimpleChanges          }   from '@angular/core';
+import { SimpleChanges		  }   from '@angular/core';
 
 
 
@@ -29,6 +29,7 @@ import { C } 								from '../../models/constants';
 import { BaseComponent } 					from '../base/base.component';
 import { StorageService } 					from '../../models/gui.service';
 import { Util } 							from '../../models/gui.service';
+import { Status } 							from '../../models/gui.service';
 import { CommunicationService} 			from '../../models/communication.service' ;
 import { DBService} 						from '../../models/remote.service' ;
 import { GeoService} 						from '../../models/remote.service' ;
@@ -72,6 +73,8 @@ export class BookingsComponent extends BaseComponent {
 	} 
 
 	ngoninit():void {
+
+		window.scroll(0,Status.scroll_position[this.class_name]);
 
 	}
 
@@ -294,17 +297,20 @@ export class BookingsComponent extends BaseComponent {
 					, C.stringify(book_from_db));
 				let n = book_from_db ; // new record
 				let o = this.bookings_from_db[index] ;	//old record
-				if ( n.book.status_cd==o.book.status_cd)
+				if(n.error) {
+					o.fail_msg='Action failed. Status might have already changed'
+					this.changeDetectorRef.detectChanges() ;
+				} else if ( n.book.status_cd==o.book.status_cd)
 				{
 					// no status_cd change
 					o.fail_msg=C.ACTION_FAIL;
 					this.changeDetectorRef.detectChanges() ;
-				} else 
-				{
+				} else {
 					o.book.status_cd= n.book.status_cd;
 					this.set_button(index);
 					o.book_status_description= n.book_status_description;
 					this.changeDetectorRef.detectChanges() ;
+					this.Status.tran_from_db = null;
 				}
 			},
 			error => {

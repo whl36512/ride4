@@ -127,10 +127,12 @@ export class TripComponent extends BaseComponent {
 		StorageService.storeForm(this.form_key, trip);
 		this.trip=trip;
 
+/*
 		if (this.trip.p1.loc == C.LOC_CURRENT1 || this.trip.p1.loc == C.LOC_CURRENT2 ) 
 			this.trip.p1	= Util.create_empty_location();
 		if (this.trip.p2.loc == C.LOC_CURRENT1 || this.trip.p2.loc == C.LOC_CURRENT2 )
 			this.trip.p2	= Util.create_empty_location();
+*/
 
 		this.form= this.form_builder.group(
 			{
@@ -203,11 +205,17 @@ export class TripComponent extends BaseComponent {
 
 	on_get_data_from_wservice(data){
 		if (data.trip_id) {
-			//this.form_saved_to_db=true;
-			this.info_msg ='The trip is published. Riders can start to book the trip. Click My Activities menu to make changes';
-			if (data.rider_ind) this.warning_msg 
-			= ' You MUST maintain your balance over Estimated Cost. Otherwise drivers cannot find your trip.'
+			if (data.rider_ind) {
+				this.info_msg =C.MSG_PUBLISHED.replace('ROLE', 'Drivers');
+				this.warning_msg 
+					= ' You MUST maintain your balance over Estimated Cost. ' 
+						+ 'Otherwise drivers cannot find your trip.' ;
+			} else {
+				this.info_msg =	C.MSG_PUBLISHED.replace('ROLE', 'Riders');
+			}
+			
 			this.button_label='Publish Another Trip';
+			this.Status.bookings_from_db	=	null;
 		}
 		else this.error_msg = C.ACTION_FAIL;
 	}
@@ -259,7 +267,7 @@ export class TripComponent extends BaseComponent {
 					) 
 				validation_error 
 					= 'You MUST maintain a balance above Estimated Cost to publish a trip as rider';
-			else if ( this.user_from_db.balance < 0)
+			else if ( this.user_from_db.balance < C.MIN_ACCOUNT_BALANCE )
 				validation_error = 'You cannot publish trip with a negative account balance';
 			else if ( !f.trip_time )
 				validation_error = 'Please enter Departure Time';

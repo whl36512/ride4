@@ -92,8 +92,11 @@ export class TriplistComponent extends BaseComponent {
 			t.google_map_url = MapService.google_map_string(tmp_book); 
 			t.stars = Util.get_stars(t.rating);
 		}
+
+
 		//this.mapService.mark_books(this.trips_from_db, null);
 		//this.mark_my_pair();
+		window.scroll(0,	this.Status.scroll_position[this.class_name]);
   	}
 
 	mark_my_pair(){
@@ -129,7 +132,9 @@ export class TriplistComponent extends BaseComponent {
 				trip.seats_booked= trip.seats_booked
 							+ book_from_db.seats;
 				this.changeDetectorRef.detectChanges();
-				
+
+				this.Status.bookings_from_db	= null;
+				this.Status.tran_from_db		= null;
 			},
 			_ => {
 				trip.info_msg=null;

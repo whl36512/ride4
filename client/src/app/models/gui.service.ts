@@ -24,6 +24,10 @@ export class Status {
 	static rider_criteria : any | null = null
 	static bookings_from_db : any | null = null  // for activity page
 	static tran_from_db : any | null = null  // for transaction history page
+	static scroll_position		: any	={};
+	static reviewee_from_db	: any= {};	//save reviewee and reviews here to avoid repeated DB retrieval
+	static reviews_from_db	: any	= null;
+	
 }
 
 export class UserService {
@@ -174,7 +178,7 @@ export class Util {
 		if(rating) {
 			return C.ICON_STAR.repeat(Math.round(rating)) + C.ICON_STAR_WHITE.repeat(5-Math.round(rating));
 		} else {
-			return 'not yet rated';
+			return 'unrated';
 		}
 	}
 	static hide_map() {
@@ -530,3 +534,4 @@ export class StorageService {
 		return form_value1;
 	}
 }
+

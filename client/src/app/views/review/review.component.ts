@@ -94,6 +94,8 @@ export class ReviewComponent extends BaseComponent {
 		if(review_from_db.book_id==this.book_id) {
 			if (this.review_from_db.book_id) {
 				this.info_msg='Review saved';
+				this.Status.reviewee_from_db 	= {};
+				this.Status.reviews_from_db 	= null;
 			}
 			this.review_from_db = review_from_db;
 			this.set_form();

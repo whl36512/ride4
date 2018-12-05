@@ -948,7 +948,7 @@ $body$
 			, funcs.calc_cost_rider(t.price, t.distance , t.seats )	as cost
 			, coalesce (b.seats,0) seats_booked	--should always ==0
 			, case when u0.balance is null 	then false else true end is_signed_in 
-			, case when u0.balance >= 0 	then true else false end sufficient_balance
+			, case when u0.balance >= -10 	then true else false end sufficient_balance
 			, uo.headline
 			, uo.rating
 			, case when uo.profile_ind then 'LinkedIn Profile available' 
@@ -1024,7 +1024,7 @@ BEGIN
 										else 'LinkedIn Profile Opted out' 
 				end profile_available
 			, case when u0.balance is null 	then false else true end is_signed_in 
-			, case when u0.balance >= 0 	then true else false end sufficient_balance
+			, case when u0.balance >= -10 	then true else false end sufficient_balance
 			, coalesce ( b.seats, 0)	seats_booked	-- should always be 0
 		from trip t
 		join usr uo on (uo.usr_id = t.usr_id) -- to get the other user's headline and balance

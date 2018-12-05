@@ -70,6 +70,7 @@ export class Constants{
 	static MAX_SEATS 			= 6					;
 	static MAX_SEARCH_TIGHTNESS = 5					;
 	static BOOKING_FEE 			= 0.2				;
+	static MIN_ACCOUNT_BALANCE 	= -10				;
 
 	static FORM_DEBOUNCE_TIME 	= 500				;
 
@@ -134,6 +135,8 @@ export class Constants{
  	static MSG_KEY_MAP_BODY_NOSHOW	= 'msgKeyShowMapBodyNoShow' 	; 
  	static MSG_KEY_MAP_LINE		= 'msgKeyMapLine' 	; 
  	static MSG_KEY_GREETING		= 'msgKeyGreeting';
+
+ 	static MSG_PUBLISHED		= 'The trip is published. ROLE can start to book the trip. Click My Activities menu to make changes';
 
  	static BODY_SHOW			= 'show' 			; 
  	static BODY_NOSHOW			= 'noshow' 			; 
