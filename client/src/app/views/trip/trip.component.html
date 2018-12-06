@@ -1,7 +1,11 @@
 <div *ngIf="false"> https://material.angular.io/components/menu/overview </div>
 <div class=hide-unhide>
-	<button (click)='show_map()' *ngIf='show_body==C.BODY_SHOW' > Map {{C.ICON_ARROW_UP}}  </button>
-	<button (click)='show_body=C.BODY_SHOW'   *ngIf='show_body==C.BODY_NOSHOW' > {{C.ICON_ARROW_DOWN}}</button>
+	<button (click)='show_map()' *ngIf='show_body==C.BODY_SHOW' > Map 
+		{{C.ICON_ARROW_DOWN}}
+	</button>
+	<button (click)='show_body=C.BODY_SHOW'   *ngIf='show_body==C.BODY_NOSHOW' > Map
+		{{C.ICON_ARROW_UP}} 
+	</button>
 </div>
 
 <div class="title" *ngIf='form_key==C.KEY_FORM_TRIP' >Publish my Trip</div>
@@ -165,7 +169,7 @@
 				</textarea>
 	  		</dd>
 		</dl>
-		<dl *ngIf='form_key==C.KEY_FORM_SEARCH'>
+		<dl *ngIf='false && form_key==C.KEY_FORM_SEARCH'>
             You can reduce number of search results by narrowing down searches.
             <dt><label for="seats">Narrowing Level: {{this.form.value.search_tightness}}  </label></dt>
             <dd>
@@ -183,7 +187,7 @@
 			{{button_label}}
 		</button>
         <button type="submit" *ngIf='form_key==C.KEY_FORM_SEARCH' [disabled]="validation_error" >
-            Save Settings to this Device and Start Map Search
+            Search on Map
         </button>
 
 

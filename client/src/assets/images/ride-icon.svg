@@ -7,11 +7,11 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   viewBox="-120 -100 240 160"
    id="svg8"
    inkscape:version="0.92.3 (2405546, 2018-03-11)"
-   sodipodi:docname="icon.svg">
+	>
   <defs
      id="defs2" />
   
@@ -34,100 +34,78 @@
     <rect
        id="car-body"
        width="240"
-       height="60"
+       height="80"
        x="-120"
        y="-30"
-       style="fill: var(--fill-color1);"
-       ry="15"
-       rx="15" />
+       style="fill: #0088dd;"
+       ry="30"
+       rx="30" />
     <rect
        id="right-wheel"
        width="40"
-       height="80"
-       x="-110"
-       y="-30"
-       ry="15"
-       rx="15"
-       style="fill: var(--fill-color1);"
+       height="60"
+       x="-120"
+       y="0"
+       ry="10"
+       rx="10"
+       style="fill: #0088dd;"
 	   />
 	<rect
-       rx="15"
        id="left-wheel"
        width="40"
-       height="80"
-       x="70"
-       y="-30"
-       style="fill: var(--fill-color1);"
-       ry="15" />
+       height="60"
+       x="80"
+       y="0"
+       style="fill: #0088dd;"
+       ry="10"
+       rx="10"
+	/>
     <circle
        id="woman-head"
        cx="-60"
-       cy="-65"
-       style="fill: var(--fill-color1);"
+       cy="-70"
+       style="fill: #0088dd;"
        r="25"
      />
 	 <circle
        id="man-head"
        cx="60"
        cy="-70"
-       style="fill: var(--fill-color1);"
+       style="fill: #0088dd;"
        r="25"
      />
 	 <circle
        id="child-head"
        cx="0"
        cy="-80"
-       style="fill: var(--fill-color1);"
-       r="22"
+       style="fill: #0088dd;"
+       r="20"
      />
 	 
-	<path
-       style="fill: var(--fill-color1);"
-       id="woman-hair"
-       sodipodi:type="arc"
-       sodipodi:cx="-60"
-       sodipodi:cy="-60"
-       sodipodi:rx="30"
-       sodipodi:ry="40"
-       sodipodi:start="3.1415927"
-       sodipodi:end="0"
-        />
     <ellipse
-       style="fill: var(--fill-color2);"
+       style="fill: white;"
        id="left-light"
        cx="-80"
        cy="0"
        rx="20"
        ry="15" />
 	   <ellipse
-       style="fill: var(--fill-color2);"
+       style="fill: white;"
        id="right-light"
        cx="80"
        cy="0"
        rx="20"
        ry="15" />
-	   <path
-       style="fill: var(--fill-color2);"
-       id="mouth-small"
-       sodipodi:type="arc"
-       sodipodi:cx="0"
-       sodipodi:cy="-10"
-       sodipodi:rx="40"
-       sodipodi:ry="30"
-       sodipodi:start="0"
-       sodipodi:end="3.1415927"
-        />
-	   <path
-       style="fill: var(--fill-color1);"
-       id="mouth-big"
-       sodipodi:type="arc"
-       sodipodi:cx="0"
-       sodipodi:cy="-20"
-       sodipodi:rx="50"
-       sodipodi:ry="30"
-       sodipodi:start="0"
-       sodipodi:end="3.1415927"
-        />
+	<path
+       style="fill: white"
+       id="mouth-lower"
+		d="m 40,0 a 40,20 0 0 1 -80,0 z"
+    />
+	<path
+       style="fill: #0088dd;"
+       id="mouth-upper"
+		d="m 40,-1 a 50,20 0 0 1 -80,0 z"
+    />
     
   </g>
 </svg>

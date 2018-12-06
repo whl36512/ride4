@@ -75,6 +75,7 @@ export class DepositComponent extends BaseComponent {
 
 				if ( this.user_from_db.deposit_id != null)
 				{
+					this.user_from_db.deposit_id= this.user_from_db.deposit_id.replace(/-/g, ''); 
 					this.show_detail=true;
 				}
 				else {

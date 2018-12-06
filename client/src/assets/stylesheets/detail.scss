@@ -22,7 +22,7 @@ $red	:  #ff9999;
 }
 
 body.flash {
-	ackground-image: url("https://eoimages.gsfc.nasa.gov/images/imagerecords/57000/57723/globe_west_540.jpg");
+	background-image: url("https://eoimages.gsfc.nasa.gov/images/imagerecords/57000/57723/globe_west_540.jpg");
 }
 
 textarea {
@@ -348,7 +348,7 @@ user-select: none;
 	align-items: center;   
 	flex-direction: column;
 
-	height:30rem;
+	height:100%;
 }
 
 div.bar {
@@ -366,4 +366,13 @@ div.bar {
 	border-top: 2px solid blue;
 	border-bottom: 1px solid #ffffff;
 	background-color: $primary-color;
+}
+
+img.ride_icon {
+	width 	: 12rem;
+	height	: 8rem
+}
+
+#abcd {
+  background-image: url(assets/images/ride-icon.svg);
 }

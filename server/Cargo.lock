@@ -239,9 +239,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "db"
 version = "0.1.0"
-source = "git+https://github.com/whl36512/db.git#b09d3eb4139d82d8a78fae7f51028f0b5e5601ca"
+source = "git+https://github.com/whl36512/db.git#77835b1d5dae9d2935ccfc3d4c3013f1aa03be31"
 dependencies = [
- "log 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "log 0.3.9 (registry+https://github.com/rust-lang/crates.io-index)",
  "postgres 0.15.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "r2d2 0.8.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "r2d2_postgres 0.14.0 (registry+https://github.com/rust-lang/crates.io-index)",
