@@ -8,7 +8,7 @@
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   viewBox="-120 -100 240 160"
+   viewBox="-120 -100 240 240"
    id="svg8"
    inkscape:version="0.92.3 (2405546, 2018-03-11)"
 	>
@@ -27,36 +27,42 @@
       </cc:Work>
     </rdf:RDF>
   </metadata>
+<style>
+    .heavy { font: bold 30px sans-serif; fill: #0088dd; }
+	.pcolor { fill: #0088dd;}
+	.bcolor { fill: white;}
+  </style>
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
+	<rect x="-120" y="-100" width="100%" height="100%" class="bcolor"/>
     <rect
        id="car-body"
        width="240"
        height="80"
        x="-120"
        y="-30"
-       style="fill: #0088dd;"
+       class="pcolor"
        ry="30"
        rx="30" />
     <rect
        id="right-wheel"
        width="40"
-       height="60"
+       height="70"
        x="-120"
        y="0"
        ry="10"
        rx="10"
-       style="fill: #0088dd;"
+       class="pcolor"
 	   />
 	<rect
        id="left-wheel"
        width="40"
-       height="60"
+       height="70"
        x="80"
        y="0"
-       style="fill: #0088dd;"
+       class="pcolor"
        ry="10"
        rx="10"
 	/>
@@ -64,48 +70,53 @@
        id="woman-head"
        cx="-60"
        cy="-70"
-       style="fill: #0088dd;"
+       class="pcolor"
        r="25"
      />
 	 <circle
        id="man-head"
        cx="60"
        cy="-70"
-       style="fill: #0088dd;"
+       class="pcolor"
        r="25"
      />
 	 <circle
        id="child-head"
        cx="0"
        cy="-80"
+       class="pcolor"
        style="fill: #0088dd;"
        r="20"
      />
 	 
     <ellipse
-       style="fill: white;"
+       class="bcolor"
        id="left-light"
        cx="-80"
        cy="0"
        rx="20"
        ry="15" />
 	   <ellipse
-       style="fill: white;"
+       class="bcolor"
        id="right-light"
        cx="80"
        cy="0"
        rx="20"
        ry="15" />
 	<path
-       style="fill: white"
+       class="bcolor"
        id="mouth-lower"
 		d="m 40,0 a 40,20 0 0 1 -80,0 z"
     />
 	<path
-       style="fill: #0088dd;"
+       class="pcolor"
        id="mouth-upper"
 		d="m 40,-1 a 50,20 0 0 1 -80,0 z"
     />
+	<text x="0" y="100" class="heavy" 
+		text-anchor="middle" alignment-baseline="central" >
+		Easy Rideshare !
+	</text>
     
   </g>
 </svg>

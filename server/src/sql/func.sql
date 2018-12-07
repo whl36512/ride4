@@ -1238,33 +1238,36 @@ create or replace function funcs.get_money_tran( in_criteria text, in_user text)
 	returns setof json
 as
 $body$
-	with u0	as ( 
-		SELECT * FROM funcs.json_populate_record(NULL::usr , in_user) 
-	)
-	, c0 as ( 
-		SELECT * FROM funcs.json_populate_record(NULL::funcs.criteria , in_criteria)
-	)
-	, s1 as (select	
+DECLARE
+	u0	usr;
+	c0	funcs.criteria;
+BEGIN
+	u0	:=	funcs.json_populate_record(NULL::usr , in_user)  ;
+	c0	:=	funcs.json_populate_record(NULL::funcs.criteria , in_criteria) ;
+
+	return query
+	with s1 as (
+		select	
 			coalesce(t.actual_ts, t.request_ts) date
 			, cd.description
 			, t.*
-		from u0
-		join money_tran t on ( t.usr_id= u0.usr_id)
-		join	c0 on (1=1)	
+		from money_tran t 
 		left outer join money_tran_tran_cd cd on (	cd.tran_cd = t.tran_cd)
 		where (
-			t.actual_ts between coalesce(c0.date1, '1970-01-01') 
-			and coalesce(c0.date2, '3000-01-01')
+			t.actual_ts between coalesce(c0.date1 - 1, '1970-01-01') 
+			and coalesce(c0.date2+1, '3000-01-01')
 			or 
-			t.request_ts between coalesce(c0.date1, '1970-01-01') 
-			and coalesce(c0.date2, '3000-01-01')
+			t.request_ts between coalesce(c0.date1 - 1, '1970-01-01') 
+			and coalesce(c0.date2 + 1, '3000-01-01')
 		)
+		and t.usr_id= u0.usr_id
 	)
 	select row_to_json (s1)	from s1
 	order by date desc
 	;
+END
 $body$
-language sql;
+language plpgsql;
 
 create or replace function funcs.withdraw( in_tran text, in_user text)
 	returns json
