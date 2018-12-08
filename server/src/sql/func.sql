@@ -888,6 +888,7 @@ $body$
 			t trip
 			, funcs.calc_cost(t.price, c0.distance , c0.seats ) as cost
 			, coalesce (b.seats,0) seats_booked
+			, c0.seats				seats_to_book
 			, case when u0.balance is null 	then false else true end is_signed_in 
 			, case when um.balance >=	(funcs.calc_cost(t.price ,c0.distance	,c0.seats )).cost_rider
 				then true else false 
@@ -947,6 +948,7 @@ $body$
 			t trip
 			, funcs.calc_cost_rider(t.price, t.distance , t.seats )	as cost
 			, coalesce (b.seats,0) seats_booked	--should always ==0
+			, t.seats				seats_to_book
 			, case when u0.balance is null 	then false else true end is_signed_in 
 			, case when u0.balance >= -10 	then true else false end sufficient_balance
 			, uo.headline
@@ -1026,6 +1028,7 @@ BEGIN
 			, case when u0.balance is null 	then false else true end is_signed_in 
 			, case when u0.balance >= -10 	then true else false end sufficient_balance
 			, coalesce ( b.seats, 0)	seats_booked	-- should always be 0
+			, t.seats				seats_to_book
 		from trip t
 		join usr uo on (uo.usr_id = t.usr_id) -- to get the other user's headline and balance
 		left outer join book b on (b.trip_id=t.trip_id and b.usr_id=u0.usr_id and b.status_cd in ('P', 'C'))

@@ -78,6 +78,7 @@ export class ReviewsComponent extends BaseComponent {
  				, public route: ActivatedRoute)  {
         super(changeDetectorRef,mapService, communicationService, dbService
                 , geoService, form_builder, router );
+		this.page_name= C.PAGE_REVIEWS;
 		this.router.routeReuseStrategy.shouldReuseRoute = function() {
 			// force recreate of component, so this.route.snapshot.paramMap.get will work
 			return false;
@@ -95,7 +96,7 @@ export class ReviewsComponent extends BaseComponent {
 			this.call_wservice(C.URL_GET_OTHER_USER, {usr_id: reviewee_usr_id});
 			this.call_wservice(C.URL_GET_REVIEWS, {usr_id: reviewee_usr_id});
 		}
-		window.scroll(0,Status.scroll_position[this.class_name]);
+		window.scroll(0,Status.scroll_position[this.page_name]);
   	}
 
 	setup_data()

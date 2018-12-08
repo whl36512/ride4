@@ -37,7 +37,9 @@
         </dl>
         <br/>
 	<!--button type="submit" [disabled]="form.invalid" -->
-	<button type="submit">Save</button>
+	<div class=center>
+		<button type="submit" class=center>Save Profile</button>
+	</div>
 </form>
 <div *ngIf='error_msg!=null' 	class='fade error'>{{error_msg}}</div>
 <div *ngIf='warning_msg!=null' 	class='fade warning' >{{warning_msg}}</div>

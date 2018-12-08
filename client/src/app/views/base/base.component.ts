@@ -98,11 +98,11 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 	//private logNavigation() { . . . }
 	@HostListener('window:scroll', ['$event'])
 	on_window_scroll(e) {
-		console.debug('201810131753', this.class_name, '.on_window_scroll() event=', e);
-		Status.scroll_position[this.class_name] = window.pageYOffset ;
-		console.debug('201810131753', this.class_name
-			, '.on_window_scroll() Status.scroll_position[this.class_name]=' 
-			, Status.scroll_position[this.class_name]);
+		console.debug('201810131753', this.page_name, '.on_window_scroll() event=', e);
+		Status.scroll_position[this.page_name] = window.pageYOffset ;
+		console.debug('201810131753', this.page_name
+			, '.on_window_scroll() Status.scroll_position=' 
+			, Status.scroll_position[this.page_name]);
 	}
 
 

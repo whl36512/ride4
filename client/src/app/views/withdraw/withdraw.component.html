@@ -12,9 +12,8 @@ you can request a full or partial withdraw of the balance.
 <div class="title">Withdraw Request</div>
 <form  *ngIf='is_signed_in' [formGroup]="form" (ngSubmit)="onSubmit()">
 	<dl>
-		<dt> Last Name : {{user_from_db.last_name}} </dt>
-		<dt> First Name : {{user_from_db.first_name}} </dt>
-       		<dt> Balance : ${{user_from_db.balance}} </dt>
+		<dt>Name : {{user_from_db.first_name}} {{user_from_db.last_name}} </dt>
+       	<dt> Balance : ${{user_from_db.balance}} </dt>
 		<dt><label>Email registered at you bank (required) </label></dt>
 		<dd >      
           		<input  type="email"  formControlName="bank_email" required 
@@ -31,11 +30,11 @@ you can request a full or partial withdraw of the balance.
 			<span class="validity"></span>
           	</dd>
         </dl>
-        <br/>
+<div *ngIf='error_msg!=null' class=error [innerHTML]='error_msg' ></div>
+<div *ngIf='warning_msg!=null' class=warning [innerHTML]='warning_msg'></div>
+<div *ngIf='info_msg!=null' class=info [innerHTML]='info_msg' ></div>
 	<div class=center *ngIf='!saved'>
 		<button type="submit" [disabled]="form.invalid" >Send Request</button>
 	</div>
 </form>
-<div *ngIf='error_msg!=null' class=error>{{error_msg}}</div>
-<div *ngIf='warning_msg!=null' class=warning>{{warning_msg}}</div>
-<div *ngIf='info_msg!=null' class=info>{{info_msg}}</div>
+&nbsp;

@@ -52,6 +52,7 @@ export class FlashComponent extends BaseComponent {
 				, public route: ActivatedRoute)  {
 		super(changeDetectorRef,mapService, communicationService, dbService
 				, geoService, form_builder, router );
+		this.page_name=C.PAGE_FLASH;
   	} 
 
 	ngoninit():void {

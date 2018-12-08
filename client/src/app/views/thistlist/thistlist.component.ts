@@ -72,6 +72,7 @@ export class ThistlistComponent extends BaseComponent {
                 , public router                 : Router )  {
         super(changeDetectorRef,mapService, communicationService, dbService
                 , geoService, form_builder, router );
+		this.page_name=C.PAGE_THIST_LIST;
 
   		console.debug("201809262245 ThistlistComponent.constructor() enter")  ;
   		console.debug("201809262245 ThistlistComponent.constructor() exit")  ;

@@ -53,6 +53,7 @@ export class MapControllerComponent extends BaseComponent {
 				)  {
 		super(changeDetectorRef,mapService, communicationService, dbService
 				, geoService, form_builder, router );
+		this.page_name= C.PAGE_MAP_CONTROLLER;
 		this.router.routeReuseStrategy.shouldReuseRoute = function() {
 			// force recreate of component, so this.route.snapshot.paramMap.get will work
 			return false;
@@ -96,7 +97,8 @@ export class MapControllerComponent extends BaseComponent {
 
 
 		this.mapService.clear_markers();
-		this.mapService.mark_books( b, i);
+		this.mapService.mark_book( b[i], i, false);
+		//this.mapService.mark_books( b, i);
 		this.mapService.fit_pair( b[i].trip);
 	}
 

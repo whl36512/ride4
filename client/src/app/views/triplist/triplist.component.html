@@ -7,13 +7,11 @@
 	<div *ngIf='error_msg!=null' 	class=error [innerHTML]='error_msg'></div>
 	<div *ngIf='warning_msg!=null' 	class=warning [innerHTML]='warning_msg'></div>
 	<div *ngIf='info_msg!=null' 	class=info [innerHTML]='info_msg'></div>
-	<br/>
-
 
 	<div *ngFor="let trip of trips_from_db ;let i=index;
 		let even=even;let odd=odd; let first = first; let last = last; trackBy:trackByFunc"
 		[ngClass]="{ odd: odd, even: even }">
-		<div class=bar></div>
+	<div class=detail>
       	<table>
 			<thead>
 				<tr >
@@ -36,7 +34,7 @@
 					<td *ngIf='!trip.trip.rider_ind'>{{trip.cost.cost_rider}} </td>
 					<td *ngIf='is_signed_in'>{{trip.seats_booked}}</td>
 					<td>
-						<button #j (click)="book(trip)"
+						<button #j (click)="book(trip, i)"
 							[disabled]='!trip.show_book_button'
 						>Book it</button>
 					</td>
@@ -70,5 +68,6 @@
 		<div class='stitle'>Description</div>
  		<div class=data [innerHTML]="trip.trip.description"></div>
 		<p>
+	</div>
 	</div>
 </div>

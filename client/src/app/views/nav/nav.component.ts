@@ -35,6 +35,7 @@ export class NavComponent extends BaseComponent {
                 , public router                 : Router )  {
         super(changeDetectorRef,mapService, communicationService, dbService
                 , geoService, form_builder, router );
+		this.page_name=C.PAGE_NAV;
 
 	}
 

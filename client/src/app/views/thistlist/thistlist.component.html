@@ -3,10 +3,9 @@
 <div *ngIf='info_msg!=null'     class=info [innerHTML]='info_msg'></div>
 
 <div class=warning *ngIf='false'>change_detect_count={{change_detect_counter()}}</div>
-<table>
+<table class=center>
 	<thead>
 		<tr >
-			<th>#</th>
 			<th>Date</th>
 			<th>Credit</th>
 			<th>Debit</th>
@@ -18,7 +17,6 @@
 		<tr *ngFor="let tran of tran_from_db ;let i=index;
 			let even=even;let odd=odd; let first = first; let last = last; trackBy:trackByFunc"
 			[ngClass]="{ odd: odd, even: even }">
-			<td>{{i+1}}</td>
 			<td>{{tran.date.slice(0,10)}} </td>
 			<td> 
 				<span *ngIf='tran.actual_amount > 0' > {{tran.actual_amount}}</span>

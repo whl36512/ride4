@@ -11,8 +11,9 @@
 <div class="title" *ngIf='form_key==C.KEY_FORM_TRIP' >Publish my Trip</div>
 <div class="title" *ngIf='form_key==C.KEY_FORM_SEARCH' >Search Settings</div>
 <div class={{show_body}} >
-	<form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf='show_form==C.BODY_SHOW'>
-		<dl> 
+
+	<form [formGroup]="form" (ngSubmit)="onSubmit()" >
+		<dl class=detail> 
 			<dt>
 					I am 
 					<label><input type="radio" formControlName='rider_ind' [value]=false />Driver</label> 
@@ -35,9 +36,7 @@
 	  		<dd  class="f08 "  > 
 				 {{trip.p1.display_name}}
 			</dd>
-		</dl>
 
-		<dl >
 	  		<dt>
 				{{to}}
 			</dt>
@@ -64,6 +63,7 @@
 			</dt>
 		</dl>
 
+		<div class=detail>
 		<table class=no_border *ngIf='form_key==C.KEY_FORM_TRIP'>
 			<tr>
 				<td>
@@ -136,8 +136,8 @@
 					munites
 			</dt>
 		</dl>
-		<p>
-		<dl >
+		</div>
+		<dl class=detail>
 			<dt>
 			<span *ngIf='!this.form.value.rider_ind'>Available Seats: </span>
 			<span *ngIf='this.form.value.rider_ind' >Requested Seats: </span>
@@ -160,7 +160,7 @@
 				<span class="validity" ></span>
 	  		</dd>
 		</dl>
-		<dl *ngIf='form_key==C.KEY_FORM_TRIP'>
+		<dl *ngIf='form_key==C.KEY_FORM_TRIP' class=detail>
 	  		<dt>Description</dt>
 	  		<dd >
 				<textarea id="description" formControlName=description 
@@ -169,7 +169,7 @@
 				</textarea>
 	  		</dd>
 		</dl>
-		<dl *ngIf='false && form_key==C.KEY_FORM_SEARCH'>
+		<dl *ngIf='false && form_key==C.KEY_FORM_SEARCH' class=detail>
             You can reduce number of search results by narrowing down searches.
             <dt><label for="seats">Narrowing Level: {{this.form.value.search_tightness}}  </label></dt>
             <dd>

@@ -55,8 +55,7 @@ export class MessageComponent extends BaseComponent {
                 , public router                 : Router )  {
         super(changeDetectorRef,mapService, communicationService, dbService
                 , geoService, form_builder, router );
-
-		console.debug("201809262245 MessageComponent.constructor() enter")	;
+		this.page_name=C.PAGE_CHAT;
 
 		this.timer_sub = BaseComponent.timer.subscribe(
 			// val will be 0, 1,2,3,...

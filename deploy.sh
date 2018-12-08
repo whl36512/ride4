@@ -1,4 +1,4 @@
-echo $TAGRET_SERVER
+echo $TARGET_SERVER
 cd ./server
 #cargo build  --release    #uncomment if not built
 cd -
@@ -7,10 +7,9 @@ cd ./client
 
 cd  -
 
-ssh ubuntu@$TAGRET_SERVER  'mkdir -p ~ubuntu/ride'
-ssh ubuntu@$TAGRET_SERVER  'rm -rf ~ubuntu/ride/*'
-#scp -p 2222 -r ./server/src/sql ./html ./client/dist/ride/* ./server/target/release/server_all root@$TAGRET_SERVER:/var/www/$TARGET_SERVER/.
-scp -r ./server/src/sql ./client/dist/ride3/* ./server/target/release/server_all ubuntu@$TAGRET_SERVER:/home/ubuntu/ride/.
+ssh ubuntu@$TARGET_SERVER  'mkdir -p ~ubuntu/ride'
+ssh ubuntu@$TARGET_SERVER  'rm -rf ~ubuntu/ride/*'
+scp -r ./server/src/sql ./client/dist/ride3/* ./server/target/release/server_all ubuntu@$TARGET_SERVER:/home/ubuntu/ride/.
 
 
 #login as ubuntu and then root. run

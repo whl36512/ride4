@@ -53,7 +53,8 @@ export class Constants{
 	static PAGE_SEARCH			= 'search'			;
 	static PAGE_ACTIVITY 		= 'activity'		;
 	static PAGE_MYOFFERS 		= 'myoffers'		;
-	static PAGE_MYBOOKING 		= 'mybooking'		;
+	static PAGE_TRIP_LIST 		= 'trip_list'		;
+	static PAGE_BOOKING 		= 'booking'			;
 	static PAGE_DEPOSIT			= 'deposit'			;
 	static PAGE_WITHDRAW		= 'withdraw'		;
 	static PAGE_CONTACT_US		= 'contact_us'		;
@@ -61,6 +62,12 @@ export class Constants{
 	static PAGE_NAV 			= 'nav'				;
 	static PAGE_MAP 			= 'map'				;
 	static PAGE_THIST 			= 'thist'			;
+	static PAGE_THIST_LIST 		= 'thist_list'		;
+	static PAGE_FLASH 			= 'flash'			;
+	static PAGE_MAP_CONTROLLER	= 'map_controller'	;
+	static PAGE_CHAT			= 'chat'	;
+	static PAGE_REVIEWS			= 'reviews'	;
+	static PAGE_REVIEW			= 'review'	;
 
 	static EMAIL_PATTERN 		
 		= String.raw`^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-]{1,30}\.){1,4}([a-zA-Z]{2,5})$` ;

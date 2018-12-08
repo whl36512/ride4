@@ -2,8 +2,8 @@
 <div *ngIf='error_msg!=null'    class=error [innerHTML]='error_msg'></div>
 <div *ngIf='warning_msg!=null'  class=warning [innerHTML]='warning_msg'></div>
 <div *ngIf='info_msg!=null'     class=info [innerHTML]='info_msg'></div>
-for {{user_from_db.headline}}
-<table>
+for: {{user_from_db.headline}}
+<table class=center>
 	<tbody>
 		<tr>
 			<td>Reviews</td>
@@ -63,11 +63,16 @@ for {{user_from_db.headline}}
 	<dt *ngFor="let r of reviews_from_db ;let i=index;
 		let even=even;let odd=odd; let first = first; let last = last; trackBy:trackByFunc"
 		[ngClass]="{ odd: odd, even: even }">
-		<div class=bar></div>
+		<div class=detail>
 		<div class=f08>
 			<span class=star [innerHTML]='r.stars'></span> 
 			on {{r.review_date}} by {{r.headline}} 
 		</div>
-		<div class=data >{{r.review}}</div>
+		<dl>
+			<dd>
+				<div class=data >{{r.review}}</div>
+			</dd>
+		</dl>
+		</div>
 	</dt>
 </dl>

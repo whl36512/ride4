@@ -57,6 +57,7 @@ export class TriplistComponent extends BaseComponent {
                 , public router                 : Router )  {
         super(changeDetectorRef,mapService, communicationService, dbService
                 , geoService, form_builder, router );
+		this.page_name=C.PAGE_TRIP_LIST;
 
 
   		console.debug("201809262245", this.class_name, ".constructor() exit")  ;
@@ -84,7 +85,7 @@ export class TriplistComponent extends BaseComponent {
 			else t.status_msg=null ;
 
 			t.show_book_button = 	this.is_signed_in && t.sufficient_balance
-					//&& Number(this.search_criteria.distance)
+					&& t.seats_to_book >0
 					;
 
 			let tmp_book= Util.deep_copy(t);
@@ -93,24 +94,10 @@ export class TriplistComponent extends BaseComponent {
 			t.stars = Util.get_stars(t.rating);
 		}
 
-
-		//this.mapService.mark_books(this.trips_from_db, null);
-		//this.mark_my_pair();
-		window.scroll(0,	this.Status.scroll_position[this.class_name]);
+		window.scroll(0,	this.Status.scroll_position[this.page_name]);
   	}
 
-	mark_my_pair(){
-		if(this.search_criteria){
-	    	let pair = this.Util.deep_copy ( this.search_criteria);
-			pair.p1.icon_type=PinIcon;
-			pair.p2.icon_type=PinIcon;
-			pair.line_color =C.MAP_LINE_COLOR_RIDER;
-	    	//this.communicationService.send_msg(C.MSG_KEY_MARKER_PAIR, pair);
-	    	this.mapService.try_mark_pair(pair);
-		}
-	}
-
-	book(trip: any): void {
+	book(trip: any, index: string): void {
 
 		let seats = trip.trip.rider_ind? trip.trip.seats	:	this.search_criteria.seats	;
 		let book_to_db = {
@@ -126,19 +113,24 @@ export class TriplistComponent extends BaseComponent {
 		book_from_db_observable.subscribe(
 	    	book_from_db => {
 				console.debug("201808201201 JourneyComponent.book() book_from_db =" + C.stringify(book_from_db));
-				if (book_from_db.status_cd=='P') trip.info_msg='Booked, pending<br/>confirmation' ;
-				else 							 trip.error_msg='Booking failed' ;
-				trip.show_book_button= book_from_db.status_cd!='P';
-				trip.seats_booked= trip.seats_booked
-							+ book_from_db.seats;
-				this.changeDetectorRef.detectChanges();
+				if (book_from_db.status_cd=='P') {
+					trip.info_msg='Booked, <br/>pending<br/>confirmation' ;
+					let sr= this.Status.search_result[index];
+					trip.show_book_button= false;
+					trip.seats_booked= trip.seats_booked + book_from_db.seats;
+					sr.seats_booked = sr.seats_booked + book_from_db.seats;
+					trip.seats_to_book= trip.seats_to_book - book_from_db.seats;
+					sr.seats_to_book = sr.seats_to_book - book_from_db.seats;
 
-				this.Status.bookings_from_db	= null;
-				this.Status.tran_from_db		= null;
+					this.Status.bookings_from_db	= null;
+					this.Status.tran_from_db		= null;
+					this.changeDetectorRef.detectChanges();
+				}
+				else trip.error_msg='Booking failed' ;
 			},
-			_ => {
+			error => {
 				trip.info_msg=null;
-				trip.error_msg='Booking failed';
+				trip.error_msg=error;
 				this.changeDetectorRef.detectChanges();
 			}
 		)
@@ -147,14 +139,5 @@ export class TriplistComponent extends BaseComponent {
 
 	show_map(index: number){
 		this.router.navigate([C.ROUTE_MAP, C.ROUTE_MAP_SEARCH_RESULTES, {index:index}]);
-/*
-		this.show_body =	C.BODY_NOSHOW;
-		//this.communicationService.send_msg(C.MSG_KEY_MAP_BODY_SHOW, {});
-		this.communicationService.send_msg(C.MSG_KEY_MARKER_CLEAR, {});
-		this.mark_my_pair();
-		//let trips = Util.deep_copy(this.trips_from_db);
-		this.mapService.mark_books(this.trips_from_db, index);
-		this.mapService.fit_book(this.trips_from_db[index]);
-*/
 	}
 }

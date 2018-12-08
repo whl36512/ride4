@@ -123,6 +123,10 @@ table {
 	& th {
 		font-size: 0.8rem
 	}
+	&.center {
+    	margin-left:auto; 
+    	margin-right:auto;
+	}
 }
 
 .error {
@@ -375,4 +379,15 @@ img.ride_icon {
 
 #abcd {
   background-image: url(assets/images/ride-icon.svg);
+}
+
+.detail {
+	background-color: white;
+	border-style: solid;
+	border-color: $primary-color $primary-color $primary-color $primary-color ;
+	border-width: 1px 1px 1px 0.2rem;
+	margin: 0.2rem 0rem 0.0rem 0rem;
+	border-radius: 0.5rem;
+	padding: 0rem 0rem 0rem 0rem;
+	box-shadow: -0.2rem 0.2rem 0.2rem #ccc;
 }

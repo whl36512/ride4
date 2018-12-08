@@ -67,6 +67,7 @@ export class BookingsComponent extends BaseComponent {
 				, public router					: Router )  {
 		super(changeDetectorRef,mapService, communicationService, dbService
 				, geoService, form_builder, router );
+		this.page_name=C.PAGE_BOOKING;
 
 
 		console.debug("201809262245 BookingsComponent.constructor() enter")	;
@@ -74,7 +75,10 @@ export class BookingsComponent extends BaseComponent {
 
 	ngoninit():void {
 
-		window.scroll(0,Status.scroll_position[this.class_name]);
+		console.debug("201812071208", this.class_name
+			,  ".ngoninit() Status.scroll_position[this.page_name]="
+			, Status.scroll_position[this.page_name] )	;
+		window.scroll(0,Status.scroll_position[this.page_name]);
 
 	}
 
@@ -343,14 +347,5 @@ export class BookingsComponent extends BaseComponent {
 	geo_mark(index: string) : void {
 
 		this.router.navigate([C.ROUTE_MAP, C.ROUTE_MAP_ACTIVITIES, {index:index}]);
-/*
-		this.communicationService.send_msg(C.MSG_KEY_MAP_BODY_SHOW, {});
-
-		this.mapService.clear_markers();	
-		//this.mapService.mark_book( b, index, true);
-		this.mapService.mark_books( this.bookings_from_db, index);
-		this.mapService.fit_pair( this.bookings_from_db[index].trip);
-		this.communicationService.send_msg(C.MSG_KEY_SHOW_ACTIVITY_BODY,{show_body: C.BODY_NOSHOW});
-*/
 	}
 }
