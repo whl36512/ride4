@@ -1,13 +1,15 @@
 <div class='title' >Chats</div>
-<div class=warning *ngIf='false'>change_detect_count={{change_detect_counter()}}</div>
+<p>
 <dl *ngFor="let msg of msgs_from_db ;let i=index;
 		let even=even;let odd=odd; let first = first; let last = last; trackBy:trackByFunc"
 		[ngClass]="{ odd: odd, even: even }">
-	<dt class=f08 >
+	<dt class='f08 stitle' >
 		{{msg.user_is}} on {{C.up_to_minutes(msg.c_ts)}},  {{C.elapsed_time(msg.c_ts)}}
 	</dt>
-	<dd>
-		{{msg.msg}}
+	<dd [innerHTML]='msg.msg'>
+	</dd>
+	<dd *ngIf='msg.google_map_string'>
+		<span class='clickable-text button' [innerHTML]='msg.google_map_string'></span>
 	</dd>
 </dl>
 

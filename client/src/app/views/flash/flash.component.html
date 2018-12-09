@@ -27,5 +27,9 @@
 		</tr>
 	</table>
 	<p>
+       <div *ngIf='error_msg'      class=error     [innerHTML]='error_msg' ></div>
+        <div *ngIf='info_msg'       class='info'    [innerHTML]='info_msg' ></div>
+        <div *ngIf='warning_msg'    class='warning' [innerHTML]='warning_msg' ></div>
+        <div *ngIf='validation_error'    class='warning' [innerHTML]='validation_error' ></div>
 </div>
 

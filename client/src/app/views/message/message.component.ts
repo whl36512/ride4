@@ -115,7 +115,7 @@ export class MessageComponent extends BaseComponent {
 		this.reset_msg();
 		
         this.form.patchValue ({
-            msg: "I'm at pickup location" 
+            msg: C.MSG_AT_PICKUP,
         });
 
 		this.action (this.form.value, 0, C.URL_SAVE_MSG);
@@ -128,7 +128,7 @@ export class MessageComponent extends BaseComponent {
 
 		console.debug("201810182231 MessageComponent.action() form=" , C.stringify(form_value) );
 		let msg_to_db = form_value;
-		msg_to_db.p = this.current_loc;
+		msg_to_db.p1 = this.current_loc;
 		this.current_loc = null;  // so next msg will have to either get a new location or null location
 		if(msg_to_db.msg.trim() === '' ) return ;
 		
@@ -139,8 +139,9 @@ export class MessageComponent extends BaseComponent {
 
 		data_from_db_observable.subscribe(
 			msg_from_db => {
-				this.get_form();
+				this.get_form(); // reset form
 				msg_from_db.user_is='Me'; 
+				this.add_geo(msg_from_db);
 				this.msgs_from_db.push(msg_from_db);
 				this.changeDetectorRef.detectChanges();
 			},
@@ -168,6 +169,7 @@ export class MessageComponent extends BaseComponent {
 				if (msgs_from_db.length>0 ) {
 					// reset timer if getting new messages
 					this.msg_no_activity_count_down = C.MSG_NO_ACTIVITY_COUNT_DOWN;
+					this.add_geos(msgs_from_db);
 					this.msgs_from_db = this.msgs_from_db.concat(msgs_from_db);
 				}
 				this.changeDetectorRef.detectChanges();
@@ -177,5 +179,18 @@ export class MessageComponent extends BaseComponent {
 				this.changeDetectorRef.detectChanges();
 			}
 		)
+	}
+
+	add_geo(msg) {
+		if (msg.msg == C.MSG_AT_PICKUP && msg.p1 && msg.p1.lat && msg.p1.lon) {
+			msg.google_map_string = MapService.google_map_string_from_points ([ msg.p1]); 
+		}
+		return msg;
+	}
+
+	add_geos(msgs) {
+		for( let index in msgs) {
+			this.add_geo(msgs[index]);
+		}
 	}
 }

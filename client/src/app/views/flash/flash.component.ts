@@ -56,6 +56,7 @@ export class FlashComponent extends BaseComponent {
   	} 
 
 	ngoninit():void {
+		this.warning_msg='Do not use this application while driving';
 	}
 
 	start(){
