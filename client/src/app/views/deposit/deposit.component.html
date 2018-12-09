@@ -1,13 +1,18 @@
-<div>
+<div class=detail>
 	<div class="title"  >Deposit Money</div>
+	<p>
+	To book a trip as Rider, you must have a positive balance to cover the cost of the trip.
 	<p>
 	Deposit and withdraw are done through the Zelle network, offered by many banks, such as
 	Chase Bank's QuickPay with Zelle, as well as Bank of America, US Bank, PNC Bank
 	, and other major banks.
-
 	<p>
-	Normally it takes around 1 minute for our bank to notify us of the deposit. You should see your deposit in your account balance in the same time frame.
-	<div *ngIf='show_detail'>
+	Normally it takes around 1 minute for our bank to notify us of the deposit. 
+	You should see your deposit in your account balance in the same time frame. 
+	Larger depoists may take longer to verify.
+</div>
+<div *ngIf='show_detail' class=detail>
+	<div class=title>How to Deposit</div>
 		Your Deposit Identification Number is 
 		<p>
 		<div class="center warning" >RD{{user_from_db.deposit_id}}</div>
@@ -19,23 +24,21 @@
 			<li> 	
 				send money to <br/>
 				<div class='center f12 warning'>{{C.EMAIL_DEPOSIT}}</div>
-				through your bank and
+				through your bank, and
 			</li>
 			<li>you MUST put your Deposit Identification Number in the 
 				memo field when you send money through your bank.</li>
 		</ol> 
-		Once we receive your deposit, it will be reflected in your account balance. <br/>
-		To book a trip, you must have a positive balance to cover the cost of the trip.
 		<p>
 	
 		<div class=stitle> Trial Deposit </div>
 		You may want to deposit a very small amount of money, a few cents, for instance, to make sure 
 		your money deposit performs correctly.
-	</div>
+<p>
+</div>
 	<div *ngIf='!show_detail'>
 		Once you sign in, you will see more information about deposit.
 	</div>
-</div>
 <div *ngIf='error_msg!=null' class=error>{{error_msg}}</div>
 <div *ngIf='warning_msg!=null' class=warning>{{warning_msg}}</div>
 <div *ngIf='info_msg!=null' class=info>{{info_msg}}</div>

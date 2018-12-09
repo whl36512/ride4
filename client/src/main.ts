@@ -12,10 +12,10 @@ if (environment.production) {
   enableProdMode();
 	if(window){
 		// disbale console in prod mode
-    	//window.console.log=function(){};
-    	//window.console.debug=function(){};
-    	//window.console.info=function(){};
-    	//window.console.error=function(){};
+    	window.console.log=function(){};
+    	window.console.debug=function(){};
+    	window.console.info=function(){};
+    	window.console.error=function(){};
   }
 }
 

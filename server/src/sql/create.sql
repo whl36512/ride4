@@ -186,6 +186,7 @@ create table msg (
 	, 	usr_id 	sys_id 	not null
 	, 	c_ts	sys_ts 	not null
 	, 	msg		text 	not null
+	, 	p		location
 	, 	constraint fk_msg2usr 	foreign key ( usr_id)	REFERENCES	usr		( usr_id)
 	, 	constraint fk_msg2book 	foreign key ( book_id)	REFERENCES	book	( book_id)
 );

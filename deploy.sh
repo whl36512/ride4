@@ -13,4 +13,10 @@ scp -r ./server/src/sql ./client/dist/ride3/* ./server/target/release/server_all
 
 
 #login as ubuntu and then root. run
-#scp -r /home/ubuntu/ride/* root@10.0.0.2:/var/www/ride/.
+#	scp -r /home/ubuntu/ride/* root@10.0.0.2:/var/www/ride/.
+#login to container and run
+# 	nohup  /var/www/ride/server_all > /root/log/server_all.log &
+#	systemctl restart httpd
+
+# email log file: /tmp/email_down.log
+

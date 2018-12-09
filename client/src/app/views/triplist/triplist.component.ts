@@ -114,7 +114,7 @@ export class TriplistComponent extends BaseComponent {
 	    	book_from_db => {
 				console.debug("201808201201 JourneyComponent.book() book_from_db =" + C.stringify(book_from_db));
 				if (book_from_db.status_cd=='P') {
-					trip.info_msg='Booked, <br/>pending<br/>confirmation' ;
+					trip.info_msg='Booked, pending confirmation' ;
 					let sr= this.Status.search_result[index];
 					trip.show_book_button= false;
 					trip.seats_booked= trip.seats_booked + book_from_db.seats;

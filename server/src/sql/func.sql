@@ -1493,8 +1493,8 @@ BEGIN
 	m0 := funcs.json_populate_record(NULL::msg, in_msg) ;
 	u0 := funcs.json_populate_record(NULL::usr, in_user) ;
 	
-	insert into msg ( book_id, usr_id, msg) 
-		values	( m0.book_id, u0.usr_id, m0.msg)
+	insert into msg ( book_id, usr_id, msg, p) 
+		values	( m0.book_id, u0.usr_id, m0.msg, m0.p)
 	returning * into m1
 	;
 

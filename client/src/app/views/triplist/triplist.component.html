@@ -38,11 +38,11 @@
 							[disabled]='!trip.show_book_button'
 						>Book it</button>
 					</td>
-					<td *ngIf='trip.error_msg' class=error 	[innerHTML]='trip.error_msg'></td>
-					<td *ngIf='trip.info_msg'  class=info 	[innerHTML]='trip.info_msg'></td>
 				</tr>
 			</tbody>
 		</table>
+		<td *ngIf='trip.error_msg' class=error 	[innerHTML]='trip.error_msg'></td>
+		<td *ngIf='trip.info_msg'  class=info 	[innerHTML]='trip.info_msg'></td>
 		<div class='stitle' >
 			<span *ngIf=' trip.trip.rider_ind' > Passenger </span>
 			<span *ngIf='!trip.trip.rider_ind' > Driver </span>

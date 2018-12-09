@@ -1,6 +1,6 @@
 <div class="title">User Profile</div>
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
-	<dl>
+	<dl class=detail>
 		<dt>
 			Last Name : {{user_from_db.last_name}}
 		</dt>
@@ -22,9 +22,9 @@
             </span>
 		</dt>
 		<dt>
- 			<label><input type=checkbox formControlName='profile_ind'/>
+ 			<mat-checkbox  formControlName='profile_ind' labelPosition="after" color=primary >
 				Show LinkedIn Profile to other users
-			</label>
+            </mat-checkbox>
 		</dt>
 		<dt>Email </dt>
 		<dd>      

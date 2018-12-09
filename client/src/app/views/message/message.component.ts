@@ -97,6 +97,7 @@ export class MessageComponent extends BaseComponent {
 		this.form = this.form_builder.group({
 				book_id	: [this.book_id, []],
 				msg	: ['', []],
+				p	: [null, []],
 				}
 			);
 	}
@@ -112,19 +113,23 @@ export class MessageComponent extends BaseComponent {
 
     on_get_geo_pos(location){
 		this.reset_msg();
+		
         this.form.patchValue ({
-            msg: "I'm at Pickup location,\n" + location.lat+','+location.lon ,
+            msg: "I'm at pickup location" 
         });
-		this.action (this.form, 0, C.URL_SAVE_MSG);
+
+		this.action (this.form.value, 0, C.URL_SAVE_MSG);
     }
 
-	action(form: any, index: number, action : string): void {
+	action(form_value: any, index: number, action : string): void {
 		this.reset_msg(); // remove msg and show it again, so fade would work
 		this.msg_no_activity_count_down = C.MSG_NO_ACTIVITY_COUNT_DOWN ; // reset timer
 		this.changeDetectorRef.detectChanges();	// have to do this so fade would work
 
-		console.debug("201810182231 MessageComponent.action() form=" , C.stringify(form.value) );
-		let msg_to_db = form.value;
+		console.debug("201810182231 MessageComponent.action() form=" , C.stringify(form_value) );
+		let msg_to_db = form_value;
+		msg_to_db.p = this.current_loc;
+		this.current_loc = null;  // so next msg will have to either get a new location or null location
 		if(msg_to_db.msg.trim() === '' ) return ;
 		
 		//msg_to_db.book_id= this.book_id;

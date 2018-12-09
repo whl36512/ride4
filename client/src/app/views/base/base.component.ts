@@ -69,7 +69,8 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 	is_signed_in			: boolean 		= false;
 	page_name 				: string| null 	= null;
 	form 					: FormGroup|null= null;	// main for of a page
-	current_loc 			= 			{lat:null, lon:null};
+	//current_loc 			= 			{lat:null, lon:null};
+	current_loc 			: any =	null;
 	form_values_old			: any = {}			;
 	form_values_new			: any = {}			;
 	today					: string			;	// browser local date
@@ -218,42 +219,6 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 				);
 	}
 	
-/*
-	subscribe_geo_watcher() {
-
-		console.debug('201811171456' , this.class_name, 'subscribe_geo_watcher enter');
-		let subscription = this.mapService.geo_watcher.subscribe(
-			position => { 
-				console.debug('201811171337', this.page_name, 'subscribe_geo_watcher'
-					, `Next: ${position.coords.latitude}, ${position.coords.longitude}`);
-				this.current_loc.lat = position.coords.latitude;
-				this.current_loc.lon = position.coords.longitude;
-				},
-				
-			err => {
-				var message = '';
-				switch (err.code) {
-					case err.PERMISSION_DENIED:
-						message = 'Permission denied';
-						break;
-					case err.POSITION_UNAVAILABLE:
-						message = 'Position unavailable';
-						break;
-					case err.PERMISSION_DENIED_TIMEOUT:
-						message = 'Position timeout';
-						break;
-				}
-				console.error('ERROR: 201811171434' , this.class_name, 'subscribe_geo_watcher',  message);
-			},
-			() => console.debug('201811171343', this.class_name, 'subscribe_geo_watcher completed')
-		);
-		this.geo_watcher_sub= subscription ;
-	}
-*/
-
-
-
-
 	//abstract ngoninit(): void;
 	ngoninit(): void{};
 	ngonchanges(changes: SimpleChanges): void {};
@@ -345,7 +310,7 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 
 		else {
 			let loc='';
-			if ( p.loc==C.LOC_CURRENT1 || p.loc==C.LOC_CURRENT2)
+			if ( p.loc==C.LOC_CURRENT1 || p.loc==C.LOC_CURRENT2)  // obsolete
 				loc = this.mapService.current_loc.lat + ',' + this.mapService.current_loc.lon ;
 			else loc = p.loc;
 
@@ -537,8 +502,9 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
             position => {
                 console.debug('201811171337', this.page_name, 'subscribe_geo_getter()'
                     , `Next: ${position.coords.latitude}, ${position.coords.longitude}`);
-                this.current_loc.lat = Math.round(position.coords.latitude*10000000)/10000000.0;
-                this.current_loc.lon = Math.round(position.coords.longitude*10000000)/10000000.0;
+                this.current_loc = {lat : Math.round(position.coords.latitude*10000000)/10000000.0
+                				,	lon : Math.round(position.coords.longitude*10000000)/10000000.0
+									};
 				this.on_get_geo_pos(this.current_loc);
                 },
 
