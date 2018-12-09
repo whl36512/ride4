@@ -109,6 +109,17 @@ export class ActivityComponent extends BaseComponent {
 		
 	}
 
+	set_date(days: number) {
+		let [today, dummy1] = Util.current_time();
+		let [next_days, dummy2] = Util.current_time_and_minutes(days*24*60);
+        this.form.patchValue ({
+            date1: today,
+            date2: next_days,
+        });
+		this.onChange();
+	}
+	
+
 	subscription_action(msg): void {
 		if (msg != undefined && msg != null && msg.msgKey == C.MSG_KEY_SHOW_ACTIVITY_BODY) {
 			this.show_body = msg.show_body;

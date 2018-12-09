@@ -2,7 +2,7 @@
 // https://angular.io/guide/form-validation
 
 import { Component} from '@angular/core';
-import { OnInit } from '@angular/core';
+//import { OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { FormGroup } from '@angular/forms';
 import { FormBuilder } from '@angular/forms';
@@ -16,6 +16,11 @@ import { ChangeDetectorRef } from '@angular/core';
 import { NgZone } from '@angular/core';
 import { Router			 }   from '@angular/router';
 import { ActivatedRoute			 }   from '@angular/router';
+
+//import {MatRadioModule} from '@angular/material/radio';
+//import {MatSliderModule} from '@angular/material/slider';
+import {ViewEncapsulation} from '@angular/core';
+
 
 
 //import { EventEmitter, Input, Output} from '@angular/core';
@@ -38,6 +43,8 @@ import { MapService			 }   from '../../models/map.service';
   styleUrls	: ['./trip.component.css']	,
   // prevent change detection unless @Input reference is changed
   changeDetection: ChangeDetectionStrategy.OnPush ,  
+//	  encapsulation: ViewEncapsulation.None ,
+
 
 })
 
@@ -295,9 +302,10 @@ export class TripComponent extends BaseComponent {
 		return validation_error;
 	}
 
+/*
 	current_location()
 	{
-		let cl = this.mapService.current_loc
+		let cl = this.mapService.current_loc;
 		if (! cl.lat) {
 			this.current_location_msg='Location service is not enabled. Please try again';
 			this.mapService.subscribe_geo_watcher();
@@ -317,6 +325,23 @@ export class TripComponent extends BaseComponent {
 			}
 		}
 	}
+*/
+	current_location() {
+		this.subscribe_geo_getter();
+		if (!this.geo_getter_sub) {
+			this.current_location_msg='GPS not supported by the browser';
+			return;
+		}
+		this.current_location_msg=null;
+	}
+
+	on_get_geo_pos(location){
+			this.form.patchValue ({
+				p1_loc: location.lat+','+location.lon,
+			});
+		
+	}
+	
 
 	switch_loc()
 	{

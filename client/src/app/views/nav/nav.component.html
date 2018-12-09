@@ -4,22 +4,7 @@
 	<div *ngIf='warning_msg!=null' class='fade warning'>{{warning_msg}}</div>
 	<div *ngIf='info_msg!=null' class=info>{{info_msg}}</div>
 
-
-
-	<ul class="nav" *ngIf="show_nav&&false"  >
-		 	<li			(click)="select(C.PAGE_SEARCH)" 		>Search</li>
-		 	<li *ngIf="is_signed_in" (click)="select(C.PAGE_TRIP)" 		>Publish my Trip</li>
-		 	<li *ngIf="is_signed_in" (click)="select(C.PAGE_ACTIVITY)"		>My Activities</li>
-		 	<li *ngIf="is_signed_in" (click)="select(C.PAGE_THIST)"		>Transaction History</li>
-		<li *ngIf="is_signed_in" (click)="select(C.PAGE_USER)" 		>My Profile</li>
-		<li			(click)="select(C.PAGE_DEPOSIT)"  	>Deposit</li>
-		<li			(click)="select(C.PAGE_WITHDRAW)"  	>Withdraw</li>
-		<li			(click)="select(C.PAGE_CONTACT_US)"  	>Contact Us</li>
-		<li			(click)="select(C.PAGE_TOU)"  		>Terms of Use</li>
-		<li			(click)="list_global_objects()"  		>List Global</li>
-	</ul>
-
-	 	<ul class="nav" *ngIf="show_nav"  >
+	<ul class="nav" *ngIf="show_nav"  >
 		<a routerLink='/Trip/form_search' 	
 			routerLinkActive='active' 
 			(click)="nav_menu_off(); map_search_stop()"	>

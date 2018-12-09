@@ -4,29 +4,46 @@
             Show activities when I am a <br/>
         </dt>
         <dd>
-            <label><input type=checkbox formControlName='show_driver'
-                (change)='set_filter()' />Driver</label>
-            <label><input type=checkbox formControlName='show_rider'
-                (change)='set_filter()' />Rider</label>
+ 			<mat-checkbox  formControlName='show_driver' labelPosition="after" color=primary 
+				(change)='set_filter()'>
+			Driver</mat-checkbox> &nbsp; &nbsp; &nbsp; &nbsp; 
+
+ 			<mat-checkbox  formControlName='show_rider' labelPosition="after" color=primary 
+				(change)='set_filter()'>
+			Rider</mat-checkbox> 
         </dd>
         <dt>
             Show activities when status is <br/>
         </dt>
         <dd>
-            <label><input type=checkbox formControlName='show_published'
-                (change)='set_filter()' />Published</label><br/>
-            <label><input type=checkbox formControlName='show_pending'
-                (change)='set_filter()' />Pending Comfirmation</label><br/>
-            <label><input type=checkbox formControlName='show_confirmed'
-                (change)='set_filter()' />Confirmed</label><br/>
-            <label><input type=checkbox formControlName='show_rejected'
-                (change)='set_filter()' />Rejected</label><br/>
-            <label><input type=checkbox formControlName='show_cancelled_by_driver'
-                (change)='set_filter()' />Cancelled by Driver</label><br/>
-            <label><input type=checkbox formControlName='show_cancelled_by_rider'
-                (change)='set_filter()' />Cancelled by Rider</label><br/>
-            <label><input type=checkbox formControlName='show_finished'
-                (change)='set_filter()' />Finished</label>
+
+ 			<mat-checkbox  formControlName='show_published' labelPosition="after" color=primary 
+				(change)='set_filter()'>
+			Published</mat-checkbox> <br/>
+
+ 			<mat-checkbox  formControlName='show_pending' labelPosition="after" color=primary 
+				(change)='set_filter()'>
+			Pending Comfirmation</mat-checkbox> <br/>
+
+ 			<mat-checkbox  formControlName='show_confirmed' labelPosition="after" color=primary 
+				(change)='set_filter()'>
+			Confirmed</mat-checkbox> <br/>
+
+ 			<mat-checkbox  formControlName='show_rejected' labelPosition="after" color=primary 
+				(change)='set_filter()'>
+			Rejected</mat-checkbox> <br/>
+
+ 			<mat-checkbox  formControlName='show_cancelled_by_driver' labelPosition="after" color=primary 
+				(change)='set_filter()'>
+			Cancelled by Driver</mat-checkbox> <br/>
+
+ 			<mat-checkbox  formControlName='show_cancelled_by_rider' labelPosition="after" color=primary 
+				(change)='set_filter()'>
+			Cancelled by Rider</mat-checkbox> <br/>
+
+ 			<mat-checkbox  formControlName='show_finished' labelPosition="after" color=primary 
+				(change)='set_filter()'>
+			Finished</mat-checkbox> <br/>
         </dd>
     </dl>
 </form>

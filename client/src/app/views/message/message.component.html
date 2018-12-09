@@ -16,6 +16,7 @@
 	<textarea formControlName=msg  > </textarea>
 	<br/>
 	<button type=button (click)="action(form ,0, C.URL_SAVE_MSG)">Send Chat</button>
+	<button type=button (click)="at_pickup()">I'm at Pickup</button>
 </form>
 <div *ngIf='error_msg!=null' class=error>{{error_msg}}</div>
 <div class=warning>Note: Chat window will close automatically 

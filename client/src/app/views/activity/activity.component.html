@@ -3,27 +3,34 @@
 <div class={{show_body}} >
 
 <form [formGroup]="form" >
-    <table class=no_border>
-        <tr>
-            <td>
-                From
-            </td>
-            <td>
-                To
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <input  type="date"  formControlName="date1" (change)='onChange()' />
-            </td>
-            <td>
-                <input  type="date" formControlName="date2" [min]='form.value.date1'
-                    (change)='onChange()'
-                />
-                <span class="validity"></span>
-            </td>
-        </tr>
-    </table>
+	<table class=no_border>
+		<tr>
+			<td>
+				From
+			</td>
+			<td>
+				To
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<input  type="date"  formControlName="date1" (change)='onChange()' />
+			</td>
+			<td>
+				<input  type="date" formControlName="date2" [min]='form.value.date1'
+					(change)='onChange()'
+				/>
+				<span class="validity"></span>
+			</td>
+		</tr>
+	</table>
+	<mat-radio-group >
+		<mat-radio-button color=primary [value]=0  #days (click)='set_date(0)'> Today &nbsp; &nbsp; &nbsp;
+		</mat-radio-button>
+		<mat-radio-button color=primary [value]=6  #days (click)='set_date(6)'> Next 7 days </mat-radio-button>
+	</mat-radio-group>
+
+	
 </form>
 <div *ngIf='error_msg!=null' class=error>{{error_msg}}</div>
 <div *ngIf='warning_msg!=null' class=warning>{{warning_msg}}</div>

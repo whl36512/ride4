@@ -12,12 +12,20 @@ import { ReactiveFormsModule } from '@angular/forms';
 //import { ChangeDetectorRef }		from '@angular/core';
 //import { NgZone }		from '@angular/core';
 import { RouteReuseStrategy                 }   from '@angular/router';
+import 'hammerjs';			// must import otherwise mat-slider doesn't work
 
 
 
-//import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 //import {NoopAnimationsModule} from '@angular/platform-browser/animations';
-//import {MatButtonModule, MatCheckboxModule} from '@angular/material'; // import after BrowserModule
+import {MatButtonModule} from '@angular/material'; // import after BrowserModule
+import {MatCheckboxModule} from '@angular/material'; // import after BrowserModule
+import {MatRadioModule} from '@angular/material'; // import after BrowserModule
+import {MatSliderModule} from '@angular/material/slider';
+import {MatInputModule} from '@angular/material/input';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+import {MatNativeDateModule } from '@angular/material';
+
 
 //third party modules
 //import { LeafletModule } from '@asymmetrik/ngx-leaflet';
@@ -103,10 +111,15 @@ import { FlashComponent } from './views/flash/flash.component' ;
 		FormsModule,
 		ReactiveFormsModule,
 		AppRoutingModule,
-		//BrowserAnimationsModule,
+		BrowserAnimationsModule,
 		//NoopAnimationsModule,
-		//MatButtonModule , 
-		//MatCheckboxModule,
+		MatButtonModule , 
+		MatCheckboxModule,
+		MatRadioModule,
+		MatSliderModule,
+		MatInputModule,
+		MatDatepickerModule,
+		MatNativeDateModule,
 		//				LeafletModule.forRoot(),
 	],
 	providers: [
@@ -118,6 +131,7 @@ import { FlashComponent } from './views/flash/flash.component' ;
 		DBService,
 		HttpService,
 		CommunicationService,
+		MatNativeDateModule,
 		// https://www.softwarearchitekt.at/post/2016/12/02/sticky-routes-in-angular-2-3-with-routereusestrategy.aspx
 		//{provide: RouteReuseStrategy, useClass: CustomReuseStrategy} 
 		//Router,

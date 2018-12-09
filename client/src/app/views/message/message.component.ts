@@ -101,6 +101,23 @@ export class MessageComponent extends BaseComponent {
 			);
 	}
 
+    at_pickup() {
+        this.subscribe_geo_getter();
+        if (!this.geo_getter_sub) {
+            this.error_msg='GPS not supported by the browser';
+            return;
+        }
+        this.error_msg=null;
+    }
+
+    on_get_geo_pos(location){
+		this.reset_msg();
+        this.form.patchValue ({
+            msg: "I'm at Pickup location,\n" + location.lat+','+location.lon ,
+        });
+		this.action (this.form, 0, C.URL_SAVE_MSG);
+    }
+
 	action(form: any, index: number, action : string): void {
 		this.reset_msg(); // remove msg and show it again, so fade would work
 		this.msg_no_activity_count_down = C.MSG_NO_ACTIVITY_COUNT_DOWN ; // reset timer

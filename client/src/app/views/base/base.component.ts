@@ -17,6 +17,8 @@ import { OnChanges				}   from '@angular/core';
 import { SimpleChanges			}   from '@angular/core';
 import { SimpleChange		   }   from '@angular/core';
 import { HostListener }					 from '@angular/core';
+import * as Rx from "rxjs";
+
 
 
 
@@ -84,7 +86,8 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 	form_status_sub			: Subscription |null = null;
 	form_value_sub			: Subscription |null = null;
 	ws_sub					: Subscription |null = null;
-	geo_watcher_sub			: Subscription |null = null;
+	geo_getter_observable	: any 			;
+	geo_getter_sub			: Subscription |null = null;
 	timer_for_injector_sub	: Subscription |null = null;
 	timer_sub				: Subscription |null = null;
 
@@ -215,12 +218,13 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 				);
 	}
 	
+/*
 	subscribe_geo_watcher() {
 
 		console.debug('201811171456' , this.class_name, 'subscribe_geo_watcher enter');
 		let subscription = this.mapService.geo_watcher.subscribe(
 			position => { 
-				console.debug('201811171337', this.class_name, 'subscribe_geo_watcher'
+				console.debug('201811171337', this.page_name, 'subscribe_geo_watcher'
 					, `Next: ${position.coords.latitude}, ${position.coords.longitude}`);
 				this.current_loc.lat = position.coords.latitude;
 				this.current_loc.lon = position.coords.longitude;
@@ -245,6 +249,7 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 		);
 		this.geo_watcher_sub= subscription ;
 	}
+*/
 
 
 
@@ -265,7 +270,7 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 		if( this.form_status_sub!= null)	this.form_status_sub.unsubscribe();
 		if( this.timer_sub		!= null)	this.timer_sub.unsubscribe();
 		if( this.ws_sub			!= null)	this.ws_sub.unsubscribe();
-		if( this.geo_watcher_sub!= null)	this.geo_watcher_sub.unsubscribe();
+		if( this.geo_getter_sub!= null)		this.geo_getter_sub.unsubscribe();
 		//if( this.nav_end_sub!= null) 		this.nav_end_sub.unsubscribe();
 		this.communicationService.send_msg(C.MSG_KEY_MAP_BODY_NOSHOW, {});
 		this.onngdestroy();
@@ -374,7 +379,8 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 
 	routing(pair, pair_before_geocode)
 	{
-		if ( !pair.p1.display_name || ! pair.p2.display_name) {
+		if ( !pair.p1.display_name || ! pair.p2.display_name
+			|| pair.p1.lat==pair.p2.lat && pair.p1.lon== pair.p2.lon) {
 			pair.distance=C.ERROR_NO_ROUTE ;
 			//this.validate_form();
 			//this.changeDetectorRef.detectChanges();
@@ -490,6 +496,72 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 			, this.current_loc.lat, this.current_loc.lon );
 	}
 */
+
+    getPosition(geolocationOptions) {
+        // modeled after MapServive.watchPosition()
+        if (!window.navigator.geolocation) {
+			this.error_msg='GPS not supported by the browser';
+			return null;
+		}
+        let source =  Rx.Observable.create(
+            function (observer) {
+                window.navigator.geolocation.getCurrentPosition(
+                    function successHandler (loc) { observer.next(loc); }
+                    , function errorHandler (err) { observer.error(err); }
+                    , geolocationOptions
+                );
+            }
+        )
+
+        //return source.publish().refCount();
+        if (source) {
+            console.debug('201811171420 MapService.getPosition() geolocation observable created source=');
+            console.debug(source);
+        }
+        else  {
+            console.debug('201811171420 MapService.getPosition() geolocation observable failed');
+        }
+        return source;
+    }
+
+    subscribe_geo_getter() {
+        console.debug('201811171456' , 'GeoService.subscribe_geo_getter enter');
+        if(!this.geo_getter_observable) this.geo_getter_observable = this.getPosition(null);
+		if (! this.geo_getter_observable) return null;
+		if ( this.geo_getter_sub) {
+			this.geo_getter_sub.unsubscribe(); 
+			this.geo_getter_sub= null;
+		}
+		
+        this.geo_getter_sub = this.geo_getter_observable.subscribe(
+            position => {
+                console.debug('201811171337', this.page_name, 'subscribe_geo_getter()'
+                    , `Next: ${position.coords.latitude}, ${position.coords.longitude}`);
+                this.current_loc.lat = Math.round(position.coords.latitude*10000000)/10000000.0;
+                this.current_loc.lon = Math.round(position.coords.longitude*10000000)/10000000.0;
+				this.on_get_geo_pos(this.current_loc);
+                },
+
+            err => {
+                switch (err.code) {
+                    case err.PERMISSION_DENIED:
+                        this.error_msg = 'GPS Permission denied';
+                        break;
+                    case err.POSITION_UNAVAILABLE:
+                        this.error_msg = 'GPS Position unavailable';
+                        break;
+                    case err.PERMISSION_DENIED_TIMEOUT:
+                        this.error_msg = 'GPS Position timeout';
+                        break;
+                }
+                console.error('ERROR: 201811171434', this.page_name, '.subscribe_geo_getter'
+						,  this.error_msg);
+            },
+            () => console.debug('201811171343', this.page_name, '.subscribe_geo_getter completed')
+        );
+    }
+	
+	on_get_geo_pos(location:any) {};  
 
 }
 

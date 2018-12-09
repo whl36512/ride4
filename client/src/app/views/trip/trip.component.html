@@ -15,9 +15,13 @@
 	<form [formGroup]="form" (ngSubmit)="onSubmit()" >
 		<dl class=detail> 
 			<dt>
-					I am 
-					<label><input type="radio" formControlName='rider_ind' [value]=false />Driver</label> 
-					<label><input type="radio" formControlName='rider_ind' [value]=true  />Rider</label>
+				I am a &nbsp; &nbsp; 
+            	<mat-radio-group  formControlName='rider_ind'>
+                	<mat-radio-button color=primary [value]=false> Driver&nbsp;&nbsp;&nbsp; 
+					</mat-radio-button>
+                	<mat-radio-button color=primary [value]=true > Rider </mat-radio-button>
+            	</mat-radio-group>
+
 			</dt>
 	  		<dt>
 				{{from}}
@@ -38,7 +42,9 @@
 			</dd>
 
 	  		<dt>
-				{{to}}
+				{{to}} &nbsp;
+				<span class='clickable-text button' (click)='switch_loc()' 
+					[innerHTML]='C.ICON_UPDOWN_ARROW'></span>
 			</dt>
 	  		<dd>
 				<span>
@@ -49,9 +55,7 @@
 					<span class="validity" 
 						*ngIf='this.form_key==C.KEY_FORM_TRIP || this.form.value.rider_ind'>
 					</span>
-				</span>&nbsp;
-				<span class='clickable-text button' (click)='switch_loc()' 
-					[innerHTML]='C.ICON_UPDOWN_ARROW'></span>
+				</span>
 			</dd>
 			<dd class="f08 " >
 				{{trip.p2.display_name	}}
@@ -129,11 +133,14 @@
 		<dl >
 			<dt>
 					Or in 
-					<label><input name=set_time type="radio" (click)='set_time(5)'  />5</label>
-					<label><input name=set_time type="radio" (click)='set_time(10)'  />10</label>
-					<label><input name=set_time type="radio" (click)='set_time(15)'  />15</label>
-					<label><input name=set_time type="radio" (click)='set_time(30)'  />30</label>
+            <mat-radio-group  >
+                <mat-radio-button color=primary [value]=5 (click)='set_time(5)'>5 &nbsp;  </mat-radio-button>
+                <mat-radio-button color=primary [value]=10 (click)='set_time(10)'>10 &nbsp;  </mat-radio-button>
+                <mat-radio-button color=primary [value]=15 (click)='set_time(15)'>15 &nbsp;  </mat-radio-button>
+                <mat-radio-button color=primary [value]=30 (click)='set_time(30)'>30 </mat-radio-button>
+            </mat-radio-group>
 					munites
+
 			</dt>
 		</dl>
 		</div>
@@ -148,17 +155,18 @@
 	  		</span>
 			</dt>
 
-			<dt>Price: ${{this.form.value.price}} per mile per passenger.
-				<span *ngIf='this.form.value.rider_ind && this.form_key==C.KEY_FORM_TRIP'> Estimated cost: 
-					$ {{this.estimate_cost()}}
-				</span>
-			</dt>
-	  		<dd>
+			<dt>Price: 
 				<input type="range" class='zoom' formControlName="price" value="0" step=0.01 min="0" 
 					max="{{max_price}}"  required
 				/>
-				<span class="validity" ></span>
-	  		</dd>
+			</dt>
+			<dt	>
+				${{this.form.value.price}} 
+				per mile per passenger.
+			</dt>
+			<dt *ngIf='this.form.value.rider_ind && this.form_key==C.KEY_FORM_TRIP'> Estimated cost: 
+					$ {{this.estimate_cost()}}
+			</dt>
 		</dl>
 		<dl *ngIf='form_key==C.KEY_FORM_TRIP' class=detail>
 	  		<dt>Description</dt>

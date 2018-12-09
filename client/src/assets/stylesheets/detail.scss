@@ -37,13 +37,18 @@ textarea {
 
 input {
 	&[type="time"] {
-		width: 8rem;
+		width: 7rem;
+		font-size: 1rem;
 	}
 	&[type="date"] {
-		width: 8rem;
+		width: 7rem;
 	}
 	&[type="range"] {
 		width : 4rem;
+	}
+	&[type="text"] {
+		width: 80%;
+		font-size: 1rem;
 	}
 	&:invalid+span:after {
 		content: '\2717';
@@ -390,4 +395,46 @@ img.ride_icon {
 	border-radius: 0.5rem;
 	padding: 0rem 0rem 0rem 0rem;
 	box-shadow: -0.2rem 0.2rem 0.2rem #ccc;
+}
+
+.mat-slider {
+	border:1px solid;
+}
+.mat-slider.mat-slider-horizontal .mat-slider-track-fill {
+  background-color: $primary-color;
+}
+.mat-slider.mat-slider-horizontal .mat-slider-track-background,
+.mat-slider.mat-slider-horizontal .mat-slider-track-fill {
+  height: 100%;
+}
+
+.mat-accent .mat-slider-thumb {
+  height: 1.8rem;
+  width: 1.8rem;
+  background-color: white;
+  border: solid 0.2rem $primary-color;
+  bottom: -0rem;
+  right: -1rem;
+}
+
+.mat-slider-thumb-label {
+	top: -1rem;
+}
+
+.mat-slider-focus-ring {
+    top: 0rem;
+    right: -15px;
+  }
+
+.mat-slider.mat-slider-horizontal .mat-slider-track-wrapper {
+    top: -0.9rem;
+  height: 0.2rem;
+  border-radius: 0.2rem;
+}
+
+.mat-slider-thumb-label {
+  background-color: $primary-color;
+}
+.mat-slider-min-value:not(.mat-slider-thumb-label-showing) .mat-slider-thumb {
+  background-color: white;
 }
