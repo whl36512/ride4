@@ -350,6 +350,7 @@ as
 $body$
 DECLARE
 	t0 trip ;
+	t0a trip ;
 	u0 usr ;
 	t1 trip ;
 	validation_error json;
@@ -376,6 +377,25 @@ BEGIN
 				, 'Insufficient balance. Estimated cost for the trip is $'|| cost.cost_rider);
 		end if;
 	end if;
+
+	-- try to find trip with same date and time. If found, reject new trip
+	select  t.*
+	into	t0a
+	from trip t
+	where 	t.trip_date = t0.trip_date
+	and 	extract (epoch from t.trip_time) between  extract ( epoch from t0.trip_time)  -5 *60
+				and extract (epoch from t0.trip_time) + 5 * 60
+	and		t.rider_ind	=	t0.rider_ind
+	and 	t.usr_id	=	u0.usr_id
+	and		t.status_cd='A'
+	limit 1
+	;
+	
+	if t0a.trip_id is not null then
+			return funcs.gen_error('201812100032'
+				, 'Found an existing trip in the same time frame.');
+	end if;
+	
 
 	t0.usr_id		:=	u0.usr_id;
 	t0.dir 			:=	funcs.bearing(t0.p1, t0.p2);
@@ -514,6 +534,40 @@ BEGIN
 	end if;
 	driver	:= round(driver*100)/100.0;
 	rider	:= round(rider*100)/100.0;
+END
+$body$
+language plpgsql;
+
+create or replace function funcs.delete( in_trip text, in_user text)
+	returns json
+as
+$body$
+DECLARE
+	u0	usr ;
+	t0	trip ;
+	t1	trip ;
+	t2	RECORD ;
+BEGIN
+	t0 := funcs.json_populate_record(NULL::trip 	, in_trip) ;
+	u0 := funcs.json_populate_record(NULL::usr 		, in_user) ;
+
+	if u0.usr_id is null then
+		return funcs.gen_error('201811191940', 'user not signed in');
+	end if;
+
+	update 	trip t 
+	set 	status_cd 	= 'NB'
+		,	m_ts		= clock_timestamp()
+	where 	t.trip_id	= 	t0.trip_id
+	and 	t.usr_id 	=	u0.usr_id	--double check. only offerer can confirm
+	and		t.status_cd	= 	'A'			-- make sure the trip is active
+	returning t.* into t1
+	;
+
+	select t1 trip
+	into t2;
+
+	return row_to_json(t2);
 END
 $body$
 language plpgsql;
@@ -1399,16 +1453,16 @@ BEGIN
 		and		t.trip_date between coalesce(c0.date1	, '1970-01-01') 
 		and 	coalesce(c0.date2	, '3000-01-01')
 		and		t.status_cd='A'
-		and		not t.rider_ind
-		union 
-		select	t.trip_id, null book_id, u0.usr_id my_usr_id, null other_usr_id
-		from 	trip 	t 	
-		where	t.usr_id=u0.usr_id 
-		and		t.trip_date between coalesce(c0.date1	, '1970-01-01') 
-		and 	coalesce(c0.date2	, '3000-01-01')
-		and		t.status_cd='A'
-		and 	t.seats>0			-- only show unbooked trip
-		and		t.rider_ind		
+		--and		not t.rider_ind
+		--union 
+		--select	t.trip_id, null book_id, u0.usr_id my_usr_id, null other_usr_id
+		--from 	trip 	t 	
+		--where	t.usr_id=u0.usr_id 
+		--and		t.trip_date between coalesce(c0.date1	, '1970-01-01') 
+		--and 	coalesce(c0.date2	, '3000-01-01')
+		--and		t.status_cd='A'
+		--and 	t.seats>0			-- only show unbooked trip if a rider
+		--and		t.rider_ind		
 	
 	)
 	, a as (
@@ -1447,7 +1501,7 @@ BEGIN
 	
 	select row_to_json(a) 
 	from a
-	order by (a.trip).trip_date , (a.trip).trip_time, (a.book).status_cd nulls last
+	order by (a.trip).trip_date , (a.trip).trip_time, (a.trip).c_ts, (a.book).c_ts nulls last
 	;
 END
 $body$

@@ -424,7 +424,7 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 					, C.stringify(data_from_db));
 				if (data_from_db.error_desc) {
 					this.reset_msg();
-					this.error_msg = C.stringify(data_from_db) ;
+					this.error_msg = 'ERROR: ' + data_from_db.error_desc;
 				}
 				else {
 					this.on_get_data_from_wservice(data_from_db);

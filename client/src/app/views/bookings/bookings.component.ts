@@ -233,12 +233,14 @@ export class BookingsComponent extends BaseComponent {
 		this.bookings_from_db[index].show_finish_button=false;
 		this.bookings_from_db[index].show_msg_button=false;
 		this.bookings_from_db[index].show_review_button=false;
+		this.bookings_from_db[index].show_delete_button=false;
 	}
 
 	set_button (index: string) : void{
 		let b = this.bookings_from_db[index];
 		if (b) {
-			b.show_update_button 	= ! b.book ;
+			b.show_update_button 	= (! b.book && b.trip.status_cd=='A') ;
+			b.show_delete_button 	= (! b.book && b.trip.status_cd=='A') ;
 			let bb	= b.book;
 			if (bb) {
 				b.show_confirm_button 	= bb.status_cd == 'P' && ! b.is_booker ;
@@ -296,26 +298,30 @@ export class BookingsComponent extends BaseComponent {
 		//this.call_wservice(action, booking_to_db);
 		let data_from_db_observable	 = this.dbService.call_db(action, booking_to_db);
 		data_from_db_observable.subscribe(
-			book_from_db => {
-				console.debug("201811241702", this.class_name, '.action() book_from_db =' 
-					, C.stringify(book_from_db));
-				let n = book_from_db ; // new record
+			data_from_db => {
+				console.debug("201811241702", this.class_name, '.action() data_from_db =' 
+					, C.stringify(data_from_db));
+				let n = data_from_db ; // new record
 				let o = this.bookings_from_db[index] ;	//old record
 				if(n.error) {
-					o.fail_msg='Action failed. Status might have already changed'
-					this.changeDetectorRef.detectChanges() ;
-				} else if ( n.book.status_cd==o.book.status_cd)
-				{
+					o.fail_msg='ERROR: ' + n.error_desc;
+				} else if (n.trip && n.trip.trip_id){ //delete action
+					o.book_status_description = 'Deleted';	
+					o.trip.status_cd = n.trip.status_cd;
+				} else if (n.trip && ! n.trip.trip_id){ //delete action failed
+					o.fail_msg=C.ACTION_FAIL;
+				} else if ( n.book && n.book.status_cd==o.book.status_cd) {
 					// no status_cd change
 					o.fail_msg=C.ACTION_FAIL;
-					this.changeDetectorRef.detectChanges() ;
+				} else if ( n.book && ! n.book.status_cd) { // get null from db
+					o.fail_msg=C.ACTION_FAIL;
 				} else {
 					o.book.status_cd= n.book.status_cd;
-					this.set_button(index);
 					o.book_status_description= n.book_status_description;
-					this.changeDetectorRef.detectChanges() ;
 					this.Status.tran_from_db = null;
 				}
+				this.set_button(index);
+				this.changeDetectorRef.detectChanges() ;
 			},
 			error => {
 				this.error_msg=error;

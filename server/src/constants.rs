@@ -30,6 +30,7 @@ pub static SQL_MYOFFER 			: &str =  "select a from funcs.myoffers($1, $2) a " ;
 pub static SQL_BOOK 			: &str =  "select a from funcs.book($1, $2) a " ;
 //pub static SQL_UPD_JOURNEY 	: &str =  "select a from funcs.upd_journey($1, $2) a " ;
 pub static SQL_MYBOOKING		: &str =  "select a from funcs.mybooking($1, $2) a " ;
+pub static SQL_DELETE			: &str =  "select a from funcs.delete($1, $2) a " ;
 pub static SQL_CANCEL			: &str =  "select a from funcs.cancel($1, $2) a " ;
 pub static SQL_FINISH			: &str =  "select a from funcs.finish($1, $2) a " ;
 pub static SQL_CONFIRM			: &str =  "select a from funcs.confirm($1, $2) a " ;

@@ -23,7 +23,7 @@ export class Constants{
 	static URL_ACTIVITY 		= '/ws/activity'	;
 	static URL_MYOFFERS 		= '/ws/myoffers'	;
 	static URL_MYBOOKING 		= '/ws/mybooking'	;
-	static URL_UPD_JOURNEY 		= '/ws/upd_journey'	;
+	static URL_DELETE 			= '/ws/delete'	;
 	static URL_CANCEL		  	= '/ws/cancel'		; 
 	static URL_FINISH 			= '/ws/finish'		; 
 	static URL_CONFIRM 			= '/ws/confirm'		; 

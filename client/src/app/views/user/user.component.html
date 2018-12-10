@@ -1,6 +1,6 @@
-<div class="title">User Profile</div>
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
 	<dl class=detail>
+		<div class="title">User Profile</div>
 		<dt>
 			Last Name : {{user_from_db.last_name}}
 		</dt>
@@ -33,17 +33,19 @@
                   		pattern="{{C.EMAIL_PATTERN}}" 
                 /> 
                          <span class="validity"></span>
-          	</dd>
-        </dl>
-        <br/>
-	<!--button type="submit" [disabled]="form.invalid" -->
-	<div class=center>
-		<button type="submit" class=center>Save Profile</button>
-	</div>
+        </dd>
+		<dt> 
+			<p>
+			<div class=center>
+				<button type="submit" class=center>Save Profile</button>
+			</div>
+			<div *ngIf='error_msg!=null' 	class='fade error'>{{error_msg}}</div>
+			<div *ngIf='warning_msg!=null' 	class='fade warning' >{{warning_msg}}</div>
+			<div *ngIf='info_msg!=null' 	class='fade info'>{{info_msg}}</div>
+			<p>
+		</dt>
+    </dl>
 </form>
-<div *ngIf='error_msg!=null' 	class='fade error'>{{error_msg}}</div>
-<div *ngIf='warning_msg!=null' 	class='fade warning' >{{warning_msg}}</div>
-<div *ngIf='info_msg!=null' 	class='fade info'>{{info_msg}}</div>
 <p>
 <div class=f08>
 	<app-misc></app-misc>

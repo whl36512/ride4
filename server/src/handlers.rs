@@ -117,6 +117,9 @@ pub fn mybooking(req: &mut Request) -> IronResult<Response> {
 	request_sql(req, constants::SQL_MYBOOKING, 2)
 }
 
+pub fn delete(req: &mut Request) -> IronResult<Response> {
+	request_sql(req, constants::SQL_DELETE, 1)
+}
 pub fn cancel(req: &mut Request) -> IronResult<Response> {
 	request_sql(req, constants::SQL_CANCEL, 1)
 }

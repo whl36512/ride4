@@ -97,7 +97,7 @@ CREATE TABLE trip
 );
 create index ix_trip_usr_id on trip(usr_id);
 create index ix_trip_dir_distance on trip(dir, distance) where status_cd = 'A' and seats > 0;
-alter table trip add constraint ck_trip_status_cd check (status_cd in ('A','E', 'NB' ) );
+alter table trip add constraint ck_trip_status_cd check (status_cd in ('A','E',  'NB' ) );
 
 CREATE TABLE book
 (

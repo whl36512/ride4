@@ -25,6 +25,8 @@ import {MatSliderModule} from '@angular/material/slider';
 import {MatInputModule} from '@angular/material/input';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import {MatNativeDateModule } from '@angular/material';
+import {MatMenuModule} from '@angular/material/menu';
+
 
 
 //third party modules
@@ -66,7 +68,8 @@ import { MiscComponent } from './views/misc/misc.component';
 import { ReviewComponent } from './views/review/review.component';
 import { ReviewsComponent } from './views/reviews/reviews.component';
 import { BaseComponent } from './views/base/base.component';
-import { FlashComponent } from './views/flash/flash.component' ;
+import { FlashComponent } from './views/flash/flash.component';
+import { Nav2Component } from './views/nav2/nav2.component' ;
 
 
 //const appRoutes: Routes = [ ]
@@ -99,6 +102,7 @@ import { FlashComponent } from './views/flash/flash.component' ;
 		ReviewsComponent,
 		BaseComponent,
 		FlashComponent,
+		Nav2Component,
 	],
 	imports: [
 		//RouterModule.forRoot(
@@ -120,6 +124,7 @@ import { FlashComponent } from './views/flash/flash.component' ;
 		MatInputModule,
 		MatDatepickerModule,
 		MatNativeDateModule,
+		MatMenuModule,
 		//				LeafletModule.forRoot(),
 	],
 	providers: [

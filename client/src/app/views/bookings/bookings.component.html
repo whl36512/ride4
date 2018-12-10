@@ -16,34 +16,51 @@
             Show activities when status is <br/>
         </dt>
         <dd>
-
- 			<mat-checkbox  formControlName='show_published' labelPosition="after" color=primary 
-				(change)='set_filter()'>
-			Published</mat-checkbox> <br/>
-
- 			<mat-checkbox  formControlName='show_pending' labelPosition="after" color=primary 
-				(change)='set_filter()'>
-			Pending Comfirmation</mat-checkbox> <br/>
-
- 			<mat-checkbox  formControlName='show_confirmed' labelPosition="after" color=primary 
-				(change)='set_filter()'>
-			Confirmed</mat-checkbox> <br/>
-
- 			<mat-checkbox  formControlName='show_rejected' labelPosition="after" color=primary 
-				(change)='set_filter()'>
-			Rejected</mat-checkbox> <br/>
-
- 			<mat-checkbox  formControlName='show_cancelled_by_driver' labelPosition="after" color=primary 
-				(change)='set_filter()'>
-			Cancelled by Driver</mat-checkbox> <br/>
-
- 			<mat-checkbox  formControlName='show_cancelled_by_rider' labelPosition="after" color=primary 
-				(change)='set_filter()'>
-			Cancelled by Rider</mat-checkbox> <br/>
-
- 			<mat-checkbox  formControlName='show_finished' labelPosition="after" color=primary 
-				(change)='set_filter()'>
-			Finished</mat-checkbox> <br/>
+			<table class=no_border>
+				<tr>
+					<td>
+ 				<mat-checkbox  formControlName='show_published' labelPosition="after" color=primary 
+					(change)='set_filter()'>
+				Published</mat-checkbox> <br/>
+					</td>
+					<td>
+ 				<mat-checkbox  formControlName='show_pending' labelPosition="after" color=primary 
+					(change)='set_filter()'>
+				Pending Confirmation</mat-checkbox> <br/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+ 				<mat-checkbox  formControlName='show_confirmed' labelPosition="after" color=primary 
+					(change)='set_filter()'>
+				Confirmed</mat-checkbox> <br/>
+					</td>
+					<td>
+ 				<mat-checkbox  formControlName='show_cancelled_by_driver' labelPosition="after" color=primary 
+					(change)='set_filter()'>
+				Cancelled by Driver</mat-checkbox> <br/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+ 				<mat-checkbox  formControlName='show_rejected' labelPosition="after" color=primary 
+					(change)='set_filter()'>
+				Rejected</mat-checkbox> <br/>
+					</td>
+					<td>
+ 				<mat-checkbox  formControlName='show_cancelled_by_rider' labelPosition="after" color=primary 
+					(change)='set_filter()'>
+				Cancelled by Rider</mat-checkbox> <br/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+ 						<mat-checkbox  formControlName='show_finished' labelPosition="after" color=primary 
+							(change)='set_filter()'>
+						Finished</mat-checkbox> <br/>
+					</td>
+				</tr>
+			</table>
         </dd>
     </dl>
 </form>
@@ -102,6 +119,9 @@
 	</button>
 	<button (click)="update(booking,i)" *ngIf='bookings_from_db[i].show_update_button' 
 		title='Change seats and unit price'>Update seats and price
+	</button>
+	<button (click)="action(booking,i, C.URL_DELETE)" *ngIf='bookings_from_db[i].show_delete_button' 
+		title='Change seats and unit price'>Delete
 	</button>
 	<span *ngIf='bookings_from_db[i].update_msg!=null' class="info fade">
 		{{bookings_from_db[i].update_msg}}
@@ -198,8 +218,11 @@
 	</div>
 
 	<span class='button clickable-text' [innerHTML]="bookings_from_db[i].google_map_url"></span>
-	<div class='stitle' >Description</div>
-	<div class=data [innerHTML]="bookings_from_db[i].trip.description"></div>
+	<div *ngIf='bookings_from_db[i].trip.description'>
+		<div class='stitle' >Description</div>
+		<div class=data [innerHTML]="bookings_from_db[i].trip.description"></div>
+	</div>
 	</form>
 	</div>
+	<p>&nbsp;<p>
 </div>
