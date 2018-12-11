@@ -16,6 +16,7 @@ import	{	AppComponent	}	from	'../../app.component';
 import	{	C				}	from	'../../models/constants';
 import	{	StorageService	}	from	'../../models/gui.service';
 import	{	Status			}	from	'../../models/gui.service';
+import	{	Util			}	from	'../../models/gui.service';
 import	{	BaseComponent	}	from	'../base/base.component'	;
 
 
@@ -34,9 +35,8 @@ import { MapService             }   from '../../models/map.service';
 })
 
 export	class	ThistComponent	extends	BaseComponent	{
-	tran_from_db	:	any	=	[]	;
+	tran_from_db	:	any	=	null	;
 	filter			:	any			;
-	trans_to_show	:	any =	[]	;
 
     constructor( public changeDetectorRef   : ChangeDetectorRef
                 , public mapService             : MapService
@@ -62,13 +62,6 @@ export	class	ThistComponent	extends	BaseComponent	{
 			form_value_from_storage	={	
 					date1			:	''
 				,	date2			:	C.TODAY()
-				,	show_booking	:	true
-				,	show_return		:	true
-				,	show_penalty	:	true
-				,	show_deposit	:	true
-				,	show_withdraw	:	true
-				,	show_earning	:	true
-				,	show_pending	:	true
 			};
         	StorageService.storeForm(C.KEY_FORM_THIST,  form_value_from_storage);
 		}
@@ -78,23 +71,22 @@ export	class	ThistComponent	extends	BaseComponent	{
 		this.form	=	this.form_builder.group({
 			date1			:	[fv.date1,	[]],
 			date2			:	[fv.date2,	[Validators.min]	],
-			show_booking	:	[fv.show_booking,	[]	],
-			show_return		:	[fv.show_return,	[]	],
-			show_penalty	:	[fv.show_penalty,	[]	],
-			show_deposit	:	[fv.show_deposit,	[]	],
-			show_withdraw	:	[fv.show_withdraw,	[]	],
-			show_earning	:	[fv.show_earning,	[]	],
-			show_pending	:	[fv.show_pending,	[]	],
 		});
 
 		this.tran_from_db = Status.tran_from_db;
 	
-		if( ! this.tran_from_db) this.onChange();
-		else( this.on_filter())
+		if( ! this.tran_from_db) this.form_change_action();
 	}
 
-	onChange()
-	{
+    form_change_action() {
+        let f= this.form.value;
+
+        if(f.date2 && f.date2< f.date1) {
+             this.form.patchValue ({
+                date2: f.date1,
+             });
+        }
+
 		this.reset_msg();
 		this.warning_msg='Loading ...'	;
 		this.tran_from_db	=	null	;	
@@ -102,54 +94,26 @@ export	class	ThistComponent	extends	BaseComponent	{
 		StorageService.storeForm(C.KEY_FORM_THIST,	this.form.value);	
 		this.changeDetectorRef.detectChanges();
 
-		let	data_from_db_observable	
-			=	this.dbService.call_db(C.URL_THIST,	this.form.value);
-		data_from_db_observable.subscribe(
-			tran_from_db	=>	{
-				this.warning_msg=	null;
-				console.debug("201810071557	ThistComponent.onChange()	tran_from_db	="	
-					,	C.stringify(tran_from_db));
-				this.tran_from_db	=	tran_from_db	;	
-				Status.tran_from_db	=	tran_from_db	;	
-				this.info_msg =`Found ${this.tran_from_db.length} transactions before filtering`;
-				this.on_filter();
-				this.changeDetectorRef.detectChanges();
-			},
-			error	=>	{	
-				this.error_msg=	error;
-				this.changeDetectorRef.detectChanges();
-			}
-		)
+		this.call_wservice(C.URL_THIST,	this.form.value);
 		
 	}
 
-	on_filter()
-	{
-		StorageService.storeForm(C.KEY_FORM_THIST,	this.form.value);	
-		this.trans_to_show = [];
-
-		for	(	let	index	in	this.tran_from_db)	{
-			let t = this.tran_from_db[index];
-			if(this.show_filtered( t)) { this.trans_to_show.push (t);}
-		}
-		console.debug("201810131007	BookingsComponent.on_filter()	this.trans_to_show.lenght="
-			, this.trans_to_show.length);
+    on_get_data_from_wservice(data_from_db: any) {
+		this.reset_msg();
+		this.tran_from_db	=	data_from_db	;	
+		Status.tran_from_db	=	data_from_db	;	
+        let len = data_from_db.length;
+		this.info_msg =`Found ${len} transactions before filtering`;
 		this.changeDetectorRef.detectChanges();
-	}
+    }
 
-	show_filtered(tran:	any):	boolean	{
-		console.debug("201810131007	BookingsComponent.show_filtered()	tran.tran_cd="
-			,	tran.tran_cd)	;
-		let	status	=false;
-		if		(tran.tran_cd	=='P'	&&	this.form.value.show_penalty	)	status=true;
-		else if	(tran.tran_cd	=='B'	&&	this.form.value.show_booking	)	status=true;
-		//else if	(tran.tran_cd	=='J'	&&	this.form.value.show_rejected	)	status=true;
-		else if	(tran.tran_cd	=='D'	&&	this.form.value.show_deposit	)	status=true;
-		else if	(tran.tran_cd	=='W'	&&	this.form.value.show_withdraw	)	status=true;
-		else if	(tran.tran_cd	=='E'	&&	this.form.value.show_earning	)	status=true;
-		else if	(tran.tran_cd	=='R'	&&	this.form.value.show_return		)	status=true;
-		//if (tran.actual_ts	==null	&&	this.form.value.show_pending	)	status=true;
 
-		return	status;
-	}
+    set_date(days: number) { // days is negative
+        let [today, dummy1] = Util.current_time();
+        let [next_days, dummy2] = Util.current_time_and_minutes(days*24*60);
+        this.form.patchValue ({
+            date1: next_days,
+            date2: today,
+        });
+    }
 }

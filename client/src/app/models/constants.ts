@@ -75,6 +75,7 @@ export class Constants{
 	static MAX_PRICE 			= 0.54 				;
 	static MAX_PRICE_RIDER 		= Math.round(0.54* 1.2*100)/100.0 		;
 	static MAX_SEATS 			= 6					;
+	static MAX_TRIP_DAYS		= 30				; // can publish trips upto 30 days from today
 	static MAX_SEARCH_TIGHTNESS = 5					;
 	static BOOKING_FEE 			= 0.2				;
 	static MIN_ACCOUNT_BALANCE 	= -10				;
@@ -95,6 +96,7 @@ export class Constants{
 	static KEY_FORM_ACTIVITY	= 'form_activity'	;
 	static KEY_FORM_ACTIVITY_FILTER	= 'form_activity_filter'	;
 	static KEY_FORM_THIST		= 'form_thist'		;
+	static KEY_FORM_THIST_FILTER		= 'form_thist_filter'		;
 
 	static VERSION_FORM_TRIP	= 3					;
 

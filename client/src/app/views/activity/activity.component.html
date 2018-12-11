@@ -14,11 +14,11 @@
 		</tr>
 		<tr>
 			<td>
-				<input  type="date"  formControlName="date1" (change)='onChange()' />
+				<input  type="date"  formControlName="date1" 
+				/>
 			</td>
 			<td>
 				<input  type="date" formControlName="date2" [min]='form.value.date1'
-					(change)='onChange()'
 				/>
 				<span class="validity"></span>
 			</td>

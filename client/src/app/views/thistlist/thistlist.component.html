@@ -2,7 +2,43 @@
 <div *ngIf='warning_msg!=null'  class=warning [innerHTML]='warning_msg'></div>
 <div *ngIf='info_msg!=null'     class=info [innerHTML]='info_msg'></div>
 
-<div class=warning *ngIf='false'>change_detect_count={{change_detect_counter()}}</div>
+Show history for
+<form [formGroup]="form" >
+
+    <table class='no_border center'>
+        <tr>
+            <td>
+    <mat-checkbox  formControlName='show_booking' labelPosition="after" color=primary > Booking
+    </mat-checkbox> <br/>
+            </td>
+            <td>
+    <mat-checkbox  formControlName='show_return' labelPosition="after" color=primary > Return
+    </mat-checkbox> <br/>
+            </td>
+            <td>
+    <mat-checkbox  formControlName='show_penalty' labelPosition="after" color=primary > Penalty
+    </mat-checkbox> <br/>
+            </td>
+        </tr>
+        <tr>
+            <td>
+    <mat-checkbox  formControlName='show_earning' labelPosition="after" color=primary > Earning
+    </mat-checkbox> <br/>
+            </td>
+            <td>
+    <mat-checkbox  formControlName='show_deposit' labelPosition="after" color=primary > Deposit
+    </mat-checkbox> <br/>
+            </td>
+            <td>
+    <mat-checkbox  formControlName='show_withdraw' labelPosition="after" color=primary > Withdraw
+    </mat-checkbox> <br/>
+            </td>
+        </tr>
+        <tr>
+        </tr>
+    </table>
+</form>
+
 <table class=center>
 	<thead>
 		<tr >
@@ -14,9 +50,9 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr *ngFor="let tran of tran_from_db ;let i=index;
+		<tr *ngFor="let tran of tran_to_show ;let i=index;
 			let even=even;let odd=odd; let first = first; let last = last; trackBy:trackByFunc"
-			[ngClass]="{ odd: odd, even: even }">
+			[ngClass]="{ odd: odd, even: even }"  >
 			<td>{{tran.date.slice(0,10)}} </td>
 			<td> 
 				<span *ngIf='tran.actual_amount > 0' > {{tran.actual_amount}}</span>

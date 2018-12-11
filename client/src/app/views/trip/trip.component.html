@@ -80,7 +80,7 @@
 			<tr>
 				<td>
 					<input type="date" formControlName="trip_date" *ngIf='form_key==C.KEY_FORM_TRIP'
-						pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" min={{today}} 
+						pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" min={{today}}  max={{max_date}}
 						required 
 					/>
 					<span class="validity"></span>
@@ -98,13 +98,13 @@
 					Dates between
 				</td>
 				<td>
-					and	
+					and	(max 30 days)
 				</td>
 			</tr>
 			<tr>
 				<td>
 					<input type="date" formControlName="date1" 
-						pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" min={{today}} 
+						pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" min={{today}}  max={{max_date}}
 						required 
 					/>
 					<span class="validity"></span>
@@ -112,7 +112,7 @@
 				<td>
 					<span class="validity"></span>
 					<input type="date" formControlName="date2" 
-						pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" min={{this.form.value.date1}} 
+						pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" min={{this.form.value.date1}}  max={{max_date}}
 						required 
 					/>
 					<span class="validity"></span>
@@ -123,9 +123,7 @@
 					Departure Time
 				</td>
 				<td>
-					<input type="time" formControlName="trip_time" step="60" 
-						required />
-					<span class="validity"></span>
+					<input type="time" formControlName="trip_time" step="60" />
 				</td>
 			</tr>
 		</table>

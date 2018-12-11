@@ -64,6 +64,8 @@ export class TripComponent extends BaseComponent {
 	to			:string;
 	current_location_msg: string = null;
 
+	max_date	: any	= null;
+
 	constructor( public changeDetectorRef   : ChangeDetectorRef
 				, public mapService			 : MapService
 				, public communicationService   : CommunicationService
@@ -81,6 +83,8 @@ export class TripComponent extends BaseComponent {
 		};
 
 		this.page_name= C.PAGE_TRIP;
+		let [max_date, dummy] = Util.current_time_and_minutes(C.MAX_TRIP_DAYS*24*60);
+		this.max_date	= max_date; 
         this.timer_sub = BaseComponent.timer.subscribe(
            val => {
                 if(val >5 && val % 1 == 0) {
@@ -177,6 +181,11 @@ export class TripComponent extends BaseComponent {
 		if (f.rider_ind ) 	this.to		= 'Dropoff Location';
 		else				this.to		= 'Arrival Location';
 		console.debug("201808201534", this.class_name, "form_change_action() this.from" , this.from);
+		if	(f.date2 < f.date1) {
+			 this.form.patchValue ({
+                date2: f.date1,
+             });
+        }
 
 		let [changed_loc1, changed_loc2]=this.form_loc_change_detect();
 		if ( changed_loc1) this.geocode(changed_loc1, this.trip, this.form) ;
@@ -264,6 +273,8 @@ export class TripComponent extends BaseComponent {
 			}
 			else if ( this.trip.distance == C.ERROR_NO_ROUTE) 
 				validation_error='Trip is not routable. Please fix it';
+			else if ( !f.trip_time )
+				validation_error = 'Please enter Departure Time';
 			else if ( f.rider_ind  && f.price> C.MAX_PRICE_RIDER ) 
 				validation_error = 'Price must be less than ' + C.MAX_PRICE_RIDER;
 			else if ( !f.rider_ind  && f.price> C.MAX_PRICE ) 
@@ -276,8 +287,6 @@ export class TripComponent extends BaseComponent {
 					= 'You MUST maintain a balance above Estimated Cost to publish a trip as rider';
 			else if ( this.user_from_db.balance < C.MIN_ACCOUNT_BALANCE )
 				validation_error = 'You cannot publish trip with a negative account balance';
-			else if ( !f.trip_time )
-				validation_error = 'Please enter Departure Time';
 		}
 
 		else if (this.form_key == C.KEY_FORM_SEARCH )	{

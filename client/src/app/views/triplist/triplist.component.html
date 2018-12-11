@@ -1,14 +1,9 @@
-<div class=hide-unhide>
-	<button (click)='show_body=C.BODY_NOSHOW' *ngIf='false && show_body==C.BODY_SHOW'> {{C.ICON_ARROW_UP}}  </button>
-	<button (click)='show_body=C.BODY_SHOW'   *ngIf='false && show_body==C.BODY_NOSHOW'> {{C.ICON_ARROW_DOWN}}</button>
-</div>
 <div class='title'>Available Trips</div>
-<div class={{show_body}} >
 	<div *ngIf='error_msg!=null' 	class=error [innerHTML]='error_msg'></div>
 	<div *ngIf='warning_msg!=null' 	class=warning [innerHTML]='warning_msg'></div>
 	<div *ngIf='info_msg!=null' 	class=info [innerHTML]='info_msg'></div>
 
-	<div *ngFor="let trip of trips_from_db ;let i=index;
+<div *ngFor="let trip of trips_from_db ;let i=index;
 		let even=even;let odd=odd; let first = first; let last = last; trackBy:trackByFunc"
 		[ngClass]="{ odd: odd, even: even }">
 	<div class=detail>
@@ -65,9 +60,9 @@
 		</div>
 		{{trip.trip.p2.display_name}}<br/>
 		<span class='f08 button clickable-text' [innerHTML]="trip.google_map_url"></span>
-		<div class='stitle'>Description</div>
- 		<div class=data [innerHTML]="trip.trip.description"></div>
+		<div class='stitle' *ngIf="trip.trip.description" >Description</div>
+ 		<div class=data [innerHTML]="trip.trip.description" *ngIf="trip.trip.description" ></div>
 		<p>
 	</div>
-	</div>
+	<p>&nbsp;<p>
 </div>

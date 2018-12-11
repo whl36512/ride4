@@ -72,12 +72,22 @@ export class ActivityComponent extends BaseComponent {
 		,	date2					: [f.date2, [Validators.min] ]
 		});
 
-		if ( !Status.bookings_from_db) this.onChange();
+		if ( !Status.bookings_from_db) {
+			this.form_change_action();
+		}	else {
+			//this.info_msg ='Loaded from cache';
+		}
 		this.bookings_from_db = Status.bookings_from_db;
 	}
 
-	onChange()
-	{
+	form_change_action() {
+		let f= this.form.value;
+
+		if(f.date2 && f.date2< f.date1) {
+             this.form.patchValue ({
+                date2: f.date1,
+             });
+		}
 		this.reset_msg();
 		this.warning_msg='loading ...' ;
 	 	//remove list of journeys. detroy subpage and completely rebuild subpage after getting data
@@ -85,29 +95,22 @@ export class ActivityComponent extends BaseComponent {
 		Status.bookings_from_db = null ;
 		this.changeDetectorRef.detectChanges();
 
-		StorageService.storeForm(C.KEY_FORM_ACTIVITY, this.form.value); 
-
-		let bookings_from_db_observable	
-			= this.dbService.call_db(C.URL_ACTIVITY, this.form.value);
-		bookings_from_db_observable.subscribe(
-			bookings_from_db => {
-				console.debug("201810071557 ActivityComponent.onChange() bookings_from_db ="
-					 , C.stringify(bookings_from_db));
-				this.reset_msg();
-				this.bookings_from_db = bookings_from_db ;	
-				Status.bookings_from_db = bookings_from_db ;	
-				if (this.bookings_from_db.length==0) this.warning_msg='Nothing found' ; 
-				else this.info_msg =`Found ${this.bookings_from_db.length} activities.`	;
-				this.changeDetectorRef.detectChanges();
-			},
-			error	=> { 
-				this.reset_msg();
-				this.error_msg= error;
-				this.changeDetectorRef.detectChanges();
-			}
-		)
-		
+		let fv= this.form.value;	// make sure we get the updated value
+		StorageService.storeForm(C.KEY_FORM_ACTIVITY, fv); 
+		this.call_wservice(C.URL_ACTIVITY, fv);
 	}
+
+	on_get_data_from_wservice(data_from_db: any) {
+		this.reset_msg();
+		this.bookings_from_db = data_from_db ;	
+		Status.bookings_from_db = data_from_db ;	
+
+		let len = data_from_db.length;
+		if (len==0) this.warning_msg='Nothing found' ; 
+		else this.info_msg =`Found ${len} activities.`	;
+		this.changeDetectorRef.detectChanges();
+	}
+
 
 	set_date(days: number) {
 		let [today, dummy1] = Util.current_time();
@@ -116,7 +119,7 @@ export class ActivityComponent extends BaseComponent {
             date1: today,
             date2: next_days,
         });
-		this.onChange();
+		//this.onChange();
 	}
 	
 
