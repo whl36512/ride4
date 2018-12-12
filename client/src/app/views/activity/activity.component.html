@@ -3,7 +3,7 @@
 <div class={{show_body}} >
 
 <form [formGroup]="form" >
-	<table class=no_border>
+	<table class='no_border center'>
 		<tr>
 			<td>
 				From
@@ -20,15 +20,16 @@
 			<td>
 				<input  type="date" formControlName="date2" [min]='form.value.date1'
 				/>
-				<span class="validity"></span>
 			</td>
 		</tr>
 	</table>
+	<div class=center>
 	<mat-radio-group >
 		<mat-radio-button [value]=0  #days (click)='set_date(0)'> Today &nbsp; &nbsp; &nbsp;
 		</mat-radio-button>
 		<mat-radio-button [value]=6  #days (click)='set_date(6)'> Next 7 days </mat-radio-button>
 	</mat-radio-group>
+	</div>
 
 	
 </form>

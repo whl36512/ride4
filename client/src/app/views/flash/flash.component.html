@@ -4,26 +4,39 @@
 		<span >
 			<img class='ride_icon' src='assets/images/ride-icon.svg' />
 		</span>
-		<p>
-		<span class='f15 flash clickable-text' (click)='start()'>
-			Start Here
-		</span>
 	<table class='no_border'>
 		<tr >
-			<td class=' flash_check' [innerHTML]='C.ICON_CHECK_MARK'></td>
+			<td>
+			<span class=' flash_check' [innerHTML]='C.ICON_CHECK_MARK'></span>&nbsp; &nbsp;
+			</td>
 			<td >
-				<div class=flash_inv>
-					Riders Seeking Drivers
+				<div class='clickable-text button'>
+        		<a routerLink='/Trip/form_search' routerLinkActive='active' >
+						Riders Seeking Drivers
+        		</a>
 				</div>
+
 			</td>
 		</tr>
 		<tr>
 			<td  class=' flash_check' [innerHTML]='C.ICON_CHECK_MARK'></td>
-			<td ><div class=flash_inv>Drivers Seeking Riders</div></td>
+			<td >
+				<div class='clickable-text button'>
+        		<a routerLink='/Trip/form_search' routerLinkActive='active' >
+						Drivers Seeking Riders
+        		</a>
+				</div>
+			</td>
 		</tr>
 		<tr >
 			<td  class=' flash_check' [innerHTML]='C.ICON_CHECK_MARK'></td>
-			<td ><div class=flash_inv>Post Your Own Trip !</div></td>
+			<td >
+				<div class='clickable-text button'>
+        		<a routerLink='/Trip/form_trip' routerLinkActive='active' >
+						Post Your Own Trip !
+        		</a>
+				</div>
+			</td>
 		</tr>
 	</table>
 	<p>
