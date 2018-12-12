@@ -7,7 +7,7 @@ authors = ["whl36512 <whl36512@gmail.com>"]
 router = "*"
 iron  = "*"
 log = "*"
-simplelog = "^0.5.0"
+#simplelog = "^0.5.0"
 #diesel = { version = "1.3.0", features = ["postgres"] }
 url    = "*"
 #postgres = { version = "*", features = ["with-rustc-serialize", "with-uuid"] }
@@ -18,7 +18,7 @@ r2d2 ="*"
 serde_json = "*"
 serde_derive = "*"
 serde = "*"
-params ="*"
+#params ="*"
 
 #hyper ="0.10.13"
 #json = "*"
@@ -28,12 +28,12 @@ ridews= { git = "https://github.com/whl36512/ridews.git" }
 #imap= {git = "https://github.com/mattnenterprise/rust-imap.git"}
 #openssl = { version = "0.10", features = ["vendored"] }
 #hyper-openssl = "*"
-hyper-native-tls = "*"
+#hyper-native-tls = "*"
 #native-tls = "0.2"
 #rust-crypto = "^0.2"
 rand = "*"
 data-encoding = "*"
-secure-session ="*"
+#secure-session ="*"
 typemap = "*"
 iron-cors ="*"
 unicase = "*"
@@ -48,6 +48,7 @@ lazy_static ="*"
 #reqwest = "*"
 #diesel = {version="1.1.0", features = ["postgres"]}
 #env_logger = "0.5.3"
+env_logger = "*"
 #futures = "0.1.17"
 #hyper = "0.11.14"
 #log = "0.4.1"

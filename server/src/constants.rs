@@ -1,4 +1,4 @@
-pub static LOG_FILE : &str ="/tmp/server.log" ;
+//pub static LOG_FILE : &str ="/tmp/server.log" ;
 pub static EMPTY_STRING : &str ="" ;
 pub static EMPTY_JSON_STRING : &str ="{}" ;
 

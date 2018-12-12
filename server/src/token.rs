@@ -87,11 +87,13 @@ mod tests {
     use chrono::Utc;
     use jwt::{encode, decode, Header, Algorithm, Validation};
     use jwt::errors::{ErrorKind};
-    use util;
+    //use util;
+	extern crate env_logger;
 
     #[test]
     fn jwt_test() {
-        util::logger_init();
+        //util::logger_init("/tmp/1234");
+		env_logger::init();
         #[derive(Debug, Serialize, Deserialize)]
         #[derive(PartialEq)]
         struct Claims {

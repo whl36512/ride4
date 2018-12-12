@@ -1,18 +1,20 @@
 //extern crate serde_json;
 extern crate server;
 extern crate ridews;
+extern crate env_logger;
 
 use std::thread;
 
-use server::util ;
+//use server::util ;
 use server::router_util ;
-use server::constants::LOG_FILE ;
+//use server::constants::LOG_FILE ;
 
 use ridews::socket;
 use server::constants::URL_WEBSOCKET_SERVER ;
 
 fn main() {
-    util::logger_init(LOG_FILE);
+    //util::logger_init(LOG_FILE);
+    env_logger::init();
 	thread::spawn(move || {
     	router_util::router_start(4201);
 	});

@@ -129,7 +129,7 @@ export class BookingsComponent extends BaseComponent {
 			this.add_form(b);
 			this.set_button(index);
 		}
-		this.set_filter();
+		this.form_change_action();
 		
 	}
 	on_star_click(index: string) {
@@ -138,7 +138,7 @@ export class BookingsComponent extends BaseComponent {
 		this.router.navigate(['/reviews', usr_id]);	
 	}
 
-	set_filter()
+	form_change_action()
 	{
 		this.filter= this.form.value;
 		StorageService.storeForm(C.KEY_FORM_ACTIVITY_FILTER, this.form.value);

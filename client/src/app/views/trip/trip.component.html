@@ -13,62 +13,59 @@
 <div class={{show_body}} >
 
 	<form [formGroup]="form" (ngSubmit)="onSubmit()" >
-		<dl class=detail> 
-			<dt>
-				I am a &nbsp; &nbsp; 
-            	<mat-radio-group  formControlName='rider_ind'>
-                	<mat-radio-button color=primary [value]=false> Driver&nbsp;&nbsp;&nbsp; 
-					</mat-radio-button>
-                	<mat-radio-button color=primary [value]=true > Rider </mat-radio-button>
-            	</mat-radio-group>
+		<p>
+		<div class='detail center'>
+			I am a &nbsp;  
+            <mat-radio-group  formControlName='rider_ind'>
+                <mat-radio-button color=primary [value]=false> Driver&nbsp; &nbsp; &nbsp; 
+				</mat-radio-button>
+                <mat-radio-button color=primary [value]=true > Rider </mat-radio-button>
+           </mat-radio-group>
 
-			</dt>
-	  		<dt>
-				{{from}}
-				<span class='clickable-text button' (click)='current_location()'>Current Location</span>
-			</dt>
+		</div>
+		<p>
+		<div class=detail>
+			{{from}}
+			<span class='clickable-text button' (click)='current_location()' style='float:right'>
+				Current Location
+			</span>
 			<div *ngIf='current_location_msg'    class='warning' [innerHTML]='current_location_msg' ></div>
+			<dd>
 			
-	  		<dd>
 	   			<input  type="text"  id="p1_loc" formControlName="p1_loc" 
 					placeholder="From" required
 					pattern=".{3,}"
 				/>
-				<span class="validity"></span>
 			</dd>
 
 	  		<dd  class="f08 "  > 
 				 {{trip.p1.display_name}}
 			</dd>
-
-	  		<dt>
-				{{to}} &nbsp;
-				<span class='clickable-text button' (click)='switch_loc()' 
+		</div>
+		<p>
+		<div class=detail>
+			{{to}} &nbsp;
+			<span class='clickable-text button' (click)='switch_loc()' style='float:right'
 					[innerHTML]='C.ICON_UPDOWN_ARROW'></span>
-			</dt>
 	  		<dd>
 				<span>
 	   				<input  type="text"  id="p2_loc" formControlName="p2_loc" 
 						placeholder="To" required
 						pattern=".{3,}"
 					/>
-					<span class="validity" 
-						*ngIf='this.form_key==C.KEY_FORM_TRIP || this.form.value.rider_ind'>
-					</span>
 				</span>
 			</dd>
 			<dd class="f08 " >
 				{{trip.p2.display_name	}}
 			</dd>
-			<dt>
+			<p>
 			Distance (miles): 
 			<span *ngIf="trip.distance==C.ERROR_NO_ROUTE " class=warning>No route</span>
 			<span *ngIf="trip.distance!=C.ERROR_NO_ROUTE "	   >{{trip.distance}}</span>
-			</dt>
-		</dl>
-
-		<div class=detail>
-		<table class=no_border *ngIf='form_key==C.KEY_FORM_TRIP'>
+		</div>
+		<p>
+		<div class='detail center'>
+		<table class='center no_border' *ngIf='form_key==C.KEY_FORM_TRIP'>
 			<tr>
 				<td>
 					Trip Date
@@ -83,22 +80,20 @@
 						pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" min={{today}}  max={{max_date}}
 						required 
 					/>
-					<span class="validity"></span>
 				</td>
 				<td>
 					<input type="time" formControlName="trip_time" step="60" 
 						required />
-					<span class="validity"></span>
 				</td>
 			</tr>
 		</table>
-		<table class=no_border *ngIf='form_key==C.KEY_FORM_SEARCH'>
+		<table class='center no_border' *ngIf='form_key==C.KEY_FORM_SEARCH'>
 			<tr>
 				<td>
 					Dates between
 				</td>
 				<td>
-					and	(max 30 days)
+					and	
 				</td>
 			</tr>
 			<tr>
@@ -107,16 +102,16 @@
 						pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" min={{today}}  max={{max_date}}
 						required 
 					/>
-					<span class="validity"></span>
 				</td>
 				<td>
-					<span class="validity"></span>
 					<input type="date" formControlName="date2" 
-						pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" min={{this.form.value.date1}}  max={{max_date}}
+						pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" min={{this.form.value.date1}}  
 						required 
 					/>
-					<span class="validity"></span>
 				</td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
 			</tr>
 			<tr>
 				<td>
@@ -127,45 +122,52 @@
 				</td>
 			</tr>
 		</table>
+		<p>
 
-		<dl >
-			<dt>
 					Or in 
             <mat-radio-group  >
                 <mat-radio-button color=primary [value]=5 (click)='set_time(5)'>5 &nbsp;  </mat-radio-button>
                 <mat-radio-button color=primary [value]=10 (click)='set_time(10)'>10 &nbsp;  </mat-radio-button>
                 <mat-radio-button color=primary [value]=15 (click)='set_time(15)'>15 &nbsp;  </mat-radio-button>
-                <mat-radio-button color=primary [value]=30 (click)='set_time(30)'>30 </mat-radio-button>
+                <mat-radio-button color=primary [value]=30 (click)='set_time(30)'>30 minutes</mat-radio-button>
             </mat-radio-group>
-					munites
 
-			</dt>
-		</dl>
 		</div>
-		<dl class=detail>
-			<dt>
+		<p>
+		<div class='detail center'>
+			<table class='center no_border'>
+				<tr>
+					<td>
 			<span *ngIf='!this.form.value.rider_ind'>Available Seats: </span>
 			<span *ngIf='this.form.value.rider_ind' >Requested Seats: </span>
-	  		<span>
-				{{this.form.value.seats}} &nbsp;&nbsp;
-				<input type="range" formControlName="seats" value="{{form.value.seats}}"  class='zoom'
+				{{this.form.value.seats}} 
+					</td>
+					<td>
+				<input type="range" formControlName="seats" value="{{form.value.seats}}"  
 					min="1" max="{{C.MAX_SEATS}}" step=1 /> 
-	  		</span>
-			</dt>
-
-			<dt>Price: 
-				<input type="range" class='zoom' formControlName="price" value="0" step=0.01 min="0" 
+					</td>
+				</tr>
+			<tr>
+				<td>&nbsp;</td>
+			</tr>
+				<tr>
+					<td>
+			Price: 
+				${{this.form.value.price}} 
+					</td>
+					<td>
+				<input type="range" formControlName="price" value="0" step=0.01 min="0" 
 					max="{{max_price}}"  required
 				/>
-			</dt>
-			<dt	>
-				${{this.form.value.price}} 
+					</td>
+				</tr>
+			</table>
 				per mile per passenger.
-			</dt>
-			<dt *ngIf='this.form.value.rider_ind && this.form_key==C.KEY_FORM_TRIP'> Estimated cost: 
+			<div *ngIf='this.form.value.rider_ind && this.form_key==C.KEY_FORM_TRIP'> Estimated cost: 
 					$ {{this.estimate_cost()}}
-			</dt>
-		</dl>
+			</div>
+		</div>
+		<p>
 		<dl *ngIf='form_key==C.KEY_FORM_TRIP' class=detail>
 	  		<dt>Description</dt>
 	  		<dd >
@@ -189,12 +191,14 @@
 		<div *ngIf='warning_msg'    class='warning' [innerHTML]='warning_msg' ></div>
 		<div *ngIf='validation_error'    class='warning' [innerHTML]='validation_error' ></div>
 
+		<div class=center>
 		<button  type="submit" [disabled]="validation_error" *ngIf='form_key==C.KEY_FORM_TRIP' >
 			{{button_label}}
 		</button>
         <button type="submit" *ngIf='form_key==C.KEY_FORM_SEARCH' [disabled]="validation_error" >
             Search on Map
         </button>
+		</div>
 
 
       </form>

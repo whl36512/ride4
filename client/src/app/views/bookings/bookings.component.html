@@ -4,12 +4,12 @@
             Show activities when I am a <br/>
         </dt>
         <dd>
- 			<mat-checkbox  formControlName='show_driver' labelPosition="after" color=primary 
-				(change)='set_filter()'>
+ 			<mat-checkbox  formControlName='show_driver' labelPosition="after"  
+				>
 			Driver</mat-checkbox> &nbsp; &nbsp; &nbsp; &nbsp; 
 
- 			<mat-checkbox  formControlName='show_rider' labelPosition="after" color=primary 
-				(change)='set_filter()'>
+ 			<mat-checkbox  formControlName='show_rider' labelPosition="after" 
+				>
 			Rider</mat-checkbox> 
         </dd>
         <dt>
@@ -19,44 +19,44 @@
 			<table class=no_border>
 				<tr>
 					<td>
- 				<mat-checkbox  formControlName='show_published' labelPosition="after" color=primary 
-					(change)='set_filter()'>
+ 				<mat-checkbox  formControlName='show_published' labelPosition="after" 
+					>
 				Published</mat-checkbox> <br/>
 					</td>
 					<td>
- 				<mat-checkbox  formControlName='show_pending' labelPosition="after" color=primary 
-					(change)='set_filter()'>
+ 				<mat-checkbox  formControlName='show_pending' labelPosition="after" 
+					>
 				Pending Confirmation</mat-checkbox> <br/>
 					</td>
 				</tr>
 				<tr>
 					<td>
- 				<mat-checkbox  formControlName='show_confirmed' labelPosition="after" color=primary 
-					(change)='set_filter()'>
+ 				<mat-checkbox  formControlName='show_confirmed' labelPosition="after" 
+					>
 				Confirmed</mat-checkbox> <br/>
 					</td>
 					<td>
- 				<mat-checkbox  formControlName='show_cancelled_by_driver' labelPosition="after" color=primary 
-					(change)='set_filter()'>
+ 				<mat-checkbox  formControlName='show_cancelled_by_driver' labelPosition="after" 
+					>
 				Cancelled by Driver</mat-checkbox> <br/>
 					</td>
 				</tr>
 				<tr>
 					<td>
- 				<mat-checkbox  formControlName='show_rejected' labelPosition="after" color=primary 
-					(change)='set_filter()'>
+ 				<mat-checkbox  formControlName='show_rejected' labelPosition="after" 
+					>
 				Rejected</mat-checkbox> <br/>
 					</td>
 					<td>
- 				<mat-checkbox  formControlName='show_cancelled_by_rider' labelPosition="after" color=primary 
-					(change)='set_filter()'>
+ 				<mat-checkbox  formControlName='show_cancelled_by_rider' labelPosition="after" 
+					>
 				Cancelled by Rider</mat-checkbox> <br/>
 					</td>
 				</tr>
 				<tr>
 					<td>
- 						<mat-checkbox  formControlName='show_finished' labelPosition="after" color=primary 
-							(change)='set_filter()'>
+ 						<mat-checkbox  formControlName='show_finished' labelPosition="after" 
+							>
 						Finished</mat-checkbox> <br/>
 					</td>
 				</tr>
@@ -224,5 +224,7 @@
 	</div>
 	</form>
 	</div>
-	<p>&nbsp;<p>
+	<div *ngIf='bookings_from_db[i].show_booking'>
+		<p>&nbsp;<p>
+	</div>
 </div>

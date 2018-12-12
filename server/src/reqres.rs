@@ -2,13 +2,13 @@ use regex::Regex;
 use iron::request::Request ;
 use std::io::Read;
 use typemap;
-use secure_session::middleware::{SessionMiddleware, SessionConfig};
-use secure_session::session::ChaCha20Poly1305SessionManager;
+//use secure_session::middleware::{SessionMiddleware, SessionConfig};
+//use secure_session::session::ChaCha20Poly1305SessionManager;
 use tables::Usr;
 use constants;
 //
-use serde_json;
-type Json = serde_json::Value;
+//use serde_json;
+//type Json = serde_json::Value;
 
 
 #[derive(Debug)]
@@ -34,6 +34,7 @@ impl typemap::Key for SessionKey {
         type Value = Session;
 }
 
+/*
 pub fn session_middleware (key: [u8; 32]) -> SessionMiddleware<Session, SessionKey, ChaCha20Poly1305SessionManager<Session>> 
 {
 
@@ -47,6 +48,7 @@ pub fn session_middleware (key: [u8; 32]) -> SessionMiddleware<Session, SessionK
 
     middleware
 }
+*/
 
 pub fn clean_json_string(js : &str) -> String
 {
@@ -71,7 +73,7 @@ pub trait RideRequest {
     fn get_session(&mut self) -> Option<Usr> ;
     fn set_session(&mut self, user: Option<Usr>) ;
     fn inspect(& mut self) -> RequestComponent;
-    fn params_to_json (& mut self ) -> String ;
+    //fn params_to_json (& mut self ) -> String ;
 }
 
 impl<'a, 'b> RideRequest for Request<'a, 'b> {
@@ -134,6 +136,7 @@ impl<'a, 'b> RideRequest for Request<'a, 'b> {
         request_c
     }
 
+/*
     fn params_to_json (& mut self ) -> String
     {
         //use std::collections::BTreeMap;
@@ -150,6 +153,7 @@ impl<'a, 'b> RideRequest for Request<'a, 'b> {
         let _json : Json = serde_json::from_str(&json_string).expect(&format!("ERROR 201809091507 Unable to convert params to Json. json_string={}", json_string));
         json_string
     }
+*/
 }
 
 #[derive(Debug)]
