@@ -30,7 +30,7 @@ import { BaseComponent } 					from '../base/base.component';
 import { StorageService } 					from '../../models/gui.service';
 import { Util } 							from '../../models/gui.service';
 import { Status } 							from '../../models/gui.service';
-import { CommunicationService} 			from '../../models/communication.service' ;
+import { CommunicationService} 				from '../../models/communication.service' ;
 import { DBService} 						from '../../models/remote.service' ;
 import { GeoService} 						from '../../models/remote.service' ;
 import { MapService } 						from '../../models/map.service';
@@ -67,7 +67,7 @@ export class BookingsComponent extends BaseComponent {
 				, public router					: Router )  {
 		super(changeDetectorRef,mapService, communicationService, dbService
 				, geoService, form_builder, router );
-		this.page_name=C.PAGE_BOOKING;
+		this.page_name=C.PAGE_BOOKINGS;
 
 
 		console.debug("201809262245 BookingsComponent.constructor() enter")	;
@@ -143,12 +143,15 @@ export class BookingsComponent extends BaseComponent {
 		this.filter= this.form.value;
 		StorageService.storeForm(C.KEY_FORM_ACTIVITY_FILTER, this.form.value);
 
+		let showing = 0;
+
 		for ( let index in this.bookings_from_db) {
 			this.bookings_from_db[index].show_booking
 				=this.show_booking(this.bookings_from_db[index], Number(index));
-
+			if ( this.bookings_from_db[index].show_booking) showing += 1;
 		}
 		// change this.bookings_from_db reference, so the bookings component can refresh
+		this.info_msg='Showing ' + showing + ' activities';
 		this.changeDetectorRef.detectChanges();
 	}
 

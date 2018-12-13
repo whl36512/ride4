@@ -55,6 +55,7 @@ export class Constants{
 	static PAGE_MYOFFERS 		= 'myoffers'		;
 	static PAGE_TRIP_LIST 		= 'trip_list'		;
 	static PAGE_BOOKING 		= 'booking'			;
+	static PAGE_BOOKINGS 		= 'bookings'			;
 	static PAGE_DEPOSIT			= 'deposit'			;
 	static PAGE_WITHDRAW		= 'withdraw'		;
 	static PAGE_CONTACT_US		= 'contact_us'		;

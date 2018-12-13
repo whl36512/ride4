@@ -2,10 +2,15 @@
 <div *ngIf='warning_msg!=null'  class=warning [innerHTML]='warning_msg'></div>
 <div *ngIf='info_msg!=null'     class=info [innerHTML]='info_msg'></div>
 
-Show history for
 <form [formGroup]="form" >
 
+	<div class=detail>
     <table class='no_border center'>
+		<tr>
+			<td colspan=2>
+				Show history for
+			</td>
+		</tr>
         <tr>
             <td>
     <mat-checkbox  formControlName='show_booking' labelPosition="after" color=primary > Booking
@@ -37,6 +42,7 @@ Show history for
         <tr>
         </tr>
     </table>
+	</div>
 </form>
 
 <table class=center>

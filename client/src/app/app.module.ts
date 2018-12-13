@@ -69,7 +69,8 @@ import { ReviewComponent } from './views/review/review.component';
 import { ReviewsComponent } from './views/reviews/reviews.component';
 import { BaseComponent } from './views/base/base.component';
 import { FlashComponent } from './views/flash/flash.component';
-import { Nav2Component } from './views/nav2/nav2.component' ;
+import { Nav2Component } from './views/nav2/nav2.component';
+import { BookingComponent } from './views/booking/booking.component' ;
 
 
 //const appRoutes: Routes = [ ]
@@ -103,6 +104,7 @@ import { Nav2Component } from './views/nav2/nav2.component' ;
 		BaseComponent,
 		FlashComponent,
 		Nav2Component,
+		BookingComponent,
 	],
 	imports: [
 		//RouterModule.forRoot(
