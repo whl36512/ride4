@@ -102,8 +102,9 @@ export class ThistlistComponent extends BaseComponent {
 		this.tran_to_show=[];
 		for (   let index   in  this.tran_from_db)  {
 			let t = this.tran_from_db[index];
-			if(this.show_filtered( t) ) this.tran_to_show.push(t);
+			if(this.show_filtered( t.tran) ) this.tran_to_show.push(t);
 		}
+		this.info_msg ='Showing ' + this.tran_to_show.length + ' transactions'; 
 		this.changeDetectorRef.detectChanges();
 	}
 

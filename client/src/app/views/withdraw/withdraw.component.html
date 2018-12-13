@@ -7,37 +7,62 @@ US Bank, PNC Bank, and other major banks.
 <p>
 You must have an email address registered at your bank to receive money.
 <p>
-If you have a positive balance in you account, 
-you can request a full or partial withdraw of the balance.
 </div>
 <p>
 <div class=detail>
 <div class="title">Withdraw Request</div>
 <form  *ngIf='is_signed_in' [formGroup]="form" (ngSubmit)="onSubmit()">
-	<dl>
-		<dt>Name : {{user_from_db.first_name}} {{user_from_db.last_name}} </dt>
-       	<dt> Balance : ${{user_from_db.balance}} </dt>
-		<dt><label>Email registered at you bank (required) </label></dt>
-		<dd >      
-          		<input  type="email"  formControlName="bank_email" required 
-				pattern="{{C.EMAIL_PATTERN}}" [readonly]='saved'
-                	/> 
-			<span class="validity"></span>
-          	</dd>
-		<dt><label>Amount to withdraw</label> </dt>
-		<dd >      
-          		<input  type="number"  formControlName="requested_amount" required
-				max='{{user_from_db.balance}}' min=0.01 step=0.01
-                  		[readonly]='saved' 
-                	/> 
-			<span class="validity"></span>
-          	</dd>
-        </dl>
-<div *ngIf='error_msg!=null' class=error [innerHTML]='error_msg' ></div>
-<div *ngIf='warning_msg!=null' class=warning [innerHTML]='warning_msg'></div>
-<div *ngIf='info_msg!=null' class=info [innerHTML]='info_msg' ></div>
+	<table class='no_border center'>
+		<tr>
+			<td>
+				Name:
+			</td>
+			<td>
+				{{user_from_db.first_name}} {{user_from_db.last_name}}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Current Balance:
+			</td>
+			<td>
+				${{user_from_db.balance}} 
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Amount to withdraw: &nbsp;
+			</td>
+			<td>
+				The entire balance
+			</td>
+		</tr>
+		<tr>
+			<td colspan=2>
+				&nbsp;
+			</td>
+		</tr>
+		<tr>
+			<td colspan=2>
+				Email registered at you bank (required) 
+			</td>
+		</tr>
+		<tr>
+			<td colspan=2>
+					<input  type="email"  formControlName="bank_email" required 
+						pattern="{{C.EMAIL_PATTERN}}" [readonly]='saved'
+					/> 
+					<span class="validity"></span>
+			</td>
+		</tr>
+	</table>
+	<div class=center>
+	<div *ngIf='error_msg!=null' class=error [innerHTML]='error_msg' ></div>
+	<div *ngIf='warning_msg!=null' class=warning [innerHTML]='warning_msg'></div>
+	<div *ngIf='info_msg!=null' class=info [innerHTML]='info_msg' ></div>
+	</div>
 	<div class=center *ngIf='!saved'>
-		<button type="submit" [disabled]="form.invalid" >Send Request</button>
+		<button type="submit" [disabled]="!button_enabled" >Send Request</button>
 	</div>
 </form>
 &nbsp;

@@ -1,5 +1,6 @@
 // https://angular.io/guide/reactive-forms
 // https://angular.io/guide/form-validation
+// laze rendering when in view https://github.com/allenhwkim/ngui-common
 
 import { Component} 						from '@angular/core';
 import { HostListener } 					from '@angular/core';

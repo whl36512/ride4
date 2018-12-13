@@ -42,6 +42,7 @@ export class WithdrawComponent extends BaseComponent {
 	user_from_db: any ={}	; 
 
 	saved : boolean = false;
+	button_enabled	: boolean	= false;
 
 	constructor( public changeDetectorRef	: ChangeDetectorRef 
                 , public mapService             : MapService
@@ -59,66 +60,46 @@ export class WithdrawComponent extends BaseComponent {
 		this.form = this.form_builder.group({
 			usr_id: ['',	[]],	
 			bank_email: ["",	[Validators.required, Validators.pattern]],	
-			requested_amount: [0,	[Validators.required]],
+			//requested_amount: [0,	[Validators.required]],
 				//trnx_cd: ['W',	[Validators.required , Validators.min, Validators.max]],	
 		});
 		if(! this.is_signed_in) {
 			this.warning_msg=C.WARN_NOT_SIGNED_IN ;
 			return;
 		}
-		let user_from_db_observable 	= this.dbService.call_db(C.URL_GET_USER, {});
-		user_from_db_observable.subscribe(
-			user_from_db => {
-				if (user_from_db.usr_id != null )	{
-					this.user_from_db=user_from_db;
-					this.form = this.form_builder.group({
-						usr_id: [this.user_from_db.usr_id,	[]],	
-						bank_email: ["",	[Validators.required, Validators.pattern]],	
-						requested_amount: [this.user_from_db.balance,	[Validators.required
-						//trnx_cd: ['W',	[Validators.required
-						, Validators.min, Validators.max]],	
-					});
-					this.is_signed_in = true;
-				} else {
-					this.error_msg= user_from_db.error;
-					this.warning_msg=C.WARN_NOT_SIGNED_IN;
-					}
-				this.changeDetectorRef.detectChanges();
-			},
-			error => {
-				this.error_msg=error;
-				this.changeDetectorRef.detectChanges();
-			}
-		);
+		this.call_wservice(C.URL_GET_USER, {});
+	}
+
+	onSubmit() {
+		this.reset_msg();
+		this.call_wservice(C.URL_WITHDRAW, this.form.value);
+	}
+
+	form_change_action ()
+	{
+		this.button_enabled = 	this.form.valid 
+							&& 	this.is_signed_in 
+							&&	this.user_from_db 
+							&& 	this.user_from_db.balance >0 ;
 		this.changeDetectorRef.detectChanges();
 	}
 
-onSubmit() {
-	// TODO: Use EventEmitter with form value
-	this.reset_msg();
-	console.warn("201808201534 WithdrawComponent.onSubmit() this.form.value=" + this.form.value );
-	let data_from_db_observable 
-		= this.dbService.call_db(C.URL_WITHDRAW, this.form.value);
-
-	data_from_db_observable.subscribe(
-		money_trnx_from_db=> {
-			console.info("201808201201 WithdrawComponent.onSubmit() money_trnx_from_db =\n" 
-				, C.stringify(money_trnx_from_db));
-			if(money_trnx_from_db.requested_amount < 0 ) { //withdraw is a debit. So negative number
-				this.saved=true;
-				this.info_msg='Request sent. it will be reviewed and processed.';
-			}
-			this.changeDetectorRef.detectChanges();
-		},
-		error => { 
-			this.saved=false;
-			this.error_msg= error;
-			this.changeDetectorRef.detectChanges();
-		},
-	)
-}
+	
+	on_get_data_from_wservice(data_from_db: any) { 
+		let d = data_from_db;
+		if(d.money_tran_id && d.requested_amount < 0 ) { //withdraw is a debit. So negative number
+			this.saved=true;
+			this.info_msg='Request sent. it will be reviewed and processed.';
+		}
+		else if ( d.member_since ) { // got usr
+			this.form.patchValue ({usr_id: d.usr_id});
+			this.user_from_db=d;
+			this.is_signed_in = true;
+		}
+		this.changeDetectorRef.detectChanges();
+	}
 		
 // the getter is required for reactive form validation to work 
 get bank_email() { return this.form.get('bank_email'); }	
-get requested_amount () { return this.form.get('requested_amount'); }	
+//get requested_amount () { return this.form.get('requested_amount'); }	
 }

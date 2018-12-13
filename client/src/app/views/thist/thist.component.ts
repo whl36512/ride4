@@ -100,10 +100,14 @@ export	class	ThistComponent	extends	BaseComponent	{
 
     on_get_data_from_wservice(data_from_db: any) {
 		this.reset_msg();
+		for (let index in data_from_db) {
+			let d = data_from_db[index];
+			d.date = Util.to_local_time(d.date);
+		}
 		this.tran_from_db	=	data_from_db	;	
 		Status.tran_from_db	=	data_from_db	;	
         let len = data_from_db.length;
-		this.info_msg =`Found ${len} transactions before filtering`;
+		//this.info_msg =`Found ${len} transactions`;
 		this.changeDetectorRef.detectChanges();
     }
 

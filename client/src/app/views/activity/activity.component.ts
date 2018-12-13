@@ -107,7 +107,7 @@ export class ActivityComponent extends BaseComponent {
 
 		let len = data_from_db.length;
 		if (len==0) this.warning_msg='Nothing found' ; 
-		else this.info_msg =`Found ${len} activities.`	;
+		//else this.info_msg =`Found ${len} activities.`	;
 		this.changeDetectorRef.detectChanges();
 	}
 

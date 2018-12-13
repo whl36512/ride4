@@ -19,6 +19,7 @@
 			</td>
 		</tr>
 	</table>
+	<p>
 	<div class=center>
     	<mat-radio-group >
         <mat-radio-button color=primary [value]=0 (click)='set_date(0)'> Today &nbsp; &nbsp; &nbsp;
@@ -27,6 +28,7 @@
     	</mat-radio-group>
 	</div>
 </form>
+<p>
 <div class=center>
 <div *ngIf='error_msg!=null'    class=error [innerHTML]='error_msg'></div>
 <div *ngIf='warning_msg!=null'  class=warning [innerHTML]='warning_msg'></div>

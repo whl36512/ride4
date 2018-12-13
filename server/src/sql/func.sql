@@ -1306,16 +1306,15 @@ BEGIN
 	with s1 as (
 		select	
 			coalesce(t.actual_ts, t.request_ts) date
-			, cd.description
-			, t.*
+			, t tran
+			, round(coalesce ( actual_amount, requested_amount ) ,2)::text amount
+			, round(t.balance, 2)::text balance
+			, case when actual_amount is null then 'Pending<br/>' else '' end ||cd.description  note
 		from money_tran t 
 		left outer join money_tran_tran_cd cd on (	cd.tran_cd = t.tran_cd)
 		where (
-			t.actual_ts between coalesce(c0.date1 - 1, '1970-01-01') 
-			and coalesce(c0.date2+1, '3000-01-01')
-			or 
-			t.request_ts between coalesce(c0.date1 - 1, '1970-01-01') 
-			and coalesce(c0.date2 + 1, '3000-01-01')
+			coalesce(t.actual_ts, t.request_ts)  between coalesce(c0.date1 - 1, '1970-01-01') 
+			and coalesce(c0.date2::date +2 , '3000-01-01')
 		)
 		and t.usr_id= u0.usr_id
 	)
@@ -1333,32 +1332,55 @@ $body$
 DECLARE
 		t0 money_tran ;
 		u0 usr ;
+		u1 usr ;
+		u2 usr ;
 		t1 money_tran ;
 BEGIN
 
 	t0 := funcs.json_populate_record(NULL::money_tran	, in_tran) ;
 	u0 := funcs.json_populate_record(NULL::usr			, in_user) ;
 
+	select u.* into u1
+	from usr u
+	where u.usr_id=	u0.usr_id;
+
+	if u1.usr_id is null then
+		return funcs.gen_error('201812122034', 'Please sign in');
+	end if;
+	
+	if u1.balance <=0 then
+		return funcs.gen_error('201812122035', 'Failed. No positive balance');
+	end if;
+
+	update usr u
+	set balance = u.balance - u1.balance
+	where u.usr_id = u1.usr_id
+	returning u.* into u2
+	;
+
 	insert into money_tran ( 
 		  usr_id
 		, tran_cd
 		, requested_amount
 		, request_ts
+		, balance
 		, bank_email
 		, ref_no	
 		)
 		values (
 		  u0.usr_id
 		, 'W'
-		, -t0.requested_amount
+		, -u1.balance
 		, clock_timestamp()
+		, u2.balance
 		, t0.bank_email
 		, uuid_generate_v4()
 		)
 		returning * into t1
 		;
 
-		return row_to_json(t1);
+
+	return row_to_json(t1);
 END
 $body$
 language plpgsql;

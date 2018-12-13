@@ -1,6 +1,8 @@
 $primary-color: #0088dd;
-$green	:  #99ff99;
-$red	:  #ff9999;
+$green	:  #00ff00;
+$red	:  #ff0000;
+//$green	:  #99ff99;
+//$red	:  #ff9999;
 
 #main {
         /* use absolute so the main page can scroll */
@@ -143,6 +145,9 @@ table {
     	margin-left:auto; 
     	margin-right:auto;
 	}
+	& td.money {
+   		text-align: right; 
+	}
 }
 
 .error {
@@ -156,9 +161,9 @@ table {
 }
 
 .stitle {
-	width:	70%;
-	background-color: $primary-color ;
-	color:	white;
+	width:	80%;
+	background-color: white ;
+	color: $primary-color ;
 }
 .mapicon {
 	text-align:center;
@@ -311,9 +316,9 @@ user-select: none;
 }
 
 .from {
-	background-color: $primary-color;
-	color:	white;
-	width:	70%;
+	color: $primary-color;
+	background-color:	white;
+	width:	80%;
 	line-height	:1.2rem;  /* make bullseye bigger without changing line height*/
 	&:before {
 		content: '\25c9' ;
@@ -322,9 +327,9 @@ user-select: none;
 	}
 }
 .to {
-	background-color: $primary-color;
-	color:	white;
-	width:	70%;
+	color: $primary-color;
+	background-color:	white;
+	width:	80%;
 	line-height	:1.2rem;  /* make bullseye bigger without changing line height*/
 	&:before {
 		content: '\25c9';
