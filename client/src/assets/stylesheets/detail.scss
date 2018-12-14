@@ -409,7 +409,7 @@ img.ride_icon {
 	background-color: white;
 	border-style: solid;
 	border-color: $primary-color $primary-color $primary-color $primary-color ;
-	border-width: 0.2rem 0.1rem 0.1rem 0.2rem;
+	border-width: 2px 1px 1px 3px;  //use px not rem.  rem will leave a tiny white area
 	margin: 0.2rem 0rem 0.0rem 0rem;
 	border-radius: 0.5rem;
 	padding: 0rem 0rem 0rem 0rem;

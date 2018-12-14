@@ -1,51 +1,86 @@
-<form [formGroup]="form" (ngSubmit)="onSubmit()">
-	<dl class=detail>
-		<div class="title">User Profile</div>
-		<dt>
-			Last Name : {{user_from_db.last_name}}
-		</dt>
-		<dt>
-			First Name : {{user_from_db.first_name}}
-		</dt>
-		<dt>
-			Headline : {{user_from_db.headline}}
-		</dt>
-		<dt class=f08>
-			Headline will be visible to other users
-		</dt>
-		<dt>
-			Balance : ${{user_from_db.balance}}
-		</dt>
-		<dt>
-			<span class='button clickable-text' >
-				<a [href]='user_from_db.sm_link' target=_blank>LinkedIn Profile</a>
-            </span>
-		</dt>
-		<dt>
- 			<mat-checkbox  formControlName='profile_ind' labelPosition="after" color=primary >
-				Show LinkedIn Profile to other users
-            </mat-checkbox>
-		</dt>
-		<dt>Email </dt>
-		<dd>      
-          		<input  type="email"  formControlName="email" value="{{user_from_db.email}}"  
-					placeholder="Email Address" required 
+<div class=detail>
+	<div class="title">User Profile</div>
+	<form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+		<table class='no_border center'>
+			<tr>
+				<td class=f08>
+					Last Name 
+				</td>
+				<td>
+					{{user_from_db.last_name}}
+				</td>
+			</tr>
+			<tr>
+				<td class=f08>
+					First Name 
+				</td>
+				<td>
+ 					{{user_from_db.first_name}}
+				</td>
+			</tr>
+			<tr>
+				<td class=f08>
+					Headline
+				</td>
+				<td>
+					{{user_from_db.headline}}
+				</td>
+			</tr>
+			<tr>
+				<td colspan=2 class=f08>
+						Headline will be visible to other users
+				</td>
+			</tr>
+			<tr>
+				<td class=f08>
+					Balance
+				</td>
+				<td>
+					${{user_from_db.balance}}
+				</td>
+			</tr>
+			<tr>
+				<td colspan=2>
+					<span class='button clickable-text' >
+						<a [href]='user_from_db.sm_link' target=_blank>LinkedIn Profile</a>
+            		</span>
+				</td>
+			</tr>
+			<tr>
+				<td colspan=2>
+ 					<mat-checkbox  formControlName='profile_ind' labelPosition="after" color=primary >
+						Show LinkedIn Profile to other users
+            		</mat-checkbox>
+				</td>
+			</tr>
+			<tr>
+				<td class=f08>
+					Email
+				</td>
+			</tr>
+			<tr>
+				<td colspan=2>
+					<dd>      
+          			<input  type="email"  formControlName="email" value="{{user_from_db.email}}"  
+						placeholder="Email Address" required 
                   		pattern="{{C.EMAIL_PATTERN}}" 
-                /> 
+                	/> 
                          <span class="validity"></span>
-        </dd>
-		<dt> 
-			<p>
-			<div class=center>
+        			</dd>
+				</td>
+			</tr>
+		</table>
+		<p>
+		<div class=center>
+				<div *ngIf='error_msg!=null' 	class='fade error'>{{error_msg}}</div>
+				<div *ngIf='warning_msg!=null' 	class='fade warning' >{{warning_msg}}</div>
+				<div *ngIf='info_msg!=null' 	class='fade info'>{{info_msg}}</div>
 				<button type="submit" class=center>Save Profile</button>
-			</div>
-			<div *ngIf='error_msg!=null' 	class='fade error'>{{error_msg}}</div>
-			<div *ngIf='warning_msg!=null' 	class='fade warning' >{{warning_msg}}</div>
-			<div *ngIf='info_msg!=null' 	class='fade info'>{{info_msg}}</div>
-			<p>
-		</dt>
-    </dl>
-</form>
+		</div>
+		<p>
+	</form>
+</div>
 <p>
 <div class=f08>
 	<app-misc></app-misc>
