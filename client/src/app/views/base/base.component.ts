@@ -102,11 +102,12 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 	//private logNavigation() { . . . }
 	@HostListener('window:scroll', ['$event'])
 	on_window_scroll(e) {
-		console.debug('201810131753', this.page_name, '.on_window_scroll() event=', e);
+		//console.debug('201810131753', this.page_name, '.on_window_scroll() event=', e);
 		Status.scroll_position[this.page_name] = window.pageYOffset ;
-		console.debug('201810131753', this.page_name
-			, '.on_window_scroll() Status.scroll_position=' 
-			, Status.scroll_position[this.page_name]);
+		//console.debug('201810131753', this.page_name
+			//, '.on_window_scroll() Status.scroll_position=' 
+			//, Status.scroll_position[this.page_name]);
+		this.window_scroll_action();
 	}
 
 
@@ -124,6 +125,7 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 		//this.subscribe_websocket();
 
 		[this.today, this.current_time] = Util.current_time();
+
 		console.debug('201811041002', this.class_name, '.constructor() exit.');
 	}
 
@@ -528,6 +530,7 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
     }
 	
 	on_get_geo_pos(location:any) {};  
+	window_scroll_action(){};
 
 }
 

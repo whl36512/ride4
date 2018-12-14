@@ -71,10 +71,6 @@ export class BookingComponent extends BaseComponent {
 	} 
 
 	ngoninit():void {
-
-		console.debug("201812071208", this.page_name
-			,  ".ngoninit() Status.scroll_position[this.page_name]="
-			, Status.scroll_position[this.page_name] )	;
 		this.b	=	this.booking_from_db;
 		this.bt	=	this.booking_from_db.trip;
 		this.bb	=	this.booking_from_db.book;

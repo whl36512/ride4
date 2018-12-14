@@ -52,12 +52,11 @@ export class BookingsComponent extends BaseComponent {
 
 	filter : any;
 
-	//@HostListener('keydown', ['$event']) 
-	onAnyEvent(e) {
-			 console.debug('201810131753 BookingsComponent.onAnyEvent() event=', e);
-		}
+	bookings_to_show	: any = [];
+	current_page: number=0;
 
 	forms: any =[];
+	page_pos	: number;
 
 	constructor( public changeDetectorRef		: ChangeDetectorRef
 				, public mapService			 	: MapService
@@ -69,16 +68,22 @@ export class BookingsComponent extends BaseComponent {
 		super(changeDetectorRef,mapService, communicationService, dbService
 				, geoService, form_builder, router );
 		this.page_name=C.PAGE_BOOKINGS;
-
+		this.page_pos = Status.current_page_pos[this.page_name]?Status.current_page_pos[this.page_name]:0 ;
+		console.debug("201812071208", this.page_name
+			,  ".ngoninit() Status.current_page_pos[this.page_name]=" 
+			, Status.current_page_pos[this.page_name] 
+			, ' this.page_pos=' , this.page_pos
+		)	;
 
 		console.debug("201809262245 BookingsComponent.constructor() enter")	;
 	} 
 
 	ngoninit():void {
 
-		console.debug("201812071208", this.class_name
+		console.debug("201812071208", this.page_name
 			,  ".ngoninit() Status.scroll_position[this.page_name]="
 			, Status.scroll_position[this.page_name] )	;
+
 		window.scroll(0,Status.scroll_position[this.page_name]);
 
 	}
@@ -139,7 +144,7 @@ export class BookingsComponent extends BaseComponent {
 		this.router.navigate(['/reviews', usr_id]);	
 	}
 
-	form_change_action()
+	form_change_action_v1()
 	{
 		this.filter= this.form.value;
 		StorageService.storeForm(C.KEY_FORM_ACTIVITY_FILTER, this.form.value);
@@ -153,6 +158,25 @@ export class BookingsComponent extends BaseComponent {
 		}
 		// change this.bookings_from_db reference, so the bookings component can refresh
 		this.info_msg='Showing ' + showing + ' activities';
+		this.changeDetectorRef.detectChanges();
+	}
+
+	form_change_action()
+	{
+		this.filter= this.form.value;
+		StorageService.storeForm(C.KEY_FORM_ACTIVITY_FILTER, this.form.value);
+
+		// change this.booking_to_show reference, so the bookings component can refresh
+		this.bookings_to_show = [];
+		this.changeDetectorRef.detectChanges();
+		
+		for ( let index in this.bookings_from_db) {
+			let b = this.bookings_from_db[index];
+			if ( this.show_booking(b,  Number(index)  )) {
+				this.bookings_to_show.push ( b);
+			}
+		}
+		this.info_msg='Showing ' + this.bookings_to_show.length + ' activities';
 		this.changeDetectorRef.detectChanges();
 	}
 
@@ -358,4 +382,39 @@ export class BookingsComponent extends BaseComponent {
 
 		this.router.navigate([C.ROUTE_MAP, C.ROUTE_MAP_ACTIVITIES, {index:index}]);
 	}
+
+    window_scroll_action (){
+        let scroll_position = Status.scroll_position[this.page_name];
+        let page_pos        = this.page_pos;
+		console.debug ('201812131219', this.page_name, 'window_scroll_action() this.page_pos=', this.page_pos);
+		console.debug ('201812131219', this.page_name, 'window_scroll_action() page_pos=', page_pos);
+        let doc_top     = document.body.getBoundingClientRect().top;
+        let element = document.getElementById ('bookings');
+        let top     = element.getBoundingClientRect().top;
+        let bottom  = element.getBoundingClientRect().bottom;
+		let abs_bottom 	= bottom-doc_top - window.innerHeight;
+		let abs_top		= top   -doc_top;
+        if ( scroll_position > abs_bottom - (abs_bottom-abs_top)/3 ) page_pos +=1 ;
+        if ( scroll_position < abs_top    + (abs_bottom-abs_top)/3 ) page_pos -=1 ;
+        if ( top > 0 )    page_pos =0 ;
+		page_pos = page_pos<0? 0:page_pos;
+		page_pos = page_pos> this.bookings_to_show.length-2 ? this.bookings_to_show.length-2: page_pos;
+		Status.current_page_pos[this.page_name] = page_pos;
+		this.page_pos							= page_pos;
+		console.debug ('201812131219', this.page_name, 'window_scroll_action()'
+			,	'scroll_position=', scroll_position
+			,	'abs_top=', abs_top
+			,	'abs_bottom=', abs_bottom
+			,	'doc_top=', doc_top
+			,	'top=', top
+			,	'bottom=', bottom
+			,	'bottom-top=', bottom- top
+			,	'bottom-doc_top=', bottom- doc_top
+			,	'window.innerHeight=', window.innerHeight
+			,	'Status.current_page_pos[this.page_name]', Status.current_page_pos[this.page_name]
+			,	'page_pos=', page_pos);
+
+		this.changeDetectorRef.detectChanges();
+    }
+
 }

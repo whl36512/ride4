@@ -67,12 +67,14 @@
 </div>
 
 
-<div  *ngFor="let booking of bookings_from_db ;let i=index;
+<div id=bookings>
+<div  *ngFor="let booking of bookings_to_show ;let i=index;
 		let even=even;let odd=odd; let first = first; let last = last; trackBy:trackByFunc"
 		[ngClass]="{ odd: odd, even: even }">
 	
-	<app-booking 		*ngIf='booking.show_booking'
+	<app-booking 		*ngIf='i >= page_pos-2 && i <= page_pos +2'
                         [booking_from_db]='booking'
                         [index]="i"
     > </app-booking>
+</div>
 </div>

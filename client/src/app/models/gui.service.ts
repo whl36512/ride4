@@ -25,6 +25,7 @@ export class Status {
 	static bookings_from_db : any | null = null  // for activity page
 	static tran_from_db : any | null = null  // for transaction history page
 	static scroll_position		: any	={};
+	static current_page_pos		: any	={};
 	static reviewee_from_db	: any= {};	//save reviewee and reviews here to avoid repeated DB retrieval
 	static reviews_from_db	: any	= null;
 	
