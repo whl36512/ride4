@@ -393,7 +393,7 @@ BEGIN
 	
 	if t0a.trip_id is not null then
 			return funcs.gen_error('201812100032'
-				, 'Found an existing trip in the same time frame.');
+				, 'You have an existing trip in the same time frame.');
 	end if;
 	
 

@@ -43,10 +43,12 @@ input {
 	&[type="time"] {
 		width: 8rem;
 		font-size: 1rem;
+  		background-color: white;
 	}
 	&[type="date"] {
 		width: 8rem;
 		font-size: 1rem;
+  		background-color: white;
 	}
 	&[type="range"] {
 		border: none;
@@ -162,8 +164,8 @@ table {
 
 .stitle {
 	width:	80%;
-	background-color: white ;
-	color: $primary-color ;
+	color: white ;
+	background-color: $primary-color ;
 }
 .mapicon {
 	text-align:center;
@@ -316,8 +318,8 @@ user-select: none;
 }
 
 .from {
-	color: $primary-color;
-	background-color:	white;
+	background-color: $primary-color;
+	color:	white;
 	width:	80%;
 	line-height	:1.2rem;  /* make bullseye bigger without changing line height*/
 	&:before {
@@ -327,8 +329,8 @@ user-select: none;
 	}
 }
 .to {
-	color: $primary-color;
-	background-color:	white;
+	background-color: $primary-color;
+	color:	white;
 	width:	80%;
 	line-height	:1.2rem;  /* make bullseye bigger without changing line height*/
 	&:before {
@@ -427,6 +429,8 @@ img.ride_icon {
 	display: inline-block;    
 	z-index:500;
 	margin:0rem;
+	border: 1px solid red;
+	//float:right;
 
 
 
@@ -459,7 +463,7 @@ img.ride_icon {
 
 	& .dropdown-content {    
 		display: none;    
-		position: absolute;    
+		//position: absolute;    
 		//background-color: #f1f1f1;  
     	//min-width: 160px;  
    // 	box-shadow: 0 px 8 px 16 px 0 px rgba(0, 0, 0, 0.2);  

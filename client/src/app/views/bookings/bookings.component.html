@@ -60,21 +60,170 @@
 		</tr>
 	</table>
 </form>
-<div class=center>
-<div *ngIf='error_msg'      class=error     [innerHTML]='error_msg' ></div>
-<div *ngIf='info_msg'       class='info'    [innerHTML]='info_msg' ></div>
-<div *ngIf='warning_msg'    class='warning' [innerHTML]='warning_msg' ></div>
-</div>
 
-
-<div id=bookings>
-<div  *ngFor="let booking of bookings_to_show ;let i=index;
+<div *ngIf='error_msg!=null' class=error>{{error_msg}}</div>
+<div *ngIf='warning_msg!=null' class=warning>{{warning_msg}}</div>
+<div class=warning *ngIf='false'>change_detect_count={{change_detect_counter()}}</div>
+<div *ngIf='info_msg!=null' class=info>{{info_msg}}</div>
+<div  *ngFor="let booking of forms ;let i=index;
 		let even=even;let odd=odd; let first = first; let last = last; trackBy:trackByFunc"
 		[ngClass]="{ odd: odd, even: even }">
+	<div class=detail *ngIf='bookings_from_db[i].show_booking'>
+	<form [formGroup]="booking" (ngSubmit)='onSubmit()' >
+      	<table class=center>
+			<thead>
+				<tr >
+					<th>#</th>
+					<th>Date/Time</th>
+					<th *ngIf='!bookings_from_db[i].book' >Seats</th>
+					<th *ngIf='!bookings_from_db[i].book' >Price($/mile)</th>
+					<th *ngIf='bookings_from_db[i].book'  >Booked</th>
+					<th *ngIf='bookings_from_db[i].book'  >Price($)</th>
+					<th>Status</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>{{i+1}}<br/>
+					<td>{{bookings_from_db[i].trip.trip_date}}<br/>
+						{{bookings_from_db[i].trip.trip_time}}</td>
+					<td *ngIf='! bookings_from_db[i].book' > 
+						{{booking.value.seats}}<br/>
+		<input class=zoom type="range" formControlName="seats" min="0" max="{{C.MAX_SEATS}}" step=1 />
+					</td>
+					<td *ngIf='! bookings_from_db[i].book' > 
+						{{booking.value.price}}<br/>
+		<input class=zoom type="range" formControlName="price" min="0" max="{{C.MAX_PRICE}}" step=0.01 />
+					</td>
+					<td *ngIf='bookings_from_db[i].book'>{{bookings_from_db[i].seats}}</td>
+					<td *ngIf='bookings_from_db[i].book'>{{bookings_from_db[i].unified_cost}}</td>
+					<td class='warning width05' >{{bookings_from_db[i].book_status_description}}</td>
+				</tr>
+			</tbody>
+		</table>
+<div class=center>
+	<button *ngIf='bookings_from_db[i].show_review_button'
+		(click)="review(null, i, null)">
+		Review
+		<span *ngIf='bookings_from_db[i].show_review_panel' > &#xfe3f;</span>
+		<span *ngIf='!bookings_from_db[i].show_review_panel' > &#xfe40;</span>
+	</button>
+	<button *ngIf='bookings_from_db[i].show_msg_button'
+		(click)="message(null, i, null)">
+		Chat
+		<span *ngIf='bookings_from_db[i].show_messaging_panel' > &#xfe3f;</span>
+		<span *ngIf='!bookings_from_db[i].show_messaging_panel' > &#xfe40;</span>
+	</button>
+	<button (click)="update(booking,i)" *ngIf='bookings_from_db[i].show_update_button' 
+		title='Change seats and unit price'>Update seats and price
+	</button>
+	<button (click)="action(booking,i, C.URL_DELETE)" *ngIf='bookings_from_db[i].show_delete_button' 
+		title='Change seats and unit price'>Delete
+	</button>
+	<span *ngIf='bookings_from_db[i].update_msg!=null' class="info fade">
+		{{bookings_from_db[i].update_msg}}
+	</span>
+	<button *ngIf='bookings_from_db[i].show_confirm_button' 
+		(click)="action(booking,i, C.URL_CONFIRM)">Confirm
+	</button>
+	<button *ngIf='bookings_from_db[i].show_reject_button'
+		(click)="action(booking,i, C.URL_CANCEL)">Reject
+	</button>
 	
-	<app-booking 		*ngIf='i >= page_pos-2 && i <= page_pos +2'
-                        [booking_from_db]='booking'
+	<button *ngIf='bookings_from_db[i].show_cancel_button' 
+		(click)="action(booking,i, C.URL_CANCEL)">Cancel
+	</button>
+	<button *ngIf='bookings_from_db[i].show_finish_button'
+		(click)="action(booking,i, C.URL_FINISH)">Finish
+	</button>
+	<div *ngIf='bookings_from_db[i].fail_msg!=null' class='error fade'>
+		{{bookings_from_db[i].fail_msg}}
+	</div>
+</div>
+	<app-message *ngIf='bookings_from_db[i].show_messaging_panel'
+                        [book_id]="bookings_from_db[i].book.book_id"
                         [index]="i"
-    > </app-booking>
+                        >
+	</app-message>
+	<app-review *ngIf='bookings_from_db[i].show_review_panel'
+                        [book_id]="bookings_from_db[i].book.book_id"
+                        [index]="i"
+                        >
+	</app-review>
+	<div *ngIf='bookings_from_db[i].book'>
+		<div class='stitle'>
+			<span *ngIf=' bookings_from_db[i].is_rider' > Driver </span>
+			<span *ngIf='!bookings_from_db[i].is_rider' > Passenger </span>
+			<span class='clickable-text star' 
+				[innerHTML]='bookings_from_db[i].stars'
+				(click)='show_reviews(bookings_from_db[i].other_usr_id)'
+				>
+			</span>
+		</div>
+		{{bookings_from_db[i].headline}} <br/>
+ 		<span class=warning *ngIf='!(bookings_from_db[i].sm_link)'>
+			LinkedIn profile opted out
+		</span> 
+ 		<span class='button clickable-text'  *ngIf='bookings_from_db[i].sm_link'>
+			<a [href]='bookings_from_db[i].sm_link' target=_blank>LinkedIn Profile</a>
+		</span>
+	</div>
+
+	<div *ngIf='bookings_from_db[i].is_booker'>
+		<div class='clickable-text from' (click)='geo_mark(i)'> 
+			<span *ngIf=' bookings_from_db[i].trip.rider_ind'>Passenger Pickup </span>
+			<span *ngIf='!bookings_from_db[i].trip.rider_ind'>Driver from </span>
+			<span class='clickable-text map_clickable'>map</span>
+		</div>
+		{{bookings_from_db[i].trip.p1.display_name}}
+		<div class='clickable-text to' (click)='geo_mark(i)'> 
+			<span *ngIf=' bookings_from_db[i].trip.rider_ind'>Passenger Dropoff </span>
+			<span *ngIf='!bookings_from_db[i].trip.rider_ind'>Driver to </span>
+			<span class='clickable-text map_clickable'>map</span>
+		</div>
+		{{bookings_from_db[i].trip.p2.display_name}}
+	</div>
+	<div *ngIf='!bookings_from_db[i].is_booker && bookings_from_db[i].book'>
+		<div class='clickable-text from' (click)='geo_mark(i)'> 
+			<span *ngIf='!bookings_from_db[i].trip.rider_ind'> Passenger Pickup </span>
+			<span *ngIf=' bookings_from_db[i].trip.rider_ind'> Driver from</span>
+			<span class='clickable-text map_clickable'>map</span>
+		</div>
+		{{bookings_from_db[i].book.p1.display_name}}
+		<div *ngIf='bookings_from_db[i].book.p2.display_name'> 
+			<div class='clickable-text to' (click)='geo_mark(i)' >
+				<span *ngIf='!bookings_from_db[i].trip.rider_ind'> Passenger Dropoff </span>
+				<span *ngIf=' bookings_from_db[i].trip.rider_ind'> Driver to</span>
+				<span class='clickable-text map_clickable'>map</span>
+			</div>
+			{{bookings_from_db[i].book.p2.display_name}}
+		</div>
+	</div>
+
+	<div *ngIf='!bookings_from_db[i].is_booker && !bookings_from_db[i].book'>
+		<div class='clickable-text from' (click)='geo_mark(i)'> 
+			<span *ngIf=' bookings_from_db[i].trip.rider_ind'> Passenger(me) Pickup </span>
+			<span *ngIf='!bookings_from_db[i].trip.rider_ind'> Driver(me) from </span>
+			<span class='clickable-text map_clickable'>map</span>
+		</div>
+		{{bookings_from_db[i].trip.p1.display_name}}
+		<div class='clickable-text to' (click)='geo_mark(i)'> 
+			<span *ngIf=' bookings_from_db[i].trip.rider_ind'> Passenger(me) Dropoff </span>
+			<span *ngIf='!bookings_from_db[i].trip.rider_ind'> Driver(me) to </span>
+			<span class='clickable-text map_clickable'>map</span>
+		</div>
+		{{bookings_from_db[i].trip.p2.display_name}}
+	</div>
+
+	<span class='button clickable-text' [innerHTML]="bookings_from_db[i].google_map_url"></span>
+	<div *ngIf='bookings_from_db[i].trip.description'>
+		<div class='stitle' >Description</div>
+		<div class=data [innerHTML]="bookings_from_db[i].trip.description"></div>
+	</div>
+	</form>
+	</div>
+	<div *ngIf='bookings_from_db[i].show_booking'>
+		<p>&nbsp;<p>
+	</div>
 </div>
-</div>
+
