@@ -479,4 +479,32 @@ img.ride_icon {
     	}
 	}
 }    
+
+.grid {
+	display: grid;
+	border: 1px solid $primary-color;
+    border-radius: 0.5rem;
+	grid-gap:1px;					// cell border
+    background-color: $primary-color ;
+
+	&.cols_2 {
+		grid-template-columns: auto auto;
+	}
+	& >  .span_2 {
+        grid-column: span 2;
+	}
+	& > * {
+		background-color: white;
+    	//border-radius: 0.5rem;
+	}
+}
+
+.th {
+	font-size :	0.8rem;
+  	font-weight: bold;
+}
+
+.no_border	{
+	border: none;
+}
     
