@@ -60,6 +60,7 @@ export class FlashComponent extends BaseComponent {
 	}
 
 	start(){
-		this.router.navigate(['/Trip/', C.KEY_FORM_SEARCH]);
+		//this.router.navigate(['/Trip/', C.KEY_FORM_SEARCH]);
+		this.router.navigate(['/map/search']);
 	}
 }

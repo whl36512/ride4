@@ -1,3 +1,5 @@
+$primary-color: #0088dd;
+
 selected {
 	background-color: #CFD8DC !important;
 	color: white;
@@ -9,18 +11,20 @@ selected {
 	list-style-type: none;
 	font-size: 1.2rem;
 	clear: both;
+//	border: 1px solid red;
 
 	& a li {
   		cursor: pointer;
   		position: relative;
   		left: 0;
-  		background-color: #EEE;
+  		background-color: #FFF;
   		margin: 0.2em;
   		padding: 0.2rem 0.2rem;
   		border-radius: 0.4rem ;
+		color: black ;
 		&:hover {
-  			color: #607D8B;
-  			background-color: #DDD;
+  			color: white;
+  			background-color: $primary-color;
   			left: .1rem;
 		}
 	}
@@ -54,16 +58,21 @@ div.topnav {
     z-index:500;
     border: 1px solid #AAA;
     font-size: 1rem;
-    background-color: #eee; 
+  	background-color: #FFF;
+    //background-color: #eee; 
     border-radius: 0.4rem ;
     padding: 0rem;
+	//&:hover .nav  { display: block; }
+	.topnav > .nav { display: none; }
+	//.topnav:focus-within > .nav { display:block; }
+	.topnav:focus > .nav { display:block; }
 }
 
 #navicon{   
 	cursor: pointer;
 	float: right;
 	clear: both;
-	font-size: 2rem;
+	font-size: 1.5rem;
 	padding: 0rem;
 	margin: 0rem;
     	border-radius: 0.4rem ;
@@ -73,8 +82,6 @@ div.topnav {
 	}
 }
 
-.topnav > .nav { display: none; }
-.topnav:focus-within > .nav { display:block; }
 
 
 #linkedin_signin {

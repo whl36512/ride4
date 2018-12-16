@@ -14,9 +14,7 @@
 					<th>Date/Time</th>
 					<th>Seats</th>
 					<th>Price($)</th>
-					<th *ngIf='is_signed_in'>Booked</th>
-					<th *ngIf='trip.status_msg' class=warning [innerHTML]='trip.status_msg'>
-					</th>
+					<th *ngIf='is_signed_in'>I Booked</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -37,6 +35,7 @@
 			</tbody>
 		</table>
 		<td *ngIf='trip.error_msg' class=error 	[innerHTML]='trip.error_msg'></td>
+		<td *ngIf='trip.warning_msg'  class=warning 	[innerHTML]='trip.warning_msg'></td>
 		<td *ngIf='trip.info_msg'  class=info 	[innerHTML]='trip.info_msg'></td>
 		<div class='stitle' >
 			<span *ngIf=' trip.trip.rider_ind' > Passenger </span>

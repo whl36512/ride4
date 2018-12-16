@@ -868,7 +868,7 @@ BEGIN
 		-- border box , a box eclosing p1 and p2, 
 		-- vertical box is tall and narrow when p1 p2 runs generally vertical
 		-- horizontal box is short and wide when p1 p2 runs generally vertical
-		, i0.lat_c - i0.radius_degree*greatest(abs(cos_dir), 0.7)	p1_lat_bb
+		, i0.lat_c - i0.radius_degree*greatest(abs(cos_dir), 0.7)	p1_lat_bb  
 		, i0.lat_c + i0.radius_degree*greatest(abs(cos_dir), 0.7) 	p2_lat_bb
 		, i0.lon_c - i0.radius_degree*greatest(abs(sin_dir), 0.7) 	p1_lon_bb
 		, i0.lon_c + i0.radius_degree*greatest(abs(sin_dir), 0.7) 	p2_lon_bb
@@ -892,8 +892,8 @@ BEGIN
 		, t.p2
 		, t.trip_date
 		, t.trip_time
-		, t.date1
-		, t.date2
+		, coalesce(t.date1, now()::date) date1
+		, coalesce(t.date2, coalesce(t.date1, now()::date) + 30) date1
 		, time '0:0' 
 			+ greatest (0		, extract (epoch from	coalesce(t.trip_time, time '00:00' ))
 				- t.distance/60*1800-300) * interval '1 second' time1
@@ -925,8 +925,9 @@ BEGIN
 	elsif not cr.rider_ind and (cr.p1).lat is not null and (cr.p2).lat is not null then
 		--return query select funcs.gen_error('dshasd','called funcs.search_by_driver');
 		return query select * from funcs.search_by_driver(cr, u0);
-	else
-		return query select * from funcs.gen_error('201811240942','Search criteria is ill formed');
+	else 
+		return query select * from funcs.search_no_p1_p2(cr, u0);
+		--return query select * from funcs.gen_error('201811240942','Search criteria is ill formed');
 	end if;
 END
 $body$
@@ -1106,6 +1107,55 @@ BEGIN
 	)
 	select row_to_json(a) 
 	from a
+	;
+END
+$body$
+language plpgsql;
+
+create or replace function funcs.search_no_p1_p2( c0 funcs.extended_criteria , u0 usr)
+-- search criteria is not set up
+	returns setof json
+as
+$body$
+DECLARE
+BEGIN
+	RETURN QUERY
+	with a as (
+		select 
+			  t trip
+			, funcs.calc_cost_rider(t.price, t.distance , t.seats ) as cost
+			, uo.headline
+			, uo.rating
+			, case when uo.profile_ind then 'LinkedIn Profile available' 
+										else 'LinkedIn Profile Opted out' 
+				end profile_available
+			, case when u0.balance is null 	then false else true end is_signed_in 
+			, case when u0.balance >= -10 	then true else false end sufficient_balance
+			, coalesce ( b.seats, 0)	seats_booked	-- should always be 0
+			--, t.seats				seats_to_book
+			, 0				seats_to_book
+		from trip t
+		join usr uo on (uo.usr_id = t.usr_id) -- to get the other user's headline and balance
+		left outer join book b on (b.trip_id=t.trip_id and b.usr_id=u0.usr_id and b.status_cd in ('P', 'C'))
+		where t.status_cd = 'A'
+		and t.usr_id	!= 	u0.usr_id
+		and t.seats > 0
+		--and t.seats <= c0.seats
+		--and	t.rider_ind = not c0.rider_ind
+		--and t.price >= c0.min_price_rider
+		and t.trip_date between c0.date1 and c0.date2
+		and t.trip_date + t.trip_time > c0.date1 + c0.trip_time
+		-- trip start and end must inside the bounding box
+		and (t.p1).lat between c0.box_p1_lat and c0.box_p2_lat
+		and (t.p1).lon between c0.box_p1_lon and c0.box_p2_lon
+		and (t.p2).lat between c0.box_p1_lat and c0.box_p2_lat
+		and (t.p2).lon between c0.box_p1_lon and c0.box_p2_lon
+		order by t.distance desc, t.trip_date, t.trip_time
+		limit 100
+	)
+	select row_to_json(a) 
+	from a
+	order by (a.trip).trip_date , (a.trip).trip_time
 	;
 END
 $body$
@@ -1655,10 +1705,10 @@ BEGIN
 	r0	:= funcs.json_populate_record(NULL::review	, in_review)	;
 	u0	:= funcs.json_populate_record(NULL::usr 	, in_user)		;
 	
-	if u0.usr_id is null then
-		return query select * from funcs.gen_error('201811272200', 'You must sign in to see reviews');
-	end if
-	;
+	--if u0.usr_id is null then
+		--return query select * from funcs.gen_error('201811272200', 'You must sign in to see reviews');
+	--end if
+	--;
 	
 	return query
 	with a as (

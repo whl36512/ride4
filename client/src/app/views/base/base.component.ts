@@ -4,6 +4,7 @@ import { Component				} 	from '@angular/core';
 import { NgZone					} 	from '@angular/core';
 import { OnInit 				} 	from '@angular/core';
 import { OnDestroy 				} 	from '@angular/core';
+import { AfterViewInit 			} 	from '@angular/core';
 import { Subscription 			}	from 'rxjs';
 import { ChangeDetectorRef 		}	from '@angular/core';
 import { FormBuilder			}	from '@angular/forms';
@@ -47,7 +48,7 @@ import { Status					} 	from '../../models/gui.service';
 	template: '',
 	//styleUrls: ['./base.component.css']
 })
-//export abstract class BaseComponent implements OnChanges, OnInit, OnDestroy {
+//export abstract class BaseComponent implements OnChanges, OnInit, OnDestroy, AfterViewInit {
 export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 
 	//mapService				: MapService			;
@@ -120,18 +121,18 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 				, public router					: Router	 
 				//public zone: NgZone
 				) { 
-		console.debug('201811041002', this.class_name, '.constructor() enter.');
+		console.debug('201811041002', this.page_name, '.constructor() enter.');
 		//this.subscribe_geo_watcher();
 		//this.subscribe_websocket();
 
 		[this.today, this.current_time] = Util.current_time();
 
-		console.debug('201811041002', this.class_name, '.constructor() exit.');
+		console.debug('201811041002', this.page_name, '.constructor() exit.');
 	}
 
 
 	ngOnInit() { 
-		console.debug ('201810290933 ', this.class_name,'.ngOnInit() enter.');
+		console.debug ('201810290933 ', this.page_name,'.ngOnInit() enter.');
 		this.is_signed_in= UserService.is_signed_in();
 
 		if(!this.subscription0) this.subscription0 =this.communicationService.msg.subscribe(
@@ -142,19 +143,36 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 			}
 		);
 		//this.subscribe_geo_watcher();
-		//this.communicationService.ws_send(C.MSG_KEY_GREETING, `{"say":"Greeting from ${this.class_name}"}` );
+		//this.communicationService.ws_send(C.MSG_KEY_GREETING, `{"say":"Greeting from ${this.page_name}"}` );
 		this.ngoninit();
 		this.subscribe_form_change();
 		//this.subscribe_nav_end();
-		console.debug ('201810290933 ', this.class_name,'.ngOnInit() exit.');
+		console.debug ('201810290933 ', this.page_name,'.ngOnInit() exit.');
 	}
 
 	ngOnChanges(changes: SimpleChanges) {
 		// It’s called before ngOnInit and whenever one or more data-bound input properties change.
-		console.debug("201809262246", this.class_name, ".ngOnChanges() enter");
+		console.debug("201809262246", this.page_name, ".ngOnChanges() enter");
 		this.ngonchanges(changes);
-		console.debug("201809262246", this.class_name, ".ngOnChanges() exit");
+		console.debug("201809262246", this.page_name, ".ngOnChanges() exit");
 	}
+
+	ngAfterViewInit()  {
+		console.debug("201812151757", this.page_name, ".ngAfterViewInit() enter");
+		if (this.page_name==C.PAGE_TRIP_LIST || this.page_name == C.PAGE_BOOKINGS) {
+			console.debug("201812071208", this.page_name
+            	,  ".ngoninit() this.Status.scroll_position[this.page_name]="
+            	, this.Status.scroll_position[this.page_name] )  ;
+	
+        	window.scroll(0,    this.Status.scroll_position[this.page_name]);
+		}
+
+		this.ngafterviewinit();
+		console.debug("201812151757", this.page_name, ".ngAfterViewInit() exit");
+	}
+
+	ngafterviewinit() { }
+
 
 
 	subscribe_form_change(){
@@ -163,7 +181,7 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 			debounceTime(C.FORM_DEBOUNCE_TIME)
 			,distinctUntilChanged((v1,v2) => C.stringify(v1)===C.stringify(v2)) 
 			).subscribe(newValues => { 
-					console.debug('201811172143', this.class_name, 'subscribe_form_change() newValues=');
+					console.debug('201811172143', this.page_name, 'subscribe_form_change() newValues=');
 					console.debug(C.stringify(newValues));
 					this.form_values_new = Util.deep_copy(newValues);
 					this.form_change_action();
@@ -194,7 +212,7 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 	{
 		if (this.websocket_retry_count > 2)
 		{
-			console.error("ERROR 201811141550", this.class_name
+			console.error("ERROR 201811141550", this.page_name
 				, '.subscribe_websocket() retried', this.websocket_retry_count, 'times. Bail out');
 			return;
 		}
@@ -203,7 +221,7 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 			this.ws_sub
 				=this.communicationService.ws_subject.subscribe(
 					msg	=> {
-						console.debug ('201811142241 ', this.class_name
+						console.debug ('201811142241 ', this.page_name
 							,'.subscribe_websocket() got message. msg=');
 						console.debug (msg);
 						this.websocket_retry_count=0;
@@ -213,7 +231,7 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 								this.ws_sub.unsubscribe()	
 								this.ws_sub= null;
 								//this.subscribe_websocket();
-								//this.communicationService.ws_send(C.MSG_KEY_GREETING, `{"say":"Greeting from ${this.class_name}"}` );
+								//this.communicationService.ws_send(C.MSG_KEY_GREETING, `{"say":"Greeting from ${this.page_name}"}` );
 							},
 					()	=> 	{ 	console.info ("201811141518 websocket closed"); 
 								this.ws_sub= null;
@@ -227,7 +245,7 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 
 
 	ngOnDestroy(): void {
-		console.debug ('201810290932 ', this.class_name,'.ngOnDestroy() enter.');
+		console.debug ('201810290932 ', this.page_name,'.ngOnDestroy() enter.');
 		// prevent memory leak when component destroyed
 		if( this.subscription0	!= null)	this.subscription0.unsubscribe();
 		if( this.subscription1	!= null)	this.subscription1.unsubscribe();
@@ -241,7 +259,7 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 		//if( this.nav_end_sub!= null) 		this.nav_end_sub.unsubscribe();
 		this.communicationService.send_msg(C.MSG_KEY_MAP_BODY_NOSHOW, {});
 		this.onngdestroy();
-		console.debug ('201810290932 ', this.class_name,'.ngOnDestroy() exit.');
+		console.debug ('201810290932 ', this.page_name,'.ngOnDestroy() exit.');
 	}
 
 	onngdestroy(){}
@@ -252,7 +270,7 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 	
 	subscription_action_ignore()
 	{
-		console.debug('DEBUG 201810312014', this.class_name, '.subscription_action() ignore msg'); 
+		console.debug('DEBUG 201810312014', this.page_name, '.subscription_action() ignore msg'); 
 	}
 
 	reset_msg() : void{
@@ -279,7 +297,7 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 	}
 
 	geocode(element_id: string, pair, form):any {
-		console.debug('201800111346', this.class_name, '.geocode() element_id =' , element_id);
+		console.debug('201800111346', this.page_name, '.geocode() element_id =' , element_id);
 
 		let pair_before_geocode = Util.deep_copy(pair) ;
 		var p :any ;
@@ -373,7 +391,7 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 			);
 		route_response.subscribe(
 			body => {
-				console.info("201808201201", this.class_name, '.routing() body =\n' , C.stringify(body));
+				console.info("201808201201", this.page_name, '.routing() body =\n' , C.stringify(body));
 				if( body.routes.length >0 ) {
 					let distance=body.routes[0].distance ;
 					pair.distance= Math.round(distance /160)/10;
@@ -422,7 +440,7 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 		let data_from_db_observable  = this.dbService.call_db(url, payload1);
 		data_from_db_observable.subscribe(
 			data_from_db => {
-				console.info("201808201201", this.class_name, ".call_wservice() data_from_db ="
+				console.info("201808201201", this.page_name, ".call_wservice() data_from_db ="
 					, C.stringify(data_from_db));
 				if (data_from_db.error_desc) {
 					this.reset_msg();

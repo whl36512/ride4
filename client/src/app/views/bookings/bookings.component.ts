@@ -67,7 +67,7 @@ export class BookingsComponent extends BaseComponent {
 				, public router					: Router )  {
 		super(changeDetectorRef,mapService, communicationService, dbService
 				, geoService, form_builder, router );
-		this.page_name=C.PAGE_BOOKING;
+		this.page_name=C.PAGE_BOOKINGS;
 
 
 		console.debug("201809262245 BookingsComponent.constructor() enter")	;
@@ -75,10 +75,12 @@ export class BookingsComponent extends BaseComponent {
 
 	ngoninit():void {
 
-		console.debug("201812071208", this.class_name
+/*
+		console.debug("201812071208", this.page_name
 			,  ".ngoninit() Status.scroll_position[this.page_name]="
 			, Status.scroll_position[this.page_name] )	;
 		window.scroll(0,Status.scroll_position[this.page_name]);
+*/
 
 	}
 

@@ -85,16 +85,20 @@ export class TriplistComponent extends BaseComponent {
 			else t.status_msg=null ;
 
 			t.show_book_button = 	this.is_signed_in && t.sufficient_balance
-					&& t.seats_to_book >0
+					&& t.seats_to_book >0 
 					;
 
 			let tmp_book= Util.deep_copy(t);
 			tmp_book.book= sc;
 			t.google_map_url = MapService.google_map_string(tmp_book); 
 			t.stars = Util.get_stars(t.rating);
+			
+			if ( t.seats_to_book <=0 ) t.warning_msg = 'Use Search Setting menu to refine searches';
+			else if ( ! this.is_signed_in) t.warning_msg = 'Please sign in';
+			else if ( ! t.sufficient_balance && ! t.trip.rider_ind) t.warning_msg = 'You have insufficient balance';
+			else if ( ! t.sufficient_balance && t.trip.rider_ind) t.status_msg = 'You have negative balance';
 		}
 
-		window.scroll(0,	this.Status.scroll_position[this.page_name]);
   	}
 
 	book(trip: any, index: string): void {

@@ -36,6 +36,17 @@ export class NavComponent extends BaseComponent {
         super(changeDetectorRef,mapService, communicationService, dbService
                 , geoService, form_builder, router );
 		this.page_name=C.PAGE_NAV;
+        this.timer_sub = BaseComponent.timer.subscribe(
+            // val will be 0, 1,2,3,...
+            val => {
+                if(val % 2==0) {
+					//this.show_nav = true ;
+					//console.debug('201812151024', this.page_name, 'timer_sub this.show_nav=', this.show_nav);
+					//this.changeDetectorRef.detectChanges();
+				}
+            },
+        );
+
 
 	}
 
@@ -49,12 +60,30 @@ export class NavComponent extends BaseComponent {
 
 	nav_menu_off():boolean  {
 		this.show_nav = false ;
+		this.changeDetectorRef.detectChanges();
 		this.Util.hide_map();
 		return true;
 
 	}
 
+	navicon_enter(event) {
+		this.show_nav=true;
+	}
+
 	toggle()  {
+/*
+		if ( ! this.show_nav ) this.show_nav=true;
+		else {
+		// https://stackoverflow.com/questions/4866229/check-element-css-display-with-javascript
+			let elem = document.getElementById('nav');
+			let display= elem.currentStyle ? elem.currentStyle.display :
+                              getComputedStyle(elem, null).display;
+			console.log('201812151104', this.page_name, 'toggle() display='+ display) ;
+			if (display =='block') this.show_nav=false;
+		}
+*/
+			
+		
 		this.show_nav =!this.show_nav ;
 		this.is_signed_in= UserService.is_signed_in();
 		console.log('301808221747 NavComponent.constructor this.is_signed_in='+ this.is_signed_in) ;

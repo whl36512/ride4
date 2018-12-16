@@ -28,7 +28,7 @@
     </rdf:RDF>
   </metadata>
 <style>
-    .heavy { font: bold 30px sans-serif; fill: #0088dd; }
+    .heavy { font: bold 24px sans-serif; fill: #0088dd; }
 	.pcolor { fill: #0088dd;}
 	.bcolor { fill: white;}
   </style>

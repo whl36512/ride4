@@ -170,6 +170,7 @@ export class Constants{
 
  	static ROUTE_MAP					= 'map'				;	
  	static ROUTE_MAP_SEARCH				= 'search'				;	
+ 	static ROUTE_MAP_QSEARCH			= 'quick_search'				;	
  	static ROUTE_MAP_ACTIVITIES			= 'activities'			;	
  	static ROUTE_MAP_SEARCH_RESULTES	= 'search_resultes'		;	
 

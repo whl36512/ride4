@@ -1,10 +1,18 @@
-<div  class="topnav" tabindex="-1"  id="topnav"	 >
-	<div id=navicon type=button (click)="toggle()" > &#9776; </div>
+<div  class="topnav" tabindex="-1"  id="topnav"	(mouseleave)='show_nav=false'  >
+	<div id=navicon type=button (click)="toggle()" 
+	>&nbsp;&#9776;&nbsp; </div>
 	<div *ngIf='error_msg!=null' class=error>{{error_msg}}</div>
 	<div *ngIf='warning_msg!=null' class='fade warning'>{{warning_msg}}</div>
 	<div *ngIf='info_msg!=null' class=info>{{info_msg}}</div>
 
-	<ul class="nav" *ngIf="show_nav"  >
+	<ul id=nav class="nav" *ngIf="show_nav"  >
+		<a routerLink='/map/quick_search' 		
+			routerLinkActive='active' 
+			(click)="nav_menu_off(); map_search_start()">
+			<li>
+				See All Trips
+			</li>			
+		</a>
 		<a routerLink='/Trip/form_search' 	
 			routerLinkActive='active' 
 			(click)="nav_menu_off(); map_search_stop()"	>
@@ -23,7 +31,7 @@
 			routerLinkActive='active' 
 			(click)="nav_menu_off(); map_search_stop()">
 			<li>
-				Search Result
+				Search Results
 			</li>			
 		</a>
 		<a routerLink='/Trip/form_trip' 		
@@ -31,7 +39,7 @@
 			*ngIf="is_signed_in" 
 			(click)="nav_menu_off();map_search_stop()">
 			<li>
-				Publish my Trip		
+				Publish My Trip		
 			</li>			
 		</a>
 		<a routerLink='/Activity'	

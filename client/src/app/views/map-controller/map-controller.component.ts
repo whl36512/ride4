@@ -72,6 +72,7 @@ export class MapControllerComponent extends BaseComponent {
 
 		console.debug('201112031831', this.class_name, '.ngoninit() perform index=' , perform, index);
 		if (		perform	==	C.ROUTE_MAP_SEARCH			) this.do_search();
+		else if (	perform ==	C.ROUTE_MAP_QSEARCH			) this.do_quick_search();
 		else if (	perform ==	C.ROUTE_MAP_ACTIVITIES		) this.do_activities(index);
 		else if (	perform ==	C.ROUTE_MAP_SEARCH_RESULTES	) this.do_search_result(index) ;
 		else this.router.navigate(['/home']);
@@ -129,6 +130,13 @@ export class MapControllerComponent extends BaseComponent {
         this.mapService.fit_book(t[i]);
 	}
 
+	do_quick_search()
+	{
+		let sc = Util.create_empty_trip();
+        StorageService.storeForm(C.KEY_FORM_SEARCH, sc);
+		this.do_search();
+	}
+
 
 	do_search(){
 		this.region_search_criteria = {} ;
@@ -138,14 +146,22 @@ export class MapControllerComponent extends BaseComponent {
 		this.map_is_moving			= true;
 
 		let serach_criteria = StorageService.getForm(C.KEY_FORM_SEARCH) ;
+
 		let sc	= serach_criteria;
 
-		if (! sc 
+		if ( !sc) {
+			sc = Util.create_empty_trip();
+		}
+        StorageService.storeForm(C.KEY_FORM_SEARCH, sc);
+
+		/*
+			if (! sc 
 			||!sc.p1.lat
 			|| (sc.distance== C.ERROR_NO_ROUTE && sc.rider_ind)
 			||sc.version != C.VERSION_FORM_TRIP) {
 			this.router.navigate(['/Trip/'+ C.KEY_FORM_SEARCH]);
 		}
+		*/
 
 		this.warning_msg = 'Please adjust map area to search for available trips' ;
 
@@ -237,8 +253,10 @@ export class MapControllerComponent extends BaseComponent {
 				//this.mapService.try_mark_pairs(trips_from_db);
 				this.mapService.mark_books(trips_from_db, null);
 				let pair = Util.deep_copy(search_criteria);
-				pair.line_color= C.MAP_LINE_COLOR_RIDER;
-				this.mapService.try_mark_pair(pair);
+				if(pair) {
+					pair.line_color= C.MAP_LINE_COLOR_RIDER;
+					this.mapService.try_mark_pair(pair);
+				}
 				this.search_is_running= false ;
 				console.debug ('201811041111 MapControllerComponent.search() finish map searching.') ;
 			},
