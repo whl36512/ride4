@@ -47,6 +47,7 @@ export class TriplistComponent extends BaseComponent {
     trips_from_db: any ;
 
 	search_criteria :any= null
+	index_being_booked: string ;
 
     constructor( public changeDetectorRef       : ChangeDetectorRef
                 , public mapService             : MapService
@@ -79,11 +80,6 @@ export class TriplistComponent extends BaseComponent {
 		for ( let index in this.trips_from_db) {
 			let t = this.trips_from_db[index];
 
-			if ( ! this.is_signed_in) t.status_msg = 'Please sign in';
-			else if ( ! t.sufficient_balance && ! t.trip.rider_ind) t.status_msg = 'Insufficient<br/>balance';
-			else if ( ! t.sufficient_balance && t.trip.rider_ind) t.status_msg = 'Negative<br/>balance';
-			else t.status_msg=null ;
-
 			t.show_book_button = 	this.is_signed_in && t.sufficient_balance
 					&& t.seats_to_book >0 
 					;
@@ -92,16 +88,32 @@ export class TriplistComponent extends BaseComponent {
 			tmp_book.book= sc;
 			t.google_map_url = MapService.google_map_string(tmp_book); 
 			t.stars = Util.get_stars(t.rating);
-			
-			if ( t.seats_to_book <=0 ) t.warning_msg = 'Use Search Setting menu to refine searches';
-			else if ( ! this.is_signed_in) t.warning_msg = 'Please sign in';
-			else if ( ! t.sufficient_balance && ! t.trip.rider_ind) t.warning_msg = 'You have insufficient balance';
-			else if ( ! t.sufficient_balance && t.trip.rider_ind) t.status_msg = 'You have negative balance';
+
+			t.enough_info = true;
+			if ( !t.trip.rider_ind  && !sc.p1.lat  ) {
+				// not enough info to make a booking, i.e. rider does not provide p1 p2
+				t.enough_info = false; 
+				t.warning_msg = 'Can not book. Use Search Setting menu to search';
+			}
+			else if ( ! this.is_signed_in) 
+				t.warning_msg = 'Cannot book. Please sign in';
+			else if ( ! t.sufficient_balance && ! t.trip.rider_ind) 
+				t.warning_msg = 'Cannot book. You have insufficient balance';
+			else if ( ! t.sufficient_balance && t.trip.rider_ind) 
+				t.warning_msg = 'Cannot book. You have negative balance';
 		}
 
   	}
+	
+	reset_trip_msg(trip: any) {
+		trip.info_msg= null;
+		trip.error_msg= null;
+		trip.warning_msg= null;
+	}
 
 	book(trip: any, index: string): void {
+		this.reset_trip_msg(trip);
+		this.changeDetectorRef.detectChanges();
 
 		let seats = trip.trip.rider_ind? trip.trip.seats	:	this.search_criteria.seats	;
 		let book_to_db = {
@@ -113,32 +125,26 @@ export class TriplistComponent extends BaseComponent {
 				, distance	:	this.search_criteria.distance
 				};
 
-		let book_from_db_observable     = this.dbService.call_db(C.URL_BOOK, book_to_db);
-		book_from_db_observable.subscribe(
-	    	book_from_db => {
-				console.debug("201808201201 JourneyComponent.book() book_from_db =" + C.stringify(book_from_db));
-				if (book_from_db.status_cd=='P') {
-					trip.info_msg='Booked, pending confirmation' ;
-					let sr= this.Status.search_result[index];
-					trip.show_book_button= false;
-					trip.seats_booked= trip.seats_booked + book_from_db.seats;
-					sr.seats_booked = sr.seats_booked + book_from_db.seats;
-					trip.seats_to_book= trip.seats_to_book - book_from_db.seats;
-					sr.seats_to_book = sr.seats_to_book - book_from_db.seats;
+		this.index_being_booked = index;
+		this.call_wservice(C.URL_BOOK, book_to_db);
+	}
 
-					this.Status.bookings_from_db	= null;
-					this.Status.tran_from_db		= null;
-					this.changeDetectorRef.detectChanges();
-				}
-				else trip.error_msg='Booking failed' ;
-			},
-			error => {
-				trip.info_msg=null;
-				trip.error_msg=error;
-				this.changeDetectorRef.detectChanges();
-			}
-		)
-		
+	on_get_data_from_wservice(data_from_wservice: any) {
+		let b	= data_from_wservice; //booking from db
+		let sr	= this.Status.search_result[this.index_being_booked];
+		let t	= this.trips_from_db[this.index_being_booked];
+		if (b.status_cd=='P') {
+			t.info_msg='Booked, pending confirmation' ;
+			t.show_book_button= false;
+			t.seats_booked= t.seats_booked + b.seats;
+			sr.seats_booked = sr.seats_booked + b.seats;
+			t.seats_to_book= t.seats_to_book - b.seats;
+			sr.seats_to_book = sr.seats_to_book - b.seats;
+			this.Status.bookings_from_db	= null;
+			this.Status.tran_from_db		= null;
+			this.changeDetectorRef.detectChanges();
+		}
+		else t.error_msg='Booking failed' ;
 	}
 
 	show_map(index: number){

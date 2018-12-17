@@ -1113,7 +1113,7 @@ $body$
 language plpgsql;
 
 create or replace function funcs.search_no_p1_p2( c0 funcs.extended_criteria , u0 usr)
--- search criteria is not set up
+-- search criteria is not set up. quick search. Only driver can book
 	returns setof json
 as
 $body$
@@ -1123,22 +1123,23 @@ BEGIN
 	with a as (
 		select 
 			  t trip
-			, funcs.calc_cost_rider(t.price, t.distance , t.seats ) as cost
+			, case when t.rider_ind then funcs.calc_cost_rider(t.price, t.distance , t.seats ) 
+					else funcs.calc_cost(t.price, t.distance , t.seats )
+					end as cost
 			, uo.headline
 			, uo.rating
 			, case when uo.profile_ind then 'LinkedIn Profile available' 
-										else 'LinkedIn Profile Opted out' 
+										else 'LinkedIn Profile opted out' 
 				end profile_available
 			, case when u0.balance is null 	then false else true end is_signed_in 
 			, case when u0.balance >= -10 	then true else false end sufficient_balance
-			, coalesce ( b.seats, 0)	seats_booked	-- should always be 0
-			--, t.seats				seats_to_book
-			, 0				seats_to_book
+			, coalesce ( b.seats, 0)	seats_booked
+			, case when t.rider_ind then t.seats else 0 end				seats_to_book
 		from trip t
 		join usr uo on (uo.usr_id = t.usr_id) -- to get the other user's headline and balance
 		left outer join book b on (b.trip_id=t.trip_id and b.usr_id=u0.usr_id and b.status_cd in ('P', 'C'))
 		where t.status_cd = 'A'
-		and t.usr_id	!= 	u0.usr_id
+		--and t.usr_id	!= 	u0.usr_id
 		and t.seats > 0
 		--and t.seats <= c0.seats
 		--and	t.rider_ind = not c0.rider_ind

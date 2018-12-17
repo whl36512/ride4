@@ -7,13 +7,15 @@
 		let even=even;let odd=odd; let first = first; let last = last; trackBy:trackByFunc"
 		[ngClass]="{ odd: odd, even: even }">
 	<div class=detail>
-      	<table>
+      	<table class=center>
 			<thead>
 				<tr >
 					<th>#</th>
 					<th>Date/Time</th>
 					<th>Seats</th>
-					<th>Price($)</th>
+					<th *ngIf='trip.trip.rider_ind'>Earning</th>
+					<th *ngIf='!trip.trip.rider_ind &&  trip.enough_info'>Price</th>
+					<th *ngIf='!trip.trip.rider_ind && !trip.enough_info '>Price<br/>/mile</th>
 					<th *ngIf='is_signed_in'>I Booked</th>
 				</tr>
 			</thead>
@@ -22,9 +24,13 @@
 					<td>{{i+1}}</td>
 					<td>{{trip.trip.trip_date}}<br/>
 					{{trip.trip.trip_time}}</td>
-					<td>{{trip.trip.seats}}</td>
-					<td *ngIf='trip.trip.rider_ind'>{{trip.cost.cost_driver}} </td>
-					<td *ngIf='!trip.trip.rider_ind'>{{trip.cost.cost_rider}} </td>
+
+					<td *ngIf='trip.enough_info'>{{trip.seats_to_book}}</td>
+					<td *ngIf='!trip.enough_info'>{{trip.trip.seats}}</td>
+
+					<td *ngIf='trip.trip.rider_ind'>${{trip.cost.cost_driver}} </td>
+					<td *ngIf='!trip.trip.rider_ind &&  trip.enough_info'>${{trip.cost.cost_rider}} </td>
+					<td *ngIf='!trip.trip.rider_ind && !trip.enough_info'>${{trip.cost.price_rider}} </td>
 					<td *ngIf='is_signed_in'>{{trip.seats_booked}}</td>
 					<td>
 						<button #j (click)="book(trip, i)"
@@ -34,9 +40,10 @@
 				</tr>
 			</tbody>
 		</table>
-		<td *ngIf='trip.error_msg' class=error 	[innerHTML]='trip.error_msg'></td>
-		<td *ngIf='trip.warning_msg'  class=warning 	[innerHTML]='trip.warning_msg'></td>
-		<td *ngIf='trip.info_msg'  class=info 	[innerHTML]='trip.info_msg'></td>
+
+		<td *ngIf='trip.error_msg'		class=error 	[innerHTML]='trip.error_msg'	></td>
+		<td *ngIf='trip.warning_msg'	class=warning 	[innerHTML]='trip.warning_msg'	></td>
+		<td *ngIf='trip.info_msg'		class=info 		[innerHTML]='trip.info_msg'		></td>
 		<div class='stitle' >
 			<span *ngIf=' trip.trip.rider_ind' > Passenger </span>
 			<span *ngIf='!trip.trip.rider_ind' > Driver </span>

@@ -107,7 +107,7 @@ CREATE TABLE book
 	--,	rider_ind	boolean		-- Driver Rider
 	--,	trip_date	date		
 	--,	trip_time	time		
-	,	p1			location	not null
+	,	p1			location	 -- can be null if booker is driver
 	,	p2			location		-- can be null if booker is driver
 	--,	dir			decimal (6,2)
 	,	distance	real	-- can be null if booker is driver
