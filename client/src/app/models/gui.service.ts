@@ -245,14 +245,16 @@ export class Util {
 	}
 	static create_empty_trip () : any{
 		let [today, current_time] = Util.current_time();
-		let [next30days, dummy] = Util.current_time_and_minutes(C.MAX_TRIP_DAYS*24*60);
+		//let [next30days, dummy] = Util.current_time_and_minutes(C.MAX_TRIP_DAYS*24*60);
+		let [nextday, dummy] = Util.current_time_and_minutes(24*60);
 
 		let trip =  {
 			  version			:   C.VERSION_FORM_TRIP
 			, rider_ind			:   false
 			, trip_date			:   today
 			, date1				:   today			//for search
-			, date2				:   next30days			//for search
+			//, date2				:   next30days			//for quick search
+			, date2				:   nextday			//for quick search
 			, trip_time			:   current_time
 			, distance			:   C.ERROR_NO_ROUTE
 			, seats				:   1

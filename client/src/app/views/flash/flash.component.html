@@ -12,18 +12,32 @@
 		<tr >
 			<td class=' flash_check' [innerHTML]='C.ICON_CHECK_MARK'></td>
 			<td >
-				<div class=flash_inv>
-					Riders Seeking Drivers
-				</div>
+				 <a routerLink='/Trip/form_search' routerLinkActive='active' >
+					<dd class='clickable-text flash_inv'>
+                		Rider Searching for Driver 
+					</dd>
+        		</a>
 			</td>
 		</tr>
 		<tr>
 			<td  class=' flash_check' [innerHTML]='C.ICON_CHECK_MARK'></td>
-			<td ><div class=flash_inv>Drivers Seeking Riders</div></td>
+			<td >
+				 <a routerLink='/Trip/form_search' routerLinkActive='active' >
+					<dd class='clickable-text flash_inv'>
+                		Driver Searching for Rider 
+					</dd>
+        		</a>
+			</td>
 		</tr>
 		<tr >
 			<td  class=' flash_check' [innerHTML]='C.ICON_CHECK_MARK'></td>
-			<td ><div class=flash_inv>Post Your Own Trip for Free!</div></td>
+			<td >
+				 <a routerLink='/Trip/form_trip' routerLinkActive='active' >
+					<dd class='clickable-text flash_inv'>
+                		Post My Trip 
+					</dd>
+        		</a>
+			</td>
 		</tr>
 	</table>
 	<p>

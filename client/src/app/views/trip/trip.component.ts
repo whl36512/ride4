@@ -55,7 +55,7 @@ export class TripComponent extends BaseComponent {
 		form_saved_to_db: boolean=false;
 
 	trip		:any;
-	button_label 	= 'Publish Trip';
+	button_label 	= 'Post Trip';
 	user_from_db: any = {};
 	show_form		= C.BODY_SHOW;
 	max_price		=C.MAX_PRICE;
@@ -230,7 +230,7 @@ export class TripComponent extends BaseComponent {
 				this.info_msg =	C.MSG_PUBLISHED.replace('ROLE', 'Riders');
 			}
 			
-			this.button_label='Publish Another Trip';
+			this.button_label='Post Another Trip';
 			this.Status.bookings_from_db	=	null;
 		}
 		else this.error_msg = C.ACTION_FAIL;

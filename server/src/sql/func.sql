@@ -896,10 +896,10 @@ BEGIN
 		, coalesce(t.date2, coalesce(t.date1, now()::date) + 30) date1
 		, time '0:0' 
 			+ greatest (0		, extract (epoch from	coalesce(t.trip_time, time '00:00' ))
-				- t.distance/60*1800-300) * interval '1 second' time1
+				- t.distance/60*3600-600) * interval '1 second' time1
 		, time '0:0' 
 			+ least (3600*24-1 	, extract (epoch from	coalesce(t.trip_time, time '23:59' ))
-				+ t.distance/60*1800+300) * interval '1 second' time2
+				+ t.distance/60*3600+600) * interval '1 second' time2
 		, t.distance 								-- can be 0
 		, t.distance /(3-0.2*t.search_tightness)		min_distance
 		, t.distance *(4-0.2*t.search_tightness)		max_distance

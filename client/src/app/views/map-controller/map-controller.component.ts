@@ -34,12 +34,15 @@ import { MapService			 }   from '../../models/map.service';
 })
 
 export class MapControllerComponent extends BaseComponent {
-	region_search_criteria: any ;
+	region_search_criteria: any ;  // for detection of map change
 	map_region: any ;  // for map movement detection
 	map_move_time	: number; 
 	search_is_running: boolean;
 	map_is_moving:boolean ;
 
+	show_search_result_button	: boolean= false;
+
+	show_refine_search_button	: boolean	 = false;
 
 	constructor( public changeDetectorRef	   : ChangeDetectorRef
 				, public mapService			 : MapService
@@ -59,6 +62,8 @@ export class MapControllerComponent extends BaseComponent {
 			return false;
 		};
 
+		this.show_refine_search_button =false;
+
 
 	}
 		
@@ -71,7 +76,7 @@ export class MapControllerComponent extends BaseComponent {
 		let index = this.route.snapshot.paramMap.get('index');
 
 		console.debug('201112031831', this.class_name, '.ngoninit() perform index=' , perform, index);
-		if (		perform	==	C.ROUTE_MAP_SEARCH			) this.do_search();
+		if (		perform	==	C.ROUTE_MAP_SEARCH			) this.do_search(null);
 		else if (	perform ==	C.ROUTE_MAP_QSEARCH			) this.do_quick_search();
 		else if (	perform ==	C.ROUTE_MAP_ACTIVITIES		) this.do_activities(index);
 		else if (	perform ==	C.ROUTE_MAP_SEARCH_RESULTES	) this.do_search_result(index) ;
@@ -133,26 +138,27 @@ export class MapControllerComponent extends BaseComponent {
 	do_quick_search()
 	{
 		let sc = Util.create_empty_trip();
-        StorageService.storeForm(C.KEY_FORM_SEARCH, sc);
-		this.do_search();
+        //StorageService.storeForm(C.KEY_FORM_SEARCH, sc);
+		this.do_search(sc);
 	}
 
 
-	do_search(){
+	do_search( search_criteria: any){
 		this.region_search_criteria = {} ;
 		this.map_region 			= {} ;
 		this.map_move_time			= 0;
 		this.search_is_running		= false
 		this.map_is_moving			= true;
 
-		let serach_criteria = StorageService.getForm(C.KEY_FORM_SEARCH) ;
+		if(! search_criteria) search_criteria = StorageService.getForm(C.KEY_FORM_SEARCH) ;
 
-		let sc	= serach_criteria;
+		//let sc	= search_criteria;
 
-		if ( !sc) {
-			sc = Util.create_empty_trip();
+		if ( !search_criteria) {
+			search_criteria = Util.create_empty_trip();
 		}
-        StorageService.storeForm(C.KEY_FORM_SEARCH, sc);
+		this.Status.search_criteria=search_criteria;
+        //StorageService.storeForm(C.KEY_FORM_SEARCH, sc);
 
 		/*
 			if (! sc 
@@ -164,9 +170,10 @@ export class MapControllerComponent extends BaseComponent {
 		*/
 
 		this.warning_msg = 'Please adjust map area to search for available trips' ;
+		this.show_refine_search_button =true;
 
 		//move map viewport to contain rider_criteria
-		let viewport= MapService.map_viewport_with_margin(sc, C.MAP_VIEWPORT_MARGIN);
+		let viewport= MapService.map_viewport_with_margin(search_criteria, C.MAP_VIEWPORT_MARGIN);
 		this.communicationService.send_msg(C.MSG_KEY_MARKER_FIT, viewport);
 
  		this.timer_sub = BaseComponent.timer.subscribe(
@@ -212,61 +219,61 @@ export class MapControllerComponent extends BaseComponent {
 		console.debug ('201811041111 MapControllerComponent.search() perform map searching.') ;
 
 		this.reset_msg();
-		this.changeDetectorRef.detectChanges() ;
+		this.show_search_result_button=false;
 		this.warning_msg 			= 'Searching ...';
+		console.debug ('201810270146', this.page_name, '.search() this.warning_msg=\n'
+					, this.warning_msg);
+		this.changeDetectorRef.detectChanges() ;
+
 		this.search_is_running		= true;
 		this.region_search_criteria = region_search_criteria;
 		this.communicationService.send_msg(C.MSG_KEY_MARKER_CLEAR, {});
 		
-		this.changeDetectorRef.detectChanges() ;
 
 
-		let search_criteria = StorageService.getForm(C.KEY_FORM_SEARCH) ;
+		//let search_criteria = StorageService.getForm(C.KEY_FORM_SEARCH) ;
 		// region p1,p2 overwrite rider_criteria.p1,p2
-		let search_criteria_combined = {...search_criteria, ... JSON.parse(region_search_criteria)};
+		let search_criteria_combined = {...this.Status.search_criteria, ... JSON.parse(region_search_criteria)};
 		
 		console.debug ('201810270146 MapControllerComponent.search() search_criteria_combined=\n'
 					, search_criteria_combined);
-		let data_from_db_observable	 
-			= this.dbService.call_db(C.URL_SEARCH, search_criteria_combined);
+		this.call_wservice(C.URL_SEARCH, search_criteria_combined);
 		
-		data_from_db_observable.subscribe(
-			trips_from_db => {
-				this.reset_msg();
-				this.changeDetectorRef.detectChanges() ;
-				console.info("201808201201 MapControllerComponent.search() trips_from_db ="
-						, C.stringify(trips_from_db));
+	}
+
+	on_get_data_from_wservice (trips_from_db: any) {
+		this.reset_msg();
+		this.show_search_result_button = false;
+		this.changeDetectorRef.detectChanges() ;
 				// save both search result and rider criteria at the same time
 				// rider criteria will be used to determin the Book button in journey page
-				this.Status.search_result= trips_from_db;
-				this.Status.search_criteria= search_criteria;
-				let rows_found = trips_from_db.length ;
+		this.Status.search_result= trips_from_db;
+		let rows_found = trips_from_db.length ;
 
-				if(rows_found == 0 ) this.warning_msg = 'Nothing found in the map region.<br/> Please adjust Search Settings '+ C.ICON_RIGHT_DOUBLE_ARROW+C.ICON_RIGHT_DOUBLE_ARROW;
-				else if(rows_found >= C.MAX_SEARCH_RESULT ) 
-					this.warning_msg = 'Found more than ' + C.MAX_SEARCH_RESULT 
-						+ ' offers. Showing ' + C.MAX_SEARCH_RESULT
-						+ '. <br/>Please adjust map area to found more relevant offers';
-				else this.info_msg = `Found ${rows_found} offers.`
-				this.changeDetectorRef.detectChanges() ;
+		if(rows_found == 0 ) this.warning_msg 
+			= 'Nothing found in the map region.<br/> Please adjust Search Settings '
+			+ C.ICON_RIGHT_DOUBLE_ARROW+C.ICON_RIGHT_DOUBLE_ARROW;
+		else if(rows_found >= C.MAX_SEARCH_RESULT )  {
+			this.warning_msg = 'Found more than ' + C.MAX_SEARCH_RESULT 
+				+ ' offers. Showing ' + C.MAX_SEARCH_RESULT
+				+ '. <br/>Please adjust map area to found more relevant offers';
+			this.show_search_result_button=true;
+		}
+		else {
+			this.info_msg = `Found ${rows_found} offers.`
+			this.show_search_result_button=true;
+		}
+		this.changeDetectorRef.detectChanges() ;
 
-				//this.mapService.try_mark_pairs(trips_from_db);
-				this.mapService.mark_books(trips_from_db, null);
-				let pair = Util.deep_copy(search_criteria);
-				if(pair) {
-					pair.line_color= C.MAP_LINE_COLOR_RIDER;
-					this.mapService.try_mark_pair(pair);
-				}
-				this.search_is_running= false ;
-				console.debug ('201811041111 MapControllerComponent.search() finish map searching.') ;
-			},
-			error => {
-				this.reset_msg();
-				this.error_msg=error;
-				this.search_is_running= false ;
-				this.changeDetectorRef.detectChanges() ;
-			}
-		)
+		//this.mapService.try_mark_pairs(trips_from_db);
+		this.mapService.mark_books(trips_from_db, null);
+		let pair = Util.deep_copy(this.Status.search_criteria);
+		if(pair) {
+			pair.line_color= C.MAP_LINE_COLOR_RIDER;
+			this.mapService.try_mark_pair(pair);
+		}
+		this.search_is_running= false ;
+		console.debug ('201811041111 MapControllerComponent.search() finish map searching.') ;
 	}
 
 	get_map_region(): any {

@@ -10,14 +10,14 @@
 			routerLinkActive='active' 
 			(click)="nav_menu_off(); map_search_start()">
 			<li>
-				Search All Trips
+				Quick Search
 			</li>			
 		</a>
 		<a routerLink='/Trip/form_search' 	
 			routerLinkActive='active' 
 			(click)="nav_menu_off(); map_search_stop()"	>
 			<li>
-				Search Settings
+				Refine Search
 			</li>			
 		</a>
 		<a routerLink='/map/search' 		
@@ -31,7 +31,7 @@
 			routerLinkActive='active' 
 			(click)="nav_menu_off(); map_search_stop()">
 			<li>
-				Search Results
+				List Search Results
 			</li>			
 		</a>
 		<a routerLink='/Trip/form_trip' 		
@@ -39,7 +39,7 @@
 			*ngIf="is_signed_in" 
 			(click)="nav_menu_off();map_search_stop()">
 			<li>
-				Publish My Trip		
+				Post My Trip		
 			</li>			
 		</a>
 		<a routerLink='/Activity'	
