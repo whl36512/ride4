@@ -169,7 +169,7 @@ export class MapControllerComponent extends BaseComponent {
 		}
 		*/
 
-		this.warning_msg = 'Please adjust map area to search for available trips' ;
+		this.warning_msg = 'Please move map area to search for available trips' ;
 		this.show_refine_search_button =true;
 
 		//move map viewport to contain rider_criteria
@@ -251,8 +251,7 @@ export class MapControllerComponent extends BaseComponent {
 		let rows_found = trips_from_db.length ;
 
 		if(rows_found == 0 ) this.warning_msg 
-			= 'Nothing found in the map region.<br/> Please adjust Search Settings '
-			+ C.ICON_RIGHT_DOUBLE_ARROW+C.ICON_RIGHT_DOUBLE_ARROW;
+			= 'Nothing found in the map region.<br/> Please move map or refine search';
 		else if(rows_found >= C.MAX_SEARCH_RESULT )  {
 			this.warning_msg = 'Found more than ' + C.MAX_SEARCH_RESULT 
 				+ ' offers. Showing ' + C.MAX_SEARCH_RESULT
