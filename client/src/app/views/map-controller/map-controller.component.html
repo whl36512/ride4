@@ -1,15 +1,15 @@
 <div *ngIf='error_msg' 		class=error [innerHTML]='error_msg' ></div>
 <div *ngIf='warning_msg' 	class='warning' [innerHTML]='warning_msg' ></div>
 <span *ngIf='info_msg' 		class='info' [innerHTML]='info_msg' ></span>
-<span *ngIf='show_search_result_button'>
+<div *ngIf='show_search_result_button'>
  <a routerLink='/show_search_result' class='clickable-text button'
             routerLinkActive='active'
             (click)="Util.map_search_stop()">
                 List Search Results
         </a>
 
-</span>
-<span *ngIf='show_refine_search_button'>
+</div>
+<div *ngIf='show_refine_search_button'>
        <a routerLink='/Trip/form_search'  class='clickable-text button'
             routerLinkActive='active'
             (click)="Util.map_search_stop()" >
@@ -17,5 +17,5 @@
         </a>
 
 
-</span>
+</div>
 
