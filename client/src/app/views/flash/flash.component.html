@@ -1,44 +1,41 @@
 <p>
 <p>
 <div class='centerFlex f12'>
+	<a routerLink='/map/quick_search' routerLinkActive='active' >
 		<span >
 			<img class='ride_icon' src='assets/images/ride-icon.svg' />
 		</span>
-	<table class=no_border>
-		<tr >
-			<td class=' flash_check' [innerHTML]='C.ICON_CHECK_MARK'></td>
-			<td >
-				 <a routerLink='/Trip/form_search' routerLinkActive='active' >
-					<dd class='clickable-text flash_inv'>
-                		Rider Searching for Driver 
-					</dd>
-        		</a>
-			</td>
-		</tr>
-		<tr>
-			<td  class=' flash_check' [innerHTML]='C.ICON_CHECK_MARK'></td>
-			<td >
-				 <a routerLink='/Trip/form_search' routerLinkActive='active' >
-					<dd class='clickable-text flash_inv'>
-                		Driver Searching for Rider 
-					</dd>
-        		</a>
-			</td>
-		</tr>
-		<tr >
-			<td  class=' flash_check' [innerHTML]='C.ICON_CHECK_MARK'></td>
-			<td >
-				 <a routerLink='/Trip/form_trip' routerLinkActive='active' >
-					<dd class='clickable-text flash_inv'>
-                		Post My Trip 
-					</dd>
-        		</a>
-			</td>
-		</tr>
-	</table>
+    </a>
+
+	<div>A service to </div>
+	<div>connect riders and drives</div> 
+	<div>for carpooling </div>
 	<p>
+				 <a routerLink='/map/quick_search' routerLinkActive='active' >
+					<div class='center clickable-text flash_inv'>
+                		Qucik Search 
+						<div class=f08>just let me see what's out there </div>
+						<p>
+					</div>
+        		</a>
+
+				 <a routerLink='/Trip/form_search' routerLinkActive='active' >
+					<div class=' center clickable-text flash_inv'>
+                		Detailed Search <div class=f08>for Rider or Driver</div>
+						<p>
+					</div>
+        		</a>
+				 <a routerLink='/Trip/form_trip' routerLinkActive='active' >
+					<div class='center clickable-text flash_inv'>
+                		Post My Trip 
+						<p>
+					</div>
+        		</a>
+<div class=center>
        <div *ngIf='error_msg'      class=error     [innerHTML]='error_msg' ></div>
         <div *ngIf='info_msg'       class='info'    [innerHTML]='info_msg' ></div>
         <div *ngIf='warning_msg'    class='warning' [innerHTML]='warning_msg' ></div>
         <div *ngIf='validation_error'    class='warning' [innerHTML]='validation_error' ></div>
+	<p>
 </div>
+	<app-misc class=center></app-misc>

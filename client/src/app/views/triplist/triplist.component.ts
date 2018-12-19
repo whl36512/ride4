@@ -93,7 +93,7 @@ export class TriplistComponent extends BaseComponent {
 			if ( !t.trip.rider_ind  && !sc.p1.lat  ) {
 				// not enough info to make a booking, i.e. rider does not provide p1 p2
 				t.enough_info = false; 
-				t.warning_msg = 'Cannot book as rider. You must use Refine Search menu to search';
+				t.warning_msg = 'Rider: if you want to book a trip, you must first use Refine Search menu to search';
 			}
 			else if ( ! this.is_signed_in) 
 				t.warning_msg = 'Cannot book. Please sign in';

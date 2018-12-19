@@ -28,6 +28,11 @@ selected {
   			left: .1rem;
 		}
 	}
+	& a.disabled * {
+	 	opacity: .5;
+        cursor: not-allowed;
+	}
+	
 	& a.active li {
   		background-color: black;
   		color: white;

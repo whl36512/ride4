@@ -169,8 +169,7 @@ export class MapControllerComponent extends BaseComponent {
 		}
 		*/
 
-		this.warning_msg = 'Please move map area to search for available trips' ;
-		this.show_refine_search_button =true;
+		//this.warning_msg = 'Please move map area to search for available trips' ;
 
 		//move map viewport to contain rider_criteria
 		let viewport= MapService.map_viewport_with_margin(search_criteria, C.MAP_VIEWPORT_MARGIN);
@@ -220,6 +219,7 @@ export class MapControllerComponent extends BaseComponent {
 
 		this.reset_msg();
 		this.show_search_result_button=false;
+		this.show_refine_search_button =false;
 		this.warning_msg 			= 'Searching ...';
 		console.debug ('201810270146', this.page_name, '.search() this.warning_msg=\n'
 					, this.warning_msg);
@@ -244,6 +244,7 @@ export class MapControllerComponent extends BaseComponent {
 	on_get_data_from_wservice (trips_from_db: any) {
 		this.reset_msg();
 		this.show_search_result_button = false;
+		this.show_refine_search_button =false;
 		this.changeDetectorRef.detectChanges() ;
 				// save both search result and rider criteria at the same time
 				// rider criteria will be used to determin the Book button in journey page
@@ -254,14 +255,15 @@ export class MapControllerComponent extends BaseComponent {
 			= 'Nothing found in the map region.<br/> Please move map or refine search';
 		else if(rows_found >= C.MAX_SEARCH_RESULT )  {
 			this.warning_msg = 'Found more than ' + C.MAX_SEARCH_RESULT 
-				+ ' offers. Showing ' + C.MAX_SEARCH_RESULT
-				+ '. <br/>Please adjust map area to found more relevant offers';
+				+ ' trips. Showing ' + C.MAX_SEARCH_RESULT
+				+ '. <br/>Please adjust map area to found more relevant trips';
 			this.show_search_result_button=true;
 		}
 		else {
-			this.info_msg = `Found ${rows_found} offers.`
+			this.info_msg = `Found ${rows_found} trips. Adjust the map to find more or less`
 			this.show_search_result_button=true;
 		}
+		this.show_refine_search_button =true;
 		this.changeDetectorRef.detectChanges() ;
 
 		//this.mapService.try_mark_pairs(trips_from_db);

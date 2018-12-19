@@ -11,6 +11,12 @@
 <div class="title" *ngIf='form_key==C.KEY_FORM_TRIP' >Post My Trip</div>
 <div class="title" *ngIf='form_key==C.KEY_FORM_SEARCH' >Search Settings</div>
 <div class={{show_body}} >
+	<div class=center>
+		<div *ngIf='error_msg'      	class=error 	[innerHTML]='error_msg' ></div>
+		<div *ngIf='info_msg'      		class='info' 	[innerHTML]='info_msg' ></div>
+		<div *ngIf='warning_msg'		class='warning' [innerHTML]='warning_msg' ></div>
+		<div *ngIf='validation_error'	class='warning' [innerHTML]='validation_error' ></div>
+	</div>
 
 	<form [formGroup]="form" (ngSubmit)="onSubmit()" >
 		<p>
@@ -62,6 +68,11 @@
 			Distance (miles): 
 			<span *ngIf="trip.distance==C.ERROR_NO_ROUTE " class=warning>No route</span>
 			<span *ngIf="trip.distance!=C.ERROR_NO_ROUTE "	   >{{trip.distance}}</span>
+		</div>
+		<div class=center>
+        	<button type="submit" *ngIf='form_key==C.KEY_FORM_SEARCH' [disabled]="validation_error" >
+            	Search 
+        	</button>
 		</div>
 		<p>
 		<div class='detail center'>
@@ -196,7 +207,7 @@
 			{{button_label}}
 		</button>
         <button type="submit" *ngIf='form_key==C.KEY_FORM_SEARCH' [disabled]="validation_error" >
-            Search on Map
+            Search 
         </button>
 		</div>
 

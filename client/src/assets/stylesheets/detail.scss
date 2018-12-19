@@ -1,8 +1,12 @@
+//$primary-color: #2471a3;
 $primary-color: #0088dd;
-$green	:  #00ff00;
-$red	:  #ff0000;
+$green	:  #1d8348;
+$red	:  #943126;
+$yellow	:  #D4AC0D;
+$blue	:	#1a5276;
 //$green	:  #99ff99;
 //$red	:  #ff9999;
+$orange:	#ba4a00;
 
 #main {
         /* use absolute so the main page can scroll */
@@ -153,12 +157,15 @@ table {
 }
 
 .error {
+	color: white;
 	background-color: $red ;
 }
 .warning {
-	background-color: yellow;
+	color: white;
+	background-color: $yellow;
 }
 .info {
+	color: white;
 	background-color: $green ;
 }
 
@@ -197,7 +204,7 @@ table {
 }
 
 button {
-	background-color: #44e;
+	background-color: $orange ;
 	color: white;
 	border: 0 none;
   	border-radius: 1rem;
@@ -217,6 +224,16 @@ button {
   	}
 	&[disabled] {
 		opacity: .5;
+		cursor: not-allowed;
+	}
+}
+
+a.disabled, .disabled  {
+	opacity: .5;
+	cursor: not-allowed;
+	& * {
+		opacity: .5;
+		cursor: not-allowed;
 	}
 }
 
@@ -291,10 +308,14 @@ user-select: none;
 }
 
 .button {
-	background-color: #44e;
+	background-color: $orange;
 	color: white;
 	& a {
 		color: white;
+	}
+	&.space {
+		padding:0.2rem;
+		margin:0.2rem;
 	}
 }
 
@@ -324,7 +345,7 @@ user-select: none;
 	line-height	:1.2rem;  /* make bullseye bigger without changing line height*/
 	&:before {
 		content: '\25c9' ;
-		color: $green;
+		color: green;
     	font-size: 1.2rem;  /* make bullseye bigger */
 	}
 }
@@ -335,7 +356,7 @@ user-select: none;
 	line-height	:1.2rem;  /* make bullseye bigger without changing line height*/
 	&:before {
 		content: '\25c9';
-		color: $red;
+		color: red;
     	font-size: 1.2rem;  /* make bullseye bigger */
 	}
 }

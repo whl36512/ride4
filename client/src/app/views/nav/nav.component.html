@@ -20,7 +20,7 @@
 				Refine Search
 			</li>			
 		</a>
-		<a routerLink='/map/search' 		
+		<a routerLink='/map/search' 		*ngIf='false'
 			routerLinkActive='active' 
 			(click)="nav_menu_off(); map_search_start()">
 			<li>
@@ -42,12 +42,26 @@
 				Post My Trip		
 			</li>			
 		</a>
+		<a 
+			*ngIf="!is_signed_in" 
+			class='disabled'	>
+			<li >
+				Post My Trip		
+			</li>			
+		</a>
 		<a routerLink='/Activity'	
 			routerLinkActive='active' 	
 			*ngIf="is_signed_in"	 
 			(click)="nav_menu_off(); map_search_stop()">
 			<li>
 				My Activities	
+			</li>			
+		</a>
+		<a 
+			*ngIf="!is_signed_in" 
+			class='disabled'	>
+			<li>
+				My Activities
 			</li>			
 		</a>
 		<a routerLink='/Thist' 		
@@ -58,10 +72,24 @@
 				Transaction History
 			</li>			
 		</a>
+		<a 
+			*ngIf="!is_signed_in" 
+			class='disabled'	>
+			<li>
+				Transaction History
+			</li>			
+		</a>
 		<a routerLink='/Profile'	
 			routerLinkActive='active'	
 			*ngIf="is_signed_in" 
 			(click)="nav_menu_off(); map_search_stop()">
+			<li>
+				My Profile
+			</li>			
+		</a>
+		<a 
+			*ngIf="!is_signed_in" 
+			class='disabled'	>
 			<li>
 				My Profile
 			</li>			
