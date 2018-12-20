@@ -97,7 +97,7 @@
 					</td>
 					<td *ngIf='bookings_from_db[i].book'>{{bookings_from_db[i].seats}}</td>
 					<td *ngIf='bookings_from_db[i].book'>{{bookings_from_db[i].unified_cost}}</td>
-					<td class='warning width05' >{{bookings_from_db[i].book_status_description}}</td>
+					<td class='info width05' >{{bookings_from_db[i].book_status_description}}</td>
 				</tr>
 			</tbody>
 		</table>
@@ -202,14 +202,14 @@
 
 	<div *ngIf='!bookings_from_db[i].is_booker && !bookings_from_db[i].book'>
 		<div class='clickable-text from' (click)='geo_mark(i)'> 
-			<span *ngIf=' bookings_from_db[i].trip.rider_ind'> Passenger(me) Pickup </span>
-			<span *ngIf='!bookings_from_db[i].trip.rider_ind'> Driver(me) from </span>
+			<span *ngIf=' bookings_from_db[i].trip.rider_ind'> Passenger (me) Pickup </span>
+			<span *ngIf='!bookings_from_db[i].trip.rider_ind'> Driver (me) from </span>
 			<span class='clickable-text map_clickable'>map</span>
 		</div>
 		{{bookings_from_db[i].trip.p1.display_name}}
 		<div class='clickable-text to' (click)='geo_mark(i)'> 
-			<span *ngIf=' bookings_from_db[i].trip.rider_ind'> Passenger(me) Dropoff </span>
-			<span *ngIf='!bookings_from_db[i].trip.rider_ind'> Driver(me) to </span>
+			<span *ngIf=' bookings_from_db[i].trip.rider_ind'>Passenger (me) Dropoff</span>
+			<span *ngIf='!bookings_from_db[i].trip.rider_ind'>Driver (me) to</span>
 			<span class='clickable-text map_clickable'>map</span>
 		</div>
 		{{bookings_from_db[i].trip.p2.display_name}}

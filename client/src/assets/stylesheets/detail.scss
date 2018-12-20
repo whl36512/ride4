@@ -204,7 +204,7 @@ table {
 }
 
 button {
-	background-color: $orange ;
+	background-color: blue ;
 	color: white;
 	border: 0 none;
   	border-radius: 1rem;
@@ -308,7 +308,7 @@ user-select: none;
 }
 
 .button {
-	background-color: $orange;
+	background-color: blue;
 	color: white;
 	& a {
 		color: white;
@@ -361,7 +361,7 @@ user-select: none;
 	}
 }
 
-.data  { white-space: pre; }
+.data  { white-space: pre-line	; }
 
 .title  { 
 	background-color: $primary-color;

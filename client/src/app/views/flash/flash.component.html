@@ -1,6 +1,6 @@
 <p>
 <p>
-<div class='centerFlex f12'>
+<div class='centerFlex '>
 	<a routerLink='/map/quick_search' routerLinkActive='active' >
 		<span >
 			<img class='ride_icon' src='assets/images/ride-icon.svg' />
@@ -8,7 +8,7 @@
     </a>
 
 	<div>A service to </div>
-	<div>connect riders and drives</div> 
+	<div>connect riders and drivers</div> 
 	<div>for carpooling </div>
 	<p>
 				 <a routerLink='/map/quick_search' routerLinkActive='active' >
@@ -28,7 +28,6 @@
 				 <a routerLink='/Trip/form_trip' routerLinkActive='active' >
 					<div class='center clickable-text flash_inv'>
                 		Post My Trip 
-						<p>
 					</div>
         		</a>
 <div class=center>
@@ -36,6 +35,5 @@
         <div *ngIf='info_msg'       class='info'    [innerHTML]='info_msg' ></div>
         <div *ngIf='warning_msg'    class='warning' [innerHTML]='warning_msg' ></div>
         <div *ngIf='validation_error'    class='warning' [innerHTML]='validation_error' ></div>
-	<p>
 </div>
 	<app-misc class=center></app-misc>
