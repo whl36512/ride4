@@ -127,7 +127,8 @@ export class TripComponent extends BaseComponent {
 	setup_form()
 	{
 
-		let trip = StorageService.getForm(this.form_key);
+		//let trip = StorageService.getForm(this.form_key);
+		let trip = StorageService.getForm(C.KEY_FORM_TRIP);
 		if ( !trip || trip.version !=C.VERSION_FORM_TRIP) { // both search and trip use the same version
 			trip = Util.create_empty_trip();
 		}
@@ -135,7 +136,8 @@ export class TripComponent extends BaseComponent {
 		if (trip.date1) 	trip.date1 		=  this.today > trip.date1 ? this.today: trip.date1 ;
 		if (trip.date2) 	trip.date2 		=  this.today > trip.date2 ? this.today: trip.date2 ;
 	
-		StorageService.storeForm(this.form_key, trip);
+		//StorageService.storeForm(this.form_key, trip);
+		StorageService.storeForm(C.KEY_FORM_TRIP, trip);
 		this.trip=trip;
 
 /*
@@ -192,6 +194,18 @@ export class TripComponent extends BaseComponent {
 		if ( changed_loc2) this.geocode(changed_loc2, this.trip, this.form) ;
 	}
 
+	save_form(): any{
+		// combining data
+		let trip = { ...this.trip, ...this.form.value};
+		trip.p1.loc = this.form.value.p1_loc;
+		trip.p2.loc = this.form.value.p2_loc;
+		delete trip.p1_loc;
+		delete trip.p2_loc;
+		//StorageService.storeForm(this.form_key, trip);
+		StorageService.storeForm(C.KEY_FORM_TRIP, trip);
+		return trip;
+	}
+
 	onSubmit() {
 		this.reset_msg() ;
 		this.validation_error = this.validate_form() ;
@@ -200,14 +214,7 @@ export class TripComponent extends BaseComponent {
 		}
         //this.changeDetectorRef.detectChanges();
 
-		// save trip to db
-		// combining data
-		this.trip = { ...this.trip, ...this.form.value};
-		this.trip.p1.loc = this.form.value.p1_loc;
-		this.trip.p2.loc = this.form.value.p2_loc;
-		delete this.trip.p1_loc;
-		delete this.trip.p2_loc;
-		StorageService.storeForm(this.form_key, this.trip);
+		this.trip=this.save_form();
 
 		if (this.form_key == C.KEY_FORM_TRIP) {
 			let trip_to_db = Util.deep_copy( this.trip);
@@ -358,6 +365,7 @@ export class TripComponent extends BaseComponent {
 			p1_loc: this.form.value.p2_loc
 			, p2_loc: this.form.value.p1_loc
 		});
+		//this.skip_form_change();
 		let tmp= this.trip.p1;
 		this.trip.p1 = this.trip.p2;
 		this.trip.p2 = tmp;
@@ -380,6 +388,19 @@ export class TripComponent extends BaseComponent {
 			});
 		}	
 
+	}
+
+	populate_p1() {
+		this.form.patchValue ({
+			p1_loc: this.trip.p1.display_name
+		});
+		//this.skip_form_change();
+	}
+	populate_p2() {
+		this.form.patchValue ({
+			p2_loc: this.trip.p2.display_name
+		});
+		//this.skip_form_change();
 	}
 
 

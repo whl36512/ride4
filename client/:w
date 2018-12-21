@@ -183,33 +183,28 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 			debounceTime(C.FORM_DEBOUNCE_TIME)
 			,distinctUntilChanged((v1,v2) => C.stringify(v1)===C.stringify(v2)) 
 			).subscribe(newValues => { 
-					this.on_form_change(newValues);
+					console.debug('201811172143', this.page_name, 'subscribe_form_change() newValues=');
+					console.debug(C.stringify(newValues));
+					this.form_values_new = Util.deep_copy(newValues);
+					this.on_form_change();
+					this.form_values_old = Util.deep_copy(newValues);
 				}
 			);
 		this.form_status_sub = this.form.statusChanges
 			.subscribe(data => console.log('Form status changes', data));
 	}
 
-	private on_form_change(newValues: any)
+	private on_form_change()
 	{
-		console.debug('201811172143', this.page_name, 'on_form_change() newValues=');
-		console.debug(C.stringify(newValues));
-		this.form_values_new = Util.deep_copy(newValues);
-
 		if ( this.skip_form_change_cnt > 0) {
-			console.debug('201812202011', this.page_name, 'on_form_change() this.skip_form_change_cnt='
-				, this.skip_form_change_cnt);
 			this.skip_form_change_cnt --;
 		}
 		else {
 			this.form_change_action();
-			this.form_values_old = Util.deep_copy(newValues);
 		}
-		this.save_form();
 	}
 
 	form_change_action() {};
-	save_form():any{};
 
 	skip_form_change() {
 			this.skip_form_change_cnt ++ ;
@@ -361,13 +356,12 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 					console.debug('201809111347 SearchSettingComponent.geocode()	body=' );
 					console.debug( C.stringify(body) );
 					if (body[0]) {
-						let a = body[0] ;
-						p.lat			=a.lat ;
-						p.lon			=a.lon ;
-						p.display_name = a.display_name;
-						if( a.address.building) {
-							p.display_name = p.display_name.replace(a.address.building+',' ,  ''); 	
-						}
+						let b = body[0];
+						p.lat			=b.lat ;
+						p.lon			=b.lon ;
+						p.display_name= b.house_number + ' ' + b.road 
+									+ ',' + b.city + ',' + b.state + ',' + b.postal_code 
+									+ ',' + b.country;
 					}
 					else {
 						p.lat = null;
@@ -392,10 +386,8 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 		if ( !pair.p1.display_name || ! pair.p2.display_name
 			|| pair.p1.lat==pair.p2.lat && pair.p1.lon== pair.p2.lon) {
 			pair.distance=C.ERROR_NO_ROUTE ;
-			this.save_form();
 			//this.validate_form();
 			//this.changeDetectorRef.detectChanges();
-			console.debug('201812202205', this.page_name, '.routing() no p1 or p2');
 			return;
 		}
 		else if (	pair.p1.lat == pair_before_geocode.p1.lat
@@ -406,13 +398,9 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 			//pair.distance= oair_before_geocode.distance;
 			//this.validate_form();
 			//this.changeDetectorRef.detectChanges();
-			this.save_form();
-			console.debug('201812202205', this.page_name, '.routing() no p1 or p2 change');
 			return;
 		}
 
-		pair.distance=C.ERROR_NO_ROUTE ;
-		this.save_form();
 		//both start and end are geocoded. So we can calc routes
 		let route_response = this.geoService.routing(
 					pair.p1.lat
@@ -433,14 +421,13 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 					this.error_msg='Error from routing service: ' + body.error.message;
 				}
 				else {
-					//pair.distance=C.ERROR_NO_ROUTE ;
+					pair.distance=C.ERROR_NO_ROUTE ;
 					//this.validate_form();
 					//this.changeDetectorRef.detectChanges();
 				}
-				this.save_form();
 			},
 			error => {
-				//pair.distance=C.ERROR_NO_ROUTE ;
+				pair.distance=C.ERROR_NO_ROUTE ;
 				//this.validate_form();
 				//this.changeDetectorRef.detectChanges();
 			}

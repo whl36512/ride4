@@ -1145,7 +1145,7 @@ BEGIN
 		--and	t.rider_ind = not c0.rider_ind
 		--and t.price >= c0.min_price_rider
 		and t.trip_date between c0.date1 and c0.date2
-		and t.trip_date + t.trip_time > c0.date1 + c0.trip_time
+		and t.trip_date + t.trip_time > c0.date1 + c0.trip_time - interval '30 minutes'
 		-- trip start and end must inside the bounding box
 		and (t.p1).lat between c0.box_p1_lat and c0.box_p2_lat
 		and (t.p1).lon between c0.box_p1_lon and c0.box_p2_lon

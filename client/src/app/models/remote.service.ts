@@ -271,7 +271,8 @@ export class GeoService {
 
 		//	address = 135%20pilkington%20avenue,%20birmingham ;
 
-		let query="?format=json&polygon=0&addressdetails=0" ;
+		//let query="?format=json&polygon=0&addressdetails=0" ;
+		let query="?format=json&polygon=0&addressdetails=1" ;
 		let encodedUrl = this.protocol + C.URL_GEOCODE + encodeURIComponent(address) +query;
 		console.debug("20180815 geocode() encodedUrl="+encodedUrl) ;
 		let response_body= this.httpService.request(C.GET, encodedUrl, null) ;
