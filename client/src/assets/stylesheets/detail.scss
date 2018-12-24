@@ -1,5 +1,7 @@
 //$primary-color: #2471a3;
-$primary-color: #0088dd;
+//$primary-color: #0088dd;
+$primary-color: #06b;
+$dark-color: #06b;
 $green	:  #1d8348;
 $red	:  #943126;
 $yellow	:  #D4AC0D;
@@ -380,9 +382,9 @@ user-select: none;
 }
 
 .flash_inv{
-	color: $primary-color;
+	color: $dark-color;
 	background-color: white;
-	padding-left: 1rem;
+	padding-left: 0rem;
 }
 
 .flash_check {

@@ -5,6 +5,8 @@ export	class	Usr{
 	public	headline		:	string	;
 	public	email			:	string	;
 	public	bank_email		:	string	;
+	public	referral_email	:	string	;
+	public	referral_pct	:	number	;
 	public	member_since	:	Date	;
 	public	trips_posted	:	number	;
 	public	trips_completed	:	number	;

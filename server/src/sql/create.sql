@@ -66,6 +66,8 @@ create table usr
 	, deposit_id		sys_id not null
 	, sm_link			text	-- social media link
 	, profile_ind		boolean not null default false
+	, referral_email	email
+	, referral_pct		decimal (2,0)
 	, c_ts 				sys_ts not null
 	, m_ts 				sys_ts not null
 	, constraint pk_usr PRIMARY KEY (usr_id)
@@ -73,6 +75,7 @@ create table usr
 ) ;
 
 create index ix_usr_oauth_id on usr(oauth_id);
+create index ix_usr_referral_email on usr(referral_email);
 
 CREATE TABLE trip 
 (
@@ -175,7 +178,7 @@ create table money_tran
 );
 create index ix_money_tran_usr_id on money_tran(usr_id);
 alter table money_tran add constraint ck_money_tran_tran_cd 
-	check (tran_cd in ('D', 'W', 'P', 'E', 'B', 'R') );
+	check (tran_cd in ('D', 'W', 'P', 'E', 'B', 'R', 'RF') );
 alter table money_tran add constraint ck_money_tran_status_cd 
 	check (status_cd in ('K', 'F') );
 
@@ -218,6 +221,7 @@ insert into code values
 , ('TRAN'	, 'B'	, 'Booking')
 , ('TRAN'	, 'R'	, 'Return')
 , ('TRAN'	, 'E'	, 'Earning')		-- earning from completed Trip
+, ('TRAN'	, 'RF'	, 'Referral')		-- earning from referral 
 , ('TRIP'	, 'A'	, 'Published')
 , ('TRIP'	, 'E'	, 'Expired')
 , ('TRIP'	, 'NB'	, 'No more booking allowed')

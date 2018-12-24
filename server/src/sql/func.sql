@@ -265,6 +265,8 @@ BEGIN
 			, headline				=coalesce(s0.headline, u.headline) 
 			, email					=coalesce(s0.email, u.email)
 			, bank_email			=coalesce(s0.bank_email, u.bank_email)
+			, referral_email		=coalesce(s0.referral_email, u.referral_email)
+			, referral_pct			=coalesce(u.referral_pct, 50)				   -- no overwrite
 			--, member_since 		=coalesce(s0.member_since, u.member_since)
 			--, trips_posted		=coalesce(s0.trips_posted, u.trips_posted)
 			--, trips_completed		=coalesce(s0.trips_completed, u.trips_completed)
@@ -456,7 +458,7 @@ DECLARE
 	amt money_tran.actual_amount%TYPE;
 BEGIN
 	if in_actual_amount is null then return null::money_tran ;	end if;
-	amt	:=	round(in_actual_amount,2)	;
+	amt	:=	floor(in_actual_amount*100)/100.0	;
 	if amt = 0 	then return null::money_tran ;	end if;
 
 	update usr u
@@ -524,10 +526,11 @@ BEGIN
 	elsif	new_status_cd	= 'CPR'	then
 		rider	:=	(b.cost).booking_fee	* b.seats 	;
 	elsif	new_status_cd	= 'CD'	then
-		driver	:=	(b.cost).cost_driver	* distance_time_factor *.7	; -- upto 70%
+		driver	:=	(b.cost).cost_driver	* distance_time_factor *0.1	; -- upto 10%
 	elsif	new_status_cd	= 'CR'	then
 		rider	:=	(b.cost).booking_fee * b.seats 
-					+ ( (b.cost).cost_rider - (b.cost).booking_fee * b.seats )	* distance_time_factor*0.5;
+					+ ( (b.cost).cost_rider - (b.cost).booking_fee * b.seats )	
+					* distance_time_factor*0.05;   -- up to 5%
 	elsif	new_status_cd	in  ('RD', 'RR')	then
 		driver	:=	0	;
 		rider	:=	0	;
@@ -722,6 +725,10 @@ as
 $body$
 DECLARE
 	u0 usr ;
+	ub	usr	;	--booker
+	ut	usr	;	--offerer
+	ubr	usr	;	--booker's referrer
+	utr	usr	;	--offerer's referrer
 	b0 book ;
 	b1 book ;
 	b2 RECORD ;
@@ -782,6 +789,7 @@ BEGIN
 	set trips_completed =trips_completed	+ case when t1.rider_ind then 1 else 0 end
 	, 	rides_completed =rides_completed	+ case when t1.rider_ind then 0 else 1 end
 	where usr_id =  b1.usr_id
+	returning usr.* into ub
 	;
 
 	update usr 
@@ -790,6 +798,7 @@ BEGIN
 	, 	trips_published =trips_published	+ case when t1.rider_ind then 0 else 1 end
 	, 	rides_published =rides_published	+ case when t1.rider_ind then 1 else 0 end
 	where usr_id =  t1.usr_id
+	returning usr.* into ut
 	;
 
 	-- assign money to driver
@@ -797,7 +806,38 @@ BEGIN
 			in_usr_id => case when t1.rider_ind then b1.usr_id else t1.usr_id end
 			, in_actual_amount => (b1.cost).cost_driver
 			, in_tran_cd => 'E'
-			, in_ref_no => b1.trip_id::text) ;
+			, in_ref_no => b1.book_id::text) ;
+
+	-- assign money to booker's referrer
+	select  u.*
+	into ubr
+	from usr u
+	where	u.email= ub.referral_email
+	and		u.email <> ub.email
+	;
+
+	m1	:=	funcs.ins_money_tran( 
+			in_usr_id 			=> ubr.usr_id
+			, in_actual_amount 	=>  abs(((b1.cost).cost_rider-(b1.cost).cost_driver)) * ub.referral_pct/100
+			, in_tran_cd 		=> 'RF'
+			, in_ref_no 		=> b1.book_id::text) ;
+	
+	
+	-- assign money to offerer's referrer
+	select  u.*
+	into utr
+	from usr u
+	where 	u.email= ut.referral_email
+	and		u.email <> ut.email
+	;
+
+	m1	:=	funcs.ins_money_tran( 
+			in_usr_id => utr.usr_id
+			, in_actual_amount =>  abs(((b1.cost).cost_rider-(b1.cost).cost_driver)) * ut.referral_pct/100
+			, in_tran_cd => 'RF'
+			, in_ref_no => b1.book_id::text) ;
+	
+	
 
 	select b1 book
 		, s.book_status_description

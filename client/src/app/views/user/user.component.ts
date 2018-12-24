@@ -57,6 +57,7 @@ export class UserComponent extends BaseComponent {
 	ngoninit(): void{
 		this.form = this.form_builder.group({
 			email: ["",	[Validators.required, Validators.pattern]],	 // sync validators must be in an array
+			referral_email: ["",	[Validators.pattern]],	 // sync validators must be in an array
 			profile_ind: ["",	[Validators.required, Validators.pattern]],	 // sync validators must be in an array
 			//last_name: [''],
 		});
@@ -75,6 +76,7 @@ export class UserComponent extends BaseComponent {
 					this.user_from_db=user_from_db;
 					this.form.patchValue ({
             			  email			:	user_from_db.email
+            			, referral_email:	user_from_db.referral_email
 						, profile_ind	: 	user_from_db.profile_ind 
         			});
 				}
@@ -90,28 +92,25 @@ export class UserComponent extends BaseComponent {
 		//this.form.statusChanges.subscribe(data => console.log('Form status changes', data));
 	}
 
+	on_get_data_from_wservice(user_from_db: any)
+	{
+		this.user_from_db =user_from_db;
+		this.info_msg ='Profile saved';
+		this.form.patchValue ({
+            email			:	user_from_db.email
+            , referral_email:	user_from_db.referral_email
+			, profile_ind	: 	user_from_db.profile_ind 
+        	});
+		this.changeDetectorRef.detectChanges();
+	}
+
 	onSubmit() {
 		this.reset_msg();
 		this.changeDetectorRef.detectChanges();
-		console.warn("201808201534 UserComponent.onSubmit() this.form.value=" + this.form.value );
-		let user_from_db_observable	 = this.dbService.call_db(C.URL_UPD_USER, this.form.value);
-		user_from_db_observable.subscribe(
-			user_from_db => {
-				console.info("201808201201 UserComponent.constructor() user_from_db =" 
-					, C.stringify(user_from_db));
-				this.user_from_db =user_from_db
-				this.saved=true;
-				this.info_msg ='Profile saved';
-				this.changeDetectorRef.detectChanges();
-			},
-			error => {
-				this.error_msg = error;
-				this.error_msg ='Action failed';
-				this.changeDetectorRef.detectChanges();
-			}
-		)
+		this.call_wservice(C.URL_UPD_USER, this.form.value);
 	}
 	
 	// the getter is required for reactive form validation to work 
 	get email() { return this.form.get('email'); }	
+	get referral_email() { return this.form.get('referral_email'); }	
 }

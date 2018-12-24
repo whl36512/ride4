@@ -119,6 +119,7 @@ export class ThistlistComponent extends BaseComponent {
 		else if (tran.tran_cd   =='W'   &&  fv.show_withdraw)   status=true;
 		else if (tran.tran_cd   =='E'   &&  fv.show_earning	)   status=true;
 		else if (tran.tran_cd   =='R'   &&  fv.show_return	)   status=true;
+		else if (tran.tran_cd   =='RF'	&&  fv.show_earning	)   status=true;
 		//if (tran.actual_ts	==null  &&  fv.show_pending	)   status=true;
 
 		return  status;

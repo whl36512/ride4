@@ -1,5 +1,3 @@
-<p>
-<p>
 <div class='centerFlex '>
 	<a routerLink='/map/quick_search' routerLinkActive='active' >
 		<span >
@@ -7,29 +5,38 @@
 		</span>
     </a>
 
-	<div>A service to </div>
-	<div>connect riders and drivers</div> 
+	<div>A service to connect</div>
+	<div>riders and drivers</div> 
 	<div>for carpooling </div>
 	<p>
-				 <a routerLink='/map/quick_search' routerLinkActive='active' >
-					<div class='center clickable-text flash_inv'>
-                		Qucik Search 
-						<div class=f08>just let me see what's out there </div>
-						<p>
-					</div>
-        		</a>
+		<a routerLink='/map/quick_search' routerLinkActive='active' >
+			<div class='center clickable-text flash_inv'>
+              		Qucik Search 
+					<div class=f08>just let me see what's out there </div>
+					<p>
+			</div>
+       	</a>
 
-				 <a routerLink='/Trip/form_search' routerLinkActive='active' >
-					<div class=' center clickable-text flash_inv'>
-                		Detailed Search <div class=f08>for Rider or Driver</div>
-						<p>
-					</div>
-        		</a>
-				 <a routerLink='/Trip/form_trip' routerLinkActive='active' >
+		<a routerLink='/Trip/form_search' routerLinkActive='active' >
+			<div class=' center clickable-text flash_inv'>
+               		Detailed Search <div class=f08>for Rider or Driver</div>
+				<p>
+			</div>
+		</a>
+		<a routerLink='/Trip/form_trip' routerLinkActive='active' >
 					<div class='center clickable-text flash_inv'>
                 		Post My Trip 
 					</div>
-        		</a>
+   		</a>
+		<div>
+			Refer a friend and Get
+		</div>
+		<div>
+			up to 100% of the Profit
+		</div>
+		<div>
+			Each and Every Time
+		</div>
 <div class=center>
        <div *ngIf='error_msg'      class=error     [innerHTML]='error_msg' ></div>
         <div *ngIf='info_msg'       class='info'    [innerHTML]='info_msg' ></div>

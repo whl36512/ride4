@@ -40,6 +40,11 @@
 				</td>
 			</tr>
 			<tr>
+				<td >
+						&nbsp;
+				</td>
+			</tr>
+			<tr>
 				<td colspan=2>
 					<span class='button clickable-text' >
 						<a [href]='user_from_db.sm_link' target=_blank>LinkedIn Profile</a>
@@ -51,6 +56,7 @@
  					<mat-checkbox  formControlName='profile_ind' labelPosition="after" color=primary >
 						Show LinkedIn Profile to other users
             		</mat-checkbox>
+					<p>
 				</td>
 			</tr>
 			<tr>
@@ -66,6 +72,32 @@
                   		pattern="{{C.EMAIL_PATTERN}}" 
                 	/> 
                          <span class="validity"></span>
+					<p>
+        			</dd>
+				</td>
+			</tr>
+			<tr>
+				<td class=f08>
+					Referrer's Email
+				</td>
+			</tr>
+			<tr >
+				<td colspan=2>
+					<dd>      
+          			<input  type="email"  formControlName="referral_email" value="{{user_from_db.referral_email}}"  
+						placeholder="Referrer's Email Address" required 
+                  		pattern="{{C.EMAIL_PATTERN}}" 
+                	/> 
+                         <span class="validity"></span>
+        			</dd>
+				</td>
+			</tr>
+			<tr *ngIf='!user_from_db.referral_email'>
+				<td colspan=2>
+					<dd class=f08>      
+						Referrer gets 50% of profit.<br>
+						if a referrer refers both rider and driver, <br/>
+						the referrer gets 100% of profit.
         			</dd>
 				</td>
 			</tr>
