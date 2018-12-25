@@ -57,28 +57,6 @@ export class MessageComponent extends BaseComponent {
                 , geoService, form_builder, router );
 		this.page_name=C.PAGE_CHAT;
 
-		this.timer_sub = BaseComponent.timer.subscribe(
-			// val will be 0, 1,2,3,...
-			val => {
-				if(val >0) {
-					if ( val % ( 1000/C.TIMER_INTERVAL) == 0 ) { //show count down every second
-						this.msg_no_activity_count_down -= 1;
-						this.changeDetectorRef.detectChanges(); 
-					}
-				}
-				if (this.msg_no_activity_count_down <=0 ) {
-					this.communicationService.send_msg(C.MSG_KEY_MSG_PANEL
-						, {index:this.index 
-						, show_messaging_panel:false }
-					);
-				}
-				else {
-					if ( val % ( C.MSG_TIMER_WAIT*1000/C.TIMER_INTERVAL) == 0 ) {
-						this.get_msgs_from_db();
-					}
-				}
-			},
-		);
         this.subscribe_websocket();
 
         this.communicationService.ws_send(C.MSG_KEY_GREETING, `{"say":"Greeting from ${this.class_name}"}` ) ;
@@ -86,9 +64,30 @@ export class MessageComponent extends BaseComponent {
 		console.debug("201809262245 MessageComponent.constructor() exit")	;
 	} 
 
+	timer_action(val:number)
+	{
+		if (this.component_destroyed ) return;
+
+		if(val >0) {
+			if ( val % ( 1000/C.TIMER_INTERVAL) == 0 ) { //show count down every second
+				this.msg_no_activity_count_down -= 1;
+				this.changeDetectorRef.detectChanges(); 
+			}
+		}
+		if (this.msg_no_activity_count_down <=0 ) {
+			this.communicationService.send_msg(C.MSG_KEY_MSG_PANEL
+				, {index:this.index 
+				, show_messaging_panel:false }
+			);
+		}
+		else {
+			if ( val % ( C.MSG_TIMER_WAIT*1000/C.TIMER_INTERVAL) == 0 ) {
+				this.get_msgs_from_db();
+			}
+		}
+	}
+
 	ngoninit() {
-		//this.subscription1 = this.form.valueChanges.subscribe(data => console.log('Form value changes', data));
-		//this.subscription2 = this.form.statusChanges.subscribe(data => console.log('Form status changes', data));
 		this.warning_msg	=	' Loading ...' ;
 		this.get_form();
 	}

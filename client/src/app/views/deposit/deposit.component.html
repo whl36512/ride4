@@ -11,8 +11,9 @@
 	You should see your deposit in your account balance in the same time frame. 
 	Larger depoists may take longer to verify.
 </div>
-<div *ngIf='show_detail' class=detail>
-	<div class=title>How to Deposit</div>
+<div class=detail>
+	<div class='title '>How to Deposit</div>
+	<div *ngIf='show_detail' >
 		Your Deposit Identification Number is 
 		<p>
 		<div class="center warning f08" >RD{{user_from_db.deposit_id}}</div>
@@ -34,12 +35,12 @@
 		<div class=stitle> Trial Deposit </div>
 		You may want to deposit a very small amount of money, a few cents, for instance, to make sure 
 		your money deposit performs correctly.
-<p>
-</div>
-	<div *ngIf='!show_detail'>
-		Once you sign in, you will see more information about deposit.
+	<p>
 	</div>
+<div class=center>
 <div *ngIf='error_msg!=null' class=error>{{error_msg}}</div>
 <div *ngIf='warning_msg!=null' class=warning>{{warning_msg}}</div>
 <div *ngIf='info_msg!=null' class=info>{{info_msg}}</div>
 <div class=warning *ngIf='false'>change_detect_count={{change_detect_counter()}}</div>
+<p>
+</div>

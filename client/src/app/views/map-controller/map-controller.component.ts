@@ -150,7 +150,7 @@ export class MapControllerComponent extends BaseComponent {
 		this.search_is_running		= false
 		this.map_is_moving			= true;
 
-		if(! search_criteria) search_criteria = StorageService.getForm(C.KEY_FORM_SEARCH) ;
+		if(! search_criteria) search_criteria = StorageService.getForm(C.KEY_FORM_TRIP) ;
 
 		//let sc	= search_criteria;
 
@@ -175,16 +175,6 @@ export class MapControllerComponent extends BaseComponent {
 		let viewport= MapService.map_viewport_with_margin(search_criteria, C.MAP_VIEWPORT_MARGIN);
 		this.communicationService.send_msg(C.MSG_KEY_MARKER_FIT, viewport);
 
- 		this.timer_sub = BaseComponent.timer.subscribe(
-			// val will be 0, 1,2,3,...
-			val => {
-				//console.debug('201811041948', this.class_name, 'timer val=', val);
-				if(val>2){ // avoid initial double search
-					this.set_map_move(val);
-					this.search();
-				}
-			},
-		);
 		Util.map_search_start();
 		
 		//Util.show_map();
@@ -196,7 +186,15 @@ export class MapControllerComponent extends BaseComponent {
 		//window.addEventListener("resize", function(){reset_zoom_var()} );
 	}
 
-	
+	timer_action(val: number)
+	{
+        if (this.component_destroyed ) return; // avoid error message
+
+		if(val>2 ){ // avoid initial double search
+			this.set_map_move(val);
+			this.search();
+		}
+	}
 		
 	search(){
 		if (this.map_is_moving) {
@@ -260,7 +258,7 @@ export class MapControllerComponent extends BaseComponent {
 			this.show_search_result_button=true;
 		}
 		else {
-			this.info_msg = `Found ${rows_found} trips. Adjust the map to find more or less`
+			this.info_msg = `Found ${rows_found} trips. <br/>Adjust the map to find more or less`
 			this.show_search_result_button=true;
 		}
 		this.show_refine_search_button =true;
@@ -278,18 +276,15 @@ export class MapControllerComponent extends BaseComponent {
 	}
 
 	get_map_region(): any {
+		let b= this.mapService.map.getBounds();
 		let mr= {	  
 				  box_p1:		{ 
-							  //lat	:MapService.static_map.getBounds().getSouth()
-							//, lon 	:MapService.static_map.getBounds().getWest()
-							  lat	:this.mapService.map.getBounds().getSouth()
-							, lon 	:this.mapService.map.getBounds().getWest()
+							  lat	:b.getSouth()
+							, lon 	:b.getWest()
 						}
 				, box_p2:		{ 
-							  //lat	:MapService.static_map.getBounds().getNorth()
-							//, lon 	:MapService.static_map.getBounds().getEast()
-							  lat	:this.mapService.map.getBounds().getNorth()
-							, lon 	:this.mapService.map.getBounds().getEast()
+							  lat	:b.getNorth()
+							, lon 	:b.getEast()
 						}
 			} ;
 		return C.stringify(mr);

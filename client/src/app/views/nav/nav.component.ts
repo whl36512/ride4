@@ -36,18 +36,6 @@ export class NavComponent extends BaseComponent {
         super(changeDetectorRef,mapService, communicationService, dbService
                 , geoService, form_builder, router );
 		this.page_name=C.PAGE_NAV;
-        this.timer_sub = BaseComponent.timer.subscribe(
-            // val will be 0, 1,2,3,...
-            val => {
-                if(val % 2==0) {
-					//this.show_nav = true ;
-					//console.debug('201812151024', this.page_name, 'timer_sub this.show_nav=', this.show_nav);
-					//this.changeDetectorRef.detectChanges();
-				}
-            },
-        );
-
-
 	}
 
 	ngoninit() {}
@@ -86,7 +74,6 @@ export class NavComponent extends BaseComponent {
 		
 		this.show_nav =!this.show_nav ;
 		this.is_signed_in= UserService.is_signed_in();
-		console.log('301808221747 NavComponent.constructor this.is_signed_in='+ this.is_signed_in) ;
 	}
 
 	map_search_stop() {

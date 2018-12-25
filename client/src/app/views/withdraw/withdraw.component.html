@@ -56,14 +56,14 @@ You must have an email address registered at your bank to receive money.
 			</td>
 		</tr>
 	</table>
+	<div class=center *ngIf='!saved'>
+		<button type="submit" [disabled]="!button_enabled" >Send Request</button>
+	</div>
+</form>
 	<div class=center>
 	<div *ngIf='error_msg!=null' class=error [innerHTML]='error_msg' ></div>
 	<div *ngIf='warning_msg!=null' class=warning [innerHTML]='warning_msg'></div>
 	<div *ngIf='info_msg!=null' class=info [innerHTML]='info_msg' ></div>
 	</div>
-	<div class=center *ngIf='!saved'>
-		<button type="submit" [disabled]="!button_enabled" >Send Request</button>
-	</div>
-</form>
 &nbsp;
 </div>

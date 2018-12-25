@@ -28,6 +28,8 @@ var ride = {
 		//IN.API.Raw("/people/~").result(onSuccess).error(onError);
 		IN.API.Raw("/people/~").result(ride.getProfileDataOnSuccess).error(ride.onError);
 		console.log("INFO 201807131627 getProfileData() done") ;
+		//window.location.reload(false);		// use true to reload page from server
+
 
 	},
 

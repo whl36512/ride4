@@ -16,11 +16,11 @@ import { Subscription }	from 'rxjs';
 import { EventEmitter, Input, Output} from '@angular/core';
 
 import { FormBuilder 			}	from '@angular/forms';
-import { Router                 }   from '@angular/router';
+import { Router				 }   from '@angular/router';
 import { CommunicationService   }   from '../../models/communication.service' ;
-import { DBService              }   from '../../models/remote.service' ;
-import { GeoService             }   from '../../models/remote.service' ;
-import { MapService             }   from '../../models/map.service';
+import { DBService			  }   from '../../models/remote.service' ;
+import { GeoService			 }   from '../../models/remote.service' ;
+import { MapService			 }   from '../../models/map.service';
 
 import { AppComponent } from '../../app.component';
 import { C} 		from '../../models/constants';
@@ -45,15 +45,15 @@ export class DepositComponent extends BaseComponent {
 	user_from_db: any = {};
 	show_detail = false;
 
-    constructor( public changeDetectorRef   	: ChangeDetectorRef
-                , public mapService             : MapService
-                , public communicationService   : CommunicationService
-                , public dbService              : DBService
-                , public geoService             : GeoService
-                , public form_builder           : FormBuilder
-                , public router                 : Router )  {
-        super(changeDetectorRef,mapService, communicationService, dbService
-                , geoService, form_builder, router );
+	constructor( public changeDetectorRef   	: ChangeDetectorRef
+				, public mapService			 : MapService
+				, public communicationService   : CommunicationService
+				, public dbService			  : DBService
+				, public geoService			 : GeoService
+				, public form_builder		   : FormBuilder
+				, public router				 : Router )  {
+		super(changeDetectorRef,mapService, communicationService, dbService
+				, geoService, form_builder, router );
 		console.debug("201809262245 DepositComponent.constructor() enter")	;
 		this.page_name=C.PAGE_DEPOSIT;
 		console.debug("201809262245 DepositComponent.constructor() exit")	;
@@ -61,11 +61,12 @@ export class DepositComponent extends BaseComponent {
 
 	ngoninit() {
 		this.warning_msg=C.WARN_NOT_SIGNED_IN;
-		if(this.is_signed_in) this.action(null, null, C.GET_USER_URL);
+		//if(this.is_signed_in) this.action(null, null, C.GET_USER_URL);
+		console.debug('201812241934', this.page_name, '.ngoninit() this.is_signed_in=', this.is_signed_in);
+		if(this.is_signed_in) this.call_wservice(C.GET_USER_URL, {});
 	}
 
 	action(form: any, index: number, action : string): void {
-		this.reset_msg();
 		let data_from_db_observable	 = this.dbService.call_db(action, {});
 		data_from_db_observable.subscribe(
 				user_from_db => {
@@ -82,12 +83,33 @@ export class DepositComponent extends BaseComponent {
 					this.warning_msg=C.WARN_NOT_SIGNED_IN;
 				}
 				this.changeDetectorRef.detectChanges() ;
-				
 			},
 			error => {
 				this.error_msg=error;
 				this.changeDetectorRef.detectChanges() ;
 			}
 		)
+	}
+
+	subscription_action(msg){
+		if (msg.msgKey==C.MSG_KEY_SIGNIN_STATUS_CHANGE) {
+			console.debug('201812241934', this.page_name, 'subscription_action msg=', C.stringify(msg));
+			this.call_wservice(C.GET_USER_URL, {});
+		}
+	}
+
+	on_get_data_from_wservice(user_from_db:any) {
+		this.user_from_db= user_from_db;
+
+		if ( this.user_from_db.deposit_id != null)
+		{
+			this.user_from_db.deposit_id= this.user_from_db.deposit_id.replace(/-/g, ''); 
+			this.show_detail=true;
+			this.is_signed_in = true;
+		}
+		else {
+			this.warning_msg=C.WARN_NOT_SIGNED_IN;
+		}
+		this.changeDetectorRef.detectChanges() ;
 	}
 }

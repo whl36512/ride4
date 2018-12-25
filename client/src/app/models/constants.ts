@@ -145,6 +145,7 @@ export class Constants{
  	static MSG_KEY_MAP_BODY_NOSHOW	= 'msgKeyShowMapBodyNoShow' 	; 
  	static MSG_KEY_MAP_LINE		= 'msgKeyMapLine' 	; 
  	static MSG_KEY_GREETING		= 'msgKeyGreeting';
+ 	static MSG_KEY_SIGNIN_STATUS_CHANGE		= 'msgKeySigninStatusChange';
 
  	static MSG_PUBLISHED		= 'The trip is published. ROLE can start to book the trip. Click My Activities menu to make changes';
  	static MSG_AT_PICKUP		= "I'm at pickup location";

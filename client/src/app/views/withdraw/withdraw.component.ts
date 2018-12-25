@@ -63,11 +63,8 @@ export class WithdrawComponent extends BaseComponent {
 			//requested_amount: [0,	[Validators.required]],
 				//trnx_cd: ['W',	[Validators.required , Validators.min, Validators.max]],	
 		});
-		if(! this.is_signed_in) {
-			this.warning_msg=C.WARN_NOT_SIGNED_IN ;
-			return;
-		}
-		this.call_wservice(C.URL_GET_USER, {});
+		this.warning_msg=C.WARN_NOT_SIGNED_IN ;
+		if( this.is_signed_in) this.call_wservice(C.URL_GET_USER, {});
 	}
 
 	onSubmit() {
@@ -98,6 +95,14 @@ export class WithdrawComponent extends BaseComponent {
 		}
 		this.changeDetectorRef.detectChanges();
 	}
+
+    subscription_action(msg){
+        if (msg.msgKey==C.MSG_KEY_SIGNIN_STATUS_CHANGE) {
+            console.debug('201812241934', this.page_name, 'subscription_action msg=', C.stringify(msg));
+            this.call_wservice(C.URL_GET_USER, {})
+        }
+    }
+
 		
 // the getter is required for reactive form validation to work 
 get bank_email() { return this.form.get('bank_email'); }	

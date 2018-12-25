@@ -98,6 +98,15 @@ export class TripComponent extends BaseComponent {
   		console.log("201811011725", this.class_name, '.constructor() exit')  ;
   	} 
 
+	timer_action(val: number){
+		if (this.component_destroyed ) return; // avoid error message
+
+		if(val >5 && val % 1 == 0 ) {
+			this.validation_error=this.validate_form();
+			this.changeDetectorRef.detectChanges() ;
+		}
+	}
+
 	ngoninit():void {
   		this. form_key = this.route.snapshot.paramMap.get('form_key');
 		if ( ! (this.form_key == C.KEY_FORM_TRIP || this.form_key==C.KEY_FORM_SEARCH)) {

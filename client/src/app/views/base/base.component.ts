@@ -67,6 +67,7 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 	validation_error		: string|null	= null;
 	change_detect_count		: number 		= 0;
 	show_body				: string|null	= C.BODY_SHOW ;
+	static is_signed_in_static: boolean 		= false;
 	is_signed_in			: boolean 		= false;
 	page_name 				: string| null 	= null;
 	form 					: FormGroup|null= null;	// main for of a page
@@ -94,6 +95,7 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 	timer_sub				: Subscription |null = null;
 
 	skip_form_change_cnt: number = 0;
+	component_destroyed: boolean=false;
 
 	C = C;
 	//Constants = C;
@@ -126,6 +128,7 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 		console.debug('201811041002', this.page_name, '.constructor() enter.');
 		//this.subscribe_geo_watcher();
 		//this.subscribe_websocket();
+		this.subscribe_timer();
 
 		[this.today, this.current_time] = Util.current_time();
 
@@ -135,7 +138,8 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 
 	ngOnInit() { 
 		console.debug ('201810290933 ', this.page_name,'.ngOnInit() enter.');
-		this.is_signed_in= UserService.is_signed_in();
+		BaseComponent.is_signed_in_static= UserService.is_signed_in();
+		this.is_signed_in = BaseComponent.is_signed_in_static ;
 
 		if(!this.subscription0) this.subscription0 =this.communicationService.msg.subscribe(
 			msg	=> {
@@ -159,14 +163,14 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 		console.debug("201809262246", this.page_name, ".ngOnChanges() exit");
 	}
 
-	ngAfterViewInit()  {
+	ngAfterViewInit()  { // call windown.scroll() at this event
 		console.debug("201812151757", this.page_name, ".ngAfterViewInit() enter");
 		if (this.page_name==C.PAGE_TRIP_LIST || this.page_name == C.PAGE_BOOKINGS) {
 			console.debug("201812071208", this.page_name
-            	,  ".ngoninit() this.Status.scroll_position[this.page_name]="
-            	, this.Status.scroll_position[this.page_name] )  ;
+				,  ".ngoninit() this.Status.scroll_position[this.page_name]="
+				, this.Status.scroll_position[this.page_name] )  ;
 	
-        	window.scroll(0,    this.Status.scroll_position[this.page_name]);
+			window.scroll(0,	this.Status.scroll_position[this.page_name]);
 		}
 
 		this.ngafterviewinit();
@@ -226,6 +230,20 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 	}	
 
 	
+	subscribe_timer(){
+		if (this.timer_sub) return;
+		this.timer_sub = BaseComponent.timer.subscribe(
+		   val => {
+				if (val % 3 == 0 ) {
+					this.detect_signin_status_change();
+				}
+				this.timer_action(val);
+			},
+		);
+
+	}
+
+	timer_action(val:number) { };
 
 	
 	websocket_retry_count=0;
@@ -280,6 +298,8 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 		//if( this.nav_end_sub!= null) 		this.nav_end_sub.unsubscribe();
 		this.communicationService.send_msg(C.MSG_KEY_MAP_BODY_NOSHOW, {});
 		this.onngdestroy();
+		this.component_destroyed=true;
+		
 		console.debug ('201810290932 ', this.page_name,'.ngOnDestroy() exit.');
 	}
 
@@ -514,70 +534,81 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 	}
 */
 
-    getPosition(geolocationOptions) {
-        // modeled after MapServive.watchPosition()
-        if (!window.navigator.geolocation) {
+	getPosition(geolocationOptions) {
+		// modeled after MapServive.watchPosition()
+		if (!window.navigator.geolocation) {
 			this.error_msg='GPS not supported by the browser';
 			return null;
 		}
-        let source =  Rx.Observable.create(
-            function (observer) {
-                window.navigator.geolocation.getCurrentPosition(
-                    function successHandler (loc) { observer.next(loc); }
-                    , function errorHandler (err) { observer.error(err); }
-                    , geolocationOptions
-                );
-            }
-        )
+		let source =  Rx.Observable.create(
+			function (observer) {
+				window.navigator.geolocation.getCurrentPosition(
+					function successHandler (loc) { observer.next(loc); }
+					, function errorHandler (err) { observer.error(err); }
+					, geolocationOptions
+				);
+			}
+		)
 
-        //return source.publish().refCount();
-        if (source) {
-            console.debug('201811171420 MapService.getPosition() geolocation observable created source=');
-            console.debug(source);
-        }
-        else  {
-            console.debug('201811171420 MapService.getPosition() geolocation observable failed');
-        }
-        return source;
-    }
+		//return source.publish().refCount();
+		if (source) {
+			console.debug('201811171420 MapService.getPosition() geolocation observable created source=');
+			console.debug(source);
+		}
+		else  {
+			console.debug('201811171420 MapService.getPosition() geolocation observable failed');
+		}
+		return source;
+	}
 
-    subscribe_geo_getter() {
-        console.debug('201811171456' , 'GeoService.subscribe_geo_getter enter');
-        if(!this.geo_getter_observable) this.geo_getter_observable = this.getPosition(null);
+	subscribe_geo_getter() {
+		console.debug('201811171456' , 'GeoService.subscribe_geo_getter enter');
+		if(!this.geo_getter_observable) this.geo_getter_observable = this.getPosition(null);
 		if (! this.geo_getter_observable) return null;
 		if ( this.geo_getter_sub) {
 			this.geo_getter_sub.unsubscribe(); 
 			this.geo_getter_sub= null;
 		}
 		
-        this.geo_getter_sub = this.geo_getter_observable.subscribe(
-            position => {
-                console.debug('201811171337', this.page_name, 'subscribe_geo_getter()'
-                    , `Next: ${position.coords.latitude}, ${position.coords.longitude}`);
-                this.current_loc = {lat : Math.round(position.coords.latitude*10000000)/10000000.0
-                				,	lon : Math.round(position.coords.longitude*10000000)/10000000.0
+		this.geo_getter_sub = this.geo_getter_observable.subscribe(
+			position => {
+				console.debug('201811171337', this.page_name, 'subscribe_geo_getter()'
+					, `Next: ${position.coords.latitude}, ${position.coords.longitude}`);
+				this.current_loc = {lat : Math.round(position.coords.latitude*10000000)/10000000.0
+								,	lon : Math.round(position.coords.longitude*10000000)/10000000.0
 									};
 				this.on_get_geo_pos(this.current_loc);
-                },
+				},
 
-            err => {
-                switch (err.code) {
-                    case err.PERMISSION_DENIED:
-                        this.error_msg = 'GPS Permission denied';
-                        break;
-                    case err.POSITION_UNAVAILABLE:
-                        this.error_msg = 'GPS Position unavailable';
-                        break;
-                    case err.PERMISSION_DENIED_TIMEOUT:
-                        this.error_msg = 'GPS Position timeout';
-                        break;
-                }
-                console.error('ERROR: 201811171434', this.page_name, '.subscribe_geo_getter'
+			err => {
+				switch (err.code) {
+					case err.PERMISSION_DENIED:
+						this.error_msg = 'GPS Permission denied';
+						break;
+					case err.POSITION_UNAVAILABLE:
+						this.error_msg = 'GPS Position unavailable';
+						break;
+					case err.PERMISSION_DENIED_TIMEOUT:
+						this.error_msg = 'GPS Position timeout';
+						break;
+				}
+				console.error('ERROR: 201811171434', this.page_name, '.subscribe_geo_getter'
 						,  this.error_msg);
-            },
-            () => console.debug('201811171343', this.page_name, '.subscribe_geo_getter completed')
-        );
-    }
+			},
+			() => console.debug('201811171343', this.page_name, '.subscribe_geo_getter completed')
+		);
+	}
+
+	detect_signin_status_change(){
+		let o = BaseComponent.is_signed_in_static;  //old
+		if ( o == true) return; // only change from false to true is needed
+		let n = UserService.is_signed_in(); //new
+		if (o!=n) {
+			BaseComponent.is_signed_in_static	= n ;
+			this.is_signed_in					= n;
+			this.communicationService.send_msg(C.MSG_KEY_SIGNIN_STATUS_CHANGE, {is_signed_in:this.is_signed_in});
+		}
+	}
 	
 	on_get_geo_pos(location:any) {};  
 	window_scroll_action(){};
