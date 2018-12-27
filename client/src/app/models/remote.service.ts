@@ -194,49 +194,13 @@ export class DBService {
 		let jwt=  UserService.get_jwt_from_session();
 		let profile = UserService.get_profile_from_session()
 		// add profile into the payload. server side must compare jwt and profile to make sure they match
-		let combined_payload = {...payload, ...profile, ...jwt };  
+		//let combined_payload = {...payload, ...profile, ...jwt };  
+		let combined_payload = {...payload,  ...jwt };  
 		console.info("201808190206 DBService.package_payload() after adding jwt and profile"
 			, "combined_payload=\n" 
 			, C.stringify(combined_payload));
 		return combined_payload;
 	}
-
-/*
-	get_user_from_db(user: any): Observable<any> {
-		return this.call_db(C.GET_USER_URL, user);
-	}
-
-	save_user_to_db(user: any) : any {
-		return this.call_db(C.SAVE_USER_URL, user);
-	}
-
-	upd_trip(trip: any) :  Observable<any> {
-		return this.call_db(C.UPD_TRIP_URL, trip);
-	}
-
-	get_journeys_from_db(trip:any): Observable<any> {
-		return this.call_db(C.URL_MYOFFERS, trip);
-	}
-*/
-
-
-
-/*
-	private add_token( relative_url: string, payload: any): any
-	{
-		var combined_payload: any;
-		console.debug("201808190219 DBService.add_token() typeof(payload)="+ typeof(payload)) ;
-		if (typeof(payload) == 'string' ) payload = JSON.parse(payload);
-		console.debug("201808190230 DBService.add_token after JSON.parse. payload=\n" ,
-			, C.stringify(payload));
-		let jwt=  UserService.get_jwt_from_session();
-		let profile = UserService.get_profile_from_session()
-		combined_payload = {...payload, ...profile, ...jwt };  // add profile into the payload. server side must compare jwt and profile to make sure they match
-		console.debug("201810062319 DBService.add_token after combining. combined_payload=\n"
-			, C.stringify(combined_payload));
-		return combined_payload;
-	}
-*/
 }
 
 @Injectable({

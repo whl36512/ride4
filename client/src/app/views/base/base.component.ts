@@ -68,6 +68,7 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 	change_detect_count		: number 		= 0;
 	show_body				: string|null	= C.BODY_SHOW ;
 	static is_signed_in_static: boolean 		= false;
+	static jwt_exists		: boolean 		= false;
 	is_signed_in			: boolean 		= false;
 	page_name 				: string| null 	= null;
 	form 					: FormGroup|null= null;	// main for of a page
@@ -235,6 +236,7 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 		this.timer_sub = BaseComponent.timer.subscribe(
 		   val => {
 				if (val % 3 == 0 ) {
+					this.detect_jwt_change();
 					this.detect_signin_status_change();
 				}
 				this.timer_action(val);
@@ -607,6 +609,38 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 			BaseComponent.is_signed_in_static	= n ;
 			this.is_signed_in					= n;
 			this.communicationService.send_msg(C.MSG_KEY_SIGNIN_STATUS_CHANGE, {is_signed_in:this.is_signed_in});
+		}
+	}
+
+	detect_jwt_change(){
+		let o = BaseComponent.jwt_exists ;
+		let jwt = UserService.get_jwt_from_session();
+		let n = jwt?true:false;
+		BaseComponent.jwt_exists	=	n;
+		if (o==true && n == false) {
+			UserService.remove_profile_from_session();
+		}
+		else if (o==false && n == true) {
+			UserService.remove_profile_from_session(); // force reloading of profile
+
+			let data_from_db_observable  = this.dbService.call_db(C.URL_GET_USER, {});
+			data_from_db_observable.subscribe(
+				user_from_db => {
+					if (user_from_db.error) {
+						this.error_msg=user_from_db.error_desc;
+					}
+					else {
+						console.debug("201808201201",  this.page_name, '.detect_jwt_change() user_from_db ='
+							, C.stringify(user_from_db));
+						UserService.set_profile_to_session(user_from_db, jwt);
+					}
+					this.changeDetectorRef.detectChanges() ;
+				},
+				error => {
+					this.error_msg=error;
+					this.changeDetectorRef.detectChanges() ;
+				}
+			);
 		}
 	}
 	

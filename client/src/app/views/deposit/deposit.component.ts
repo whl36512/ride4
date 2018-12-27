@@ -61,9 +61,8 @@ export class DepositComponent extends BaseComponent {
 
 	ngoninit() {
 		this.warning_msg=C.WARN_NOT_SIGNED_IN;
-		//if(this.is_signed_in) this.action(null, null, C.GET_USER_URL);
 		console.debug('201812241934', this.page_name, '.ngoninit() this.is_signed_in=', this.is_signed_in);
-		if(this.is_signed_in) this.call_wservice(C.GET_USER_URL, {});
+		if(this.is_signed_in) this.call_wservice(C.URL_GET_USER, {});
 	}
 
 	action(form: any, index: number, action : string): void {

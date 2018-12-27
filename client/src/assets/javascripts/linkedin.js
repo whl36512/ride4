@@ -5,6 +5,7 @@
 //https://flaviocopes.com/commonjs/
 var ride = {
 	onLinkedInLoad: function () {
+		//ride.clearProfileInCookie();
 		IN.Event.on(IN, "auth", ride.getProfileDataOnAuthEvent);
 		IN.Event.on(IN, "logout", ride.signoutCallback);
 		var auth_status= ride.checkAuth();
@@ -54,14 +55,14 @@ var ride = {
 			, 'sm_link': data.siteStandardProfileRequest.url
 		} ;
 
-		var profile_hex = rideCrypt.encrypt(JSON.stringify(profile));
+		//var profile_hex = rideCrypt.encrypt(JSON.stringify(profile));
 	
 		//setCookie("profile", profile_hex, 1 );
-		sessionStorage.setItem("profile", profile_hex );
+		//sessionStorage.setItem("profile", profile_hex );
 
 		//var decrypted_profile= rideCrypt.decrypt(getCookie("profile"))
-		var decrypted_profile= rideCrypt.decrypt(sessionStorage.getItem("profile"))
-		profile = JSON.parse(decrypted_profile);
+		//var decrypted_profile= rideCrypt.decrypt(sessionStorage.getItem("profile"))
+		//profile = JSON.parse(decrypted_profile);
 
 		console.log("INFO 2017131508 getProfileDataOnSuccess() oauth_id =" + profile.oauth_id);
 		console.log("INFO 2017131508 getProfileDataOnSuccess() first_name =" + profile.first_name);
@@ -86,7 +87,7 @@ var ride = {
 	{
 		console.info("INFO 201808172240 ride.get_session_callback() enter ");
 		var	httpResponseTextJson = rideHttpClient.httpResponseTextJson(httpRequest);
-		if (httpResponseTextJson != null)	{
+		if (httpResponseTextJson )	{
 			console.info("INFO 201808172242 ride.get_session_callback() about to set jwt cookie ");
 			//setCookie("jwt", httpResponseTextJson.jwt) ;
 			sessionStorage.setItem('jwt', httpResponseTextJson.jwt);

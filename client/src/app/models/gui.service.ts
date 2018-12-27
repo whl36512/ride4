@@ -45,6 +45,19 @@ export class UserService {
 		return true;
 		}
 
+	static remove_profile_from_session() {
+		sessionStorage.removeItem(C.PROFILE);
+	}
+
+	static set_profile_to_session(user:any, jwt :any) {
+		let profile = C.stringify(user);
+		let jwt_string = jwt.jwt;
+		//CryptoService.set_password(jwt_string);  //use jwt as password to encrypt profile
+		let encrypted = CryptoService.encrypt(profile);
+		
+		StorageService.setSession(C.PROFILE, encrypted);
+	}
+
 	static get_profile_from_session(): object|null {
 		let encrypted_profile = StorageService.getSession(C.PROFILE);
 		let profile = CryptoService.decrypt(encrypted_profile);
@@ -57,6 +70,7 @@ export class UserService {
 		if (jwt == undefined || jwt==null || jwt=='' ) { return null;} ;
 		return {'jwt' : jwt}
 	}
+
 }
 
 export class Util {
@@ -432,7 +446,10 @@ export class CryptoService {
 	private static salt = forge.util.hexToBytes(CryptoService.salt_hex);
 	//rideCrypt.salt = forge.random.getBytesSync(32);
 	private static numIterations = 10;
-	private static key = forge.pkcs5.pbkdf2('password', CryptoService.salt, CryptoService.numIterations, 16);
+	//public static password : string='password';
+	public static password : string='d043f85493366994d41';
+	//private static key = forge.pkcs5.pbkdf2('password', CryptoService.salt, CryptoService.numIterations, 16);
+	private static key = forge.pkcs5.pbkdf2(CryptoService.password, CryptoService.salt, CryptoService.numIterations, 16);
 	private static iv = forge.util.hexToBytes(CryptoService.salt_hex);
 
 	constructor(	) {
@@ -451,6 +468,12 @@ export class CryptoService {
 	// (other modes include: ECB, CFB, OFB, CTR, and GCM)
 	// Note: CBC and ECB modes use PKCS#7 padding as default
 
+	static set_password(password:string){
+		CryptoService.password = password;
+		CryptoService.key = forge.pkcs5.pbkdf2(CryptoService.password
+								, CryptoService.salt, CryptoService.numIterations, 16);
+	}
+
 	static encrypt	(content : string) : string {
 		let cipher = forge.cipher.createCipher('AES-CBC', CryptoService.key);
 		cipher.start({iv: CryptoService.iv});
@@ -464,7 +487,8 @@ export class CryptoService {
 
 	static decrypt(encrypted_hex: string): string|null
 	{
-		if (encrypted_hex== undefined || encrypted_hex== null || encrypted_hex=="") return null ;
+		if (encrypted_hex== undefined || encrypted_hex== null 
+			|| encrypted_hex=='null' || encrypted_hex=="") return null ;
 		// decrypt some bytes using CBC mode
 		// (other modes include: CFB, OFB, CTR, and GCM)
 		let encrypted = forge.util.hexToBytes(encrypted_hex) ;
@@ -474,9 +498,17 @@ export class CryptoService {
 		decipher.start({iv: CryptoService.iv});
 		decipher.update(buffer);
 		let result = decipher.finish(); // check 'result' for true/false
-		// outputs decrypted hex
-		let decrypted = decipher.output.toString('utf8') ;
-		console.info("201808171500 CryptoService.decrypt() decrypted=" + decrypted);
+
+		let decrypted: string =null;
+		try {
+			// outputs decrypted hex //may have 'ERROR URIError: URI malformed' if password is wrong 
+			decrypted = decipher.output.toString('utf8') ; 
+
+			console.info("201808171500 CryptoService.decrypt() decrypted=" + decrypted);
+		}
+		catch (error) {
+			console.error('201812262249', 'CryptoService.decrypt ignore error=', error);
+		}
 		return decrypted;
 	}
 

@@ -7,7 +7,7 @@ export class Constants{
 	//static SERVER_PORT			= "4210"			;
 	//static SERVER_PORT			= "4201"			;
 
-	static GET_USER_URL 		= '/ws/get_user'	;
+//	static GET_USER_URL 		= '/ws/get_user'	;
 	static SAVE_USER_URL 		= '/ws/save_user'	;
 
 	static URL_SAVE_USER 		= '/ws/save_user'	;
