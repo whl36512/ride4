@@ -93,7 +93,7 @@ export class DepositComponent extends BaseComponent {
 	subscription_action(msg){
 		if (msg.msgKey==C.MSG_KEY_SIGNIN_STATUS_CHANGE) {
 			console.debug('201812241934', this.page_name, 'subscription_action msg=', C.stringify(msg));
-			this.call_wservice(C.GET_USER_URL, {});
+			this.call_wservice(C.URL_GET_USER, {});
 		}
 	}
 
