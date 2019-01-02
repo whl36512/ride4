@@ -1,8 +1,10 @@
 <div class='title'>Ratings and Reviews</div>
-<div *ngIf='error_msg!=null'    class=error [innerHTML]='error_msg'></div>
-<div *ngIf='warning_msg!=null'  class=warning [innerHTML]='warning_msg'></div>
-<div *ngIf='info_msg!=null'     class=info [innerHTML]='info_msg'></div>
-for: {{user_from_db.headline}}
+<div class=center>
+	<div *ngIf='error_msg!=null'    class=error [innerHTML]='error_msg'></div>
+	<div *ngIf='warning_msg!=null'  class=warning [innerHTML]='warning_msg'></div>
+	<div *ngIf='info_msg!=null'     class=info [innerHTML]='info_msg'></div>
+	for <br/>{{user_from_db.headline}}
+</div>
 <table class=center>
 	<tbody>
 		<tr>
@@ -39,7 +41,7 @@ for: {{user_from_db.headline}}
 	</tbody>
 </table>
 
-<div *ngIf='!reviews_from_db' class=warning>
+<div *ngIf='!reviews_from_db' class='warning center'>
 	This user has not been reviewed, yet
 </div>
 <table *ngIf='reviews_from_db' class=no_border style='width:95%'>

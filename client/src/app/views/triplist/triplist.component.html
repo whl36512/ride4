@@ -41,9 +41,11 @@
 			</tbody>
 		</table>
 
-		<td *ngIf='trip.error_msg'		class=error 	[innerHTML]='trip.error_msg'	></td>
-		<td *ngIf='trip.warning_msg'	class=warning 	[innerHTML]='trip.warning_msg'	></td>
-		<td *ngIf='trip.info_msg'		class=info 		[innerHTML]='trip.info_msg'		></td>
+		<div class=center>
+			<div *ngIf='trip.error_msg'		class=error 	[innerHTML]='trip.error_msg'	></div>
+			<div *ngIf='trip.warning_msg'	class=warning 	[innerHTML]='trip.warning_msg'	></div>
+			<div *ngIf='trip.info_msg'		class=info 		[innerHTML]='trip.info_msg'		></div>
+		</div>
 		<div class='stitle' >
 			<span *ngIf=' trip.trip.rider_ind' > Passenger </span>
 			<span *ngIf='!trip.trip.rider_ind' > Driver </span>

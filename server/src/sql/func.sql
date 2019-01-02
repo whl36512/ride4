@@ -587,11 +587,12 @@ DECLARE
 	t1				trip ;
 	b1				book ;
 	b2				RECORD ;
-	ids				RECORD ;
+	--ids				RECORD ;
 	c				RECORD ;
 	m1				money_tran ;
 	new_status_cd	text;
 	penalty 		RECORD;
+	dummy	 		RECORD;
 BEGIN
 	u0	:=	funcs.json_populate_record(NULL::usr 	, in_user)	; 
 	c	:=	funcs.calc_cost()	;
@@ -665,12 +666,22 @@ BEGIN
 		,	in_tran_cd 			=> 'P'
 		,	in_ref_no 			=> b1.book_id::text) ;
 
+
 	select b1 book
 		, s.book_status_description
 	into b2
 	from book_status s
 	where s.status_cd = b1.status_cd
 	;
+
+	dummy	:=	funcs.ins_msg( b1.book_id, null , 'Trip is '||b2.book_status_description , null);
+	dummy	:=	funcs.ins_email( 
+					case when b.usr_id=u0.usr_id then t1.usr_id else b1.usr_id end  
+				,	'book'
+				,	b1.book_id
+				,	b1.status_cd
+				,	'Trip is '||b2.book_status_description');
+
 	return row_to_json(b2);
 END
 $body$
@@ -686,6 +697,7 @@ DECLARE
 	b0	book ;
 	b1	book ;
 	b2	RECORD	;
+	dummy	RECORD;
 BEGIN
 	b0 := funcs.json_populate_record(NULL::book 	, in_book) ;
 	u0 := funcs.json_populate_record(NULL::usr 		, in_user) ;
@@ -706,12 +718,16 @@ BEGIN
 	returning b.* into b1
 	;
 
+
 	select b1 book
 		, s.book_status_description
 	into b2
 	from book_status s
 	where s.status_cd = b1.status_cd
 	;
+	dummy	:=	funcs.ins_msg( b1.book_id, null, 'Trip is '||b2.book_status_description, null);
+	dummy	:=	funcs.ins_email( b1.usr_id, 'book', b1.book_id, b1.status_cd
+					, 'Trip is '||b2.book_status_description);
 	return row_to_json(b2);
 END
 $body$
@@ -737,6 +753,7 @@ DECLARE
 	m1 money_tran ;
 	driver_id	uuid;
 	driver_earning	ridemoney;
+	dummy	RECORD;
 BEGIN
 	select b.*
 	into b0
@@ -845,6 +862,10 @@ BEGIN
 	from book_status s
 	where s.status_cd = b1.status_cd
 	;
+	dummy	:=	funcs.ins_msg( b1.book_id, null, 'Trip is marked Finished by rider', null);
+	dummy	:=	funcs.ins_email( case when t1.rider_ind then b1.usr_id else t1.usr_id end -- send email to driver
+				, 'book', b1.book_id, b1.status_cd
+					, 'Trip is marked Finished by rider');
 	return row_to_json(b2);
 END
 $body$
@@ -1250,6 +1271,7 @@ DECLARE
 		b1	book ;
 		m1	money_tran ;
 		cost cost	;
+	dummy	RECORD;
 BEGIN
 	if b0.seats <= t0.seats 
 	then
@@ -1303,6 +1325,9 @@ BEGIN
 								, in_actual_amount => - (b1.cost).cost_rider
 								, in_tran_cd => 'B'
 								, in_ref_no => b1.book_id::text) ;
+	dummy	:=	funcs.ins_msg( b1.book_id, null, 'Rider booked the trip', null);
+	dummy	:=	funcs.ins_email( t0.usr_id, 'book', b1.book_id, b1.status_cd, 'Rider booked the trip');
+
 	return row_to_json(b1);
 END
 $body$
@@ -1317,6 +1342,7 @@ DECLARE
 	b1		book ;
 	m1		money_tran ;
 	cost	cost;
+	dummy	RECORD;
 BEGIN
 	if b0.seats = t0.seats then
 		null;
@@ -1376,6 +1402,8 @@ BEGIN
 								, in_actual_amount => - (b1.cost).cost_rider
 								, in_tran_cd => 'B'
 								, in_ref_no => b1.book_id::text ) ;
+	dummy	:=	funcs.ins_msg( b1.book_id, null, 'Driver booked the trip', null);
+	dummy	:=	funcs.ins_email( t0.usr_id, 'book', b1.book_id, b1.status_cd, 'Driver booked the trip');
 	return row_to_json(b1);
 END
 $body$
@@ -1500,6 +1528,8 @@ BEGIN
 	update usr 
 	set balance = balance + t1.actual_amount
 	;
+	dummy	:=	funcs.ins_email( t1.usr_id, 'money_tran', t1.money_tran_id, t1.tran_cd
+				, 'Your withdraw request is fulfilled');
 
 	return row_to_json(t1);
 END
@@ -1524,6 +1554,8 @@ BEGIN
 		,	in_tran_cd 			=> 'D'
 		,	in_ref_no 			=> s0.ref_no 
 		);
+	dummy	:=	funcs.ins_email( m1.usr_id, 'money_tran', m1.money_tran_id, m1.tran_cd
+				, 'Your deposit is received');
 
 	return row_to_json(m1);
 END
@@ -1632,9 +1664,10 @@ $body$
 	)
 	, a as (
 		select m.*
-			,	case when u0.usr_id = m.usr_id then 'Me'
-				 	else 'They'
-				 end user_is
+			,	case 	when m.usr_id = u0.usr_id then 'Me'
+						when m.usr_id = '00000000-0000-0000-0000-000000000001'::uuid then 'System'
+					 	else 'They'
+				end user_is
 		from u0
 		join b0 on (1=1)
 		join book b 	on ( b.book_id= b0.book_id ) 
@@ -1647,6 +1680,24 @@ $body$
 $body$
 language sql;
 
+create or replace function funcs.ins_msg( in_book_id uuid, in_usr_id uuid, in_msg text, in_p1 location)
+	returns msg
+as
+$body$
+DECLARE
+	m1 msg ;
+BEGIN
+	insert into msg ( book_id, usr_id, msg, p1) 
+		values	( in_book_id, coalesce(in_usr_id, '00000000-0000-0000-0000-000000000001'::uuid)
+				, in_msg, in_p1)
+	returning * into m1
+	;
+
+	return m1;
+END
+$body$
+language plpgsql;
+
 create or replace function funcs.save_msg( in_msg text, in_user text)
 	returns json
 as
@@ -1654,6 +1705,7 @@ $body$
 DECLARE
 	m0 msg; 
 	u0 usr ;
+	usr_id_other uuid;
 	m1 msg ;
 	--m2 RECORD ;
 BEGIN
@@ -1665,6 +1717,14 @@ BEGIN
 	returning * into m1
 	;
 
+	select case when b.usr_id=u0.usr_id then t.usr_id else b.usr_id end usr_id_other
+	into usr_id_other
+	from book b
+	join	trip t on (t.trip_id=b.trip_id)
+	where	b.book_id=m1.book_id
+	;
+
+	dummy	:=	funcs.ins_email( usr_id_other, 'msg', m1.msg_id, 'N/A', 'You have got a message');
 	return row_to_json(m1);
 END
 $body$
@@ -1765,6 +1825,26 @@ BEGIN
 	select row_to_json(a)
 	from a
 	order by a.rating , a.m_ts desc
+	;
+END
+$body$
+language plpgsql;
+
+create or replace function funcs.ins_email(
+		in_usr_id 		email.usr_id%TYPE text
+		, in_ref_obj	email.ref_obj%TYPE
+		, in_ref_no		email.ref_no%TYPE
+		, in_reason_cd	email.reason_cd%TYPE
+		, in_title		email.title%TYPE
+		, OUT e1 		email)
+	returns email
+as
+$body$
+DECLARE
+BEGIN
+	insert into email 	(usr_id		, ref_obj	, ref_no	, reason_cd		, title)
+	values				(in_usr_id	, in_ref_obj, in_ref_no	, in_reason_cd	, in_title)
+	returning * into e1
 	;
 END
 $body$

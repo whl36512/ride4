@@ -249,7 +249,7 @@ export class BookingsComponent extends BaseComponent {
 				b.show_reject_button	= bb.status_cd == 'P' && ! b.is_booker ;
 				b.show_cancel_button	= bb.status_cd == 'C' || bb.status_cd == 'P' && b.is_booker;
 				b.show_finish_button	= bb.status_cd == 'C' && b.is_rider ;
-				b.show_msg_button 		= bb.status_cd == 'C';
+				b.show_msg_button 		= bb.status_cd !='P' 	;
 				b.show_review_button	= bb.status_cd.match(/^(F|CD|CR)$/);
 			}
 		}

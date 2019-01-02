@@ -77,6 +77,10 @@ create table usr
 create index ix_usr_oauth_id on usr(oauth_id);
 create index ix_usr_referral_email on usr(referral_email);
 
+insert into usr(usr_id, last_name, oauth_id, oauth_host) 
+values( '00000000-0000-0000-0000-000000000001'::uuid, 'System', 'NA', 'NA')
+;
+
 CREATE TABLE trip 
 (
 		trip_id		sys_id		not null
@@ -186,15 +190,34 @@ alter table money_tran add constraint ck_money_tran_status_cd
 create table msg (
 		msg_id 	sys_id 	not null
 	, 	book_id sys_id 	not null
-	, 	usr_id 	sys_id 	not null
+	, 	usr_id 	sys_id 	not null -- sender's usr_id
 	, 	c_ts	sys_ts 	not null
 	, 	msg		text 	not null
 	, 	p1		location
+	, 	constraint 	pk_msg PRIMARY KEY (msg_id)
 	, 	constraint fk_msg2usr 	foreign key ( usr_id)	REFERENCES	usr		( usr_id)
 	, 	constraint fk_msg2book 	foreign key ( book_id)	REFERENCES	book	( book_id)
 );
 create index ix_msg_book_id on msg(book_id);
 create index ix_msg_usr_id on msg(usr_id);
+
+create table email(
+	email_id	sys_id	not null
+	, usr_id	sys_id	not null	--recipients usr_id
+	, ref_obj	text	not null	-- table name
+	, ref_no	sys_id	not null	-- pk of refed table name
+	, status_cd	text	not null default 'P' -- Pending, Sent
+	, reason_cd	text	not null -- book.status_cd,  money_tran.tran_cd, etc
+	, title		text
+	, msg		text
+	, c_ts		sys_ts 	not null
+	, m_ts		sys_ts 	not null
+	, 	constraint 	pk_email PRIMARY KEY (email_id)
+	, 	constraint fk_email2usr 	foreign key ( usr_id)	REFERENCES	usr		( usr_id)
+	, 	constraint fk_email2book 	foreign key ( book_id)	REFERENCES	book	( book_id)
+);
+create index ix_email_usr_id 	on email(usr_id);
+create index ix_email_book_id 	on email(book_id);
 
 create table code (
 	  code_type		text not null
@@ -229,6 +252,8 @@ insert into code values
 --, ('JN'	, 'E'	, 'Expired')
 , ('TRAN_STATUS'	, 'K', 'OK, Success')
 , ('TRAN_STATUS'	, 'F', 'Failed')
+, ('EMAIL_STATUS'	, 'P', 'Pending')
+, ('EMAIL_STATUS'	, 'S', 'Sent')
 ;
 
 
@@ -262,4 +287,5 @@ grant all on public.review to ride;
 grant all on public.trip_status to ride;
 grant all on public.book_status to ride;
 grant all on public.money_tran_tran_cd to ride;
+grant all on public.email to ride;
 

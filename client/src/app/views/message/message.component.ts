@@ -34,7 +34,7 @@ export class MessageComponent extends BaseComponent {
 	// By initialize trip to an empty structure, repeated calling of constructor can be avoided
 
 	@Input()
-		book_id: string;
+		book: any;
 
 	@Input()
 		index: number;
@@ -67,6 +67,7 @@ export class MessageComponent extends BaseComponent {
 	timer_action(val:number)
 	{
 		if (this.component_destroyed ) return;
+		if ( this.book.book_status!='C') return;
 
 		if(val >0) {
 			if ( val % ( 1000/C.TIMER_INTERVAL) == 0 ) { //show count down every second
@@ -81,7 +82,8 @@ export class MessageComponent extends BaseComponent {
 			);
 		}
 		else {
-			if ( val % ( C.MSG_TIMER_WAIT*1000/C.TIMER_INTERVAL) == 0 ) {
+			if ( val > 10 && val % ( C.MSG_TIMER_WAIT*1000/C.TIMER_INTERVAL) == 0 ) {
+				// subsequent load of new chats
 				this.get_msgs_from_db();
 			}
 		}
@@ -90,11 +92,12 @@ export class MessageComponent extends BaseComponent {
 	ngoninit() {
 		this.warning_msg	=	' Loading ...' ;
 		this.get_form();
+		this.get_msgs_from_db(); // initial load of chats
 	}
 
 	get_form(): void {
 		this.form = this.form_builder.group({
-				book_id	: [this.book_id, []],
+				book_id	: [this.book.book_id, []],
 				msg	: ['', []],
 				p	: [null, []],
 				}
@@ -159,7 +162,7 @@ export class MessageComponent extends BaseComponent {
 		if ( this.msgs_from_db.length != 0) latest_c_ts = this.msgs_from_db[this.msgs_from_db.length-1].c_ts;
 		let data_from_db_observable
 			= this.dbService.call_db(C.URL_MSGS
-				, {book_id: this.book_id, c_ts: latest_c_ts});
+				, {book_id: this.book.book_id, c_ts: latest_c_ts});
 		data_from_db_observable.subscribe(
 			msgs_from_db => {
 				console.debug("201810072326 BookingsComponent.action() msg_from_db ="

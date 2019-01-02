@@ -14,15 +14,18 @@
 </dl>
 
 
-<form [formGroup]="form" (ngSubmit)='true' >
+<form [formGroup]="form" (ngSubmit)='true' *ngIf='book.status_cd=="C"'>
 	<textarea formControlName=msg  > </textarea>
 	<br/>
 	<button type=button (click)="action(form.value ,0, C.URL_SAVE_MSG)">Send Chat</button>
 	<button type=button (click)="at_pickup()">I'm at Pickup</button>
 </form>
-<div *ngIf='error_msg!=null' class=error>{{error_msg}}</div>
-<div class=warning>Note: Chat window will close automatically 
-		{{C.MSG_NO_ACTIVITY_COUNT_DOWN}} seconds 
-		after no activities. {{msg_no_activity_count_down}}</div>
-<div *ngIf='warning_msg!=null' class=warning>{{warning_msg}}</div>
-<div *ngIf='info_msg!=null' class=info>{{info_msg}}</div>
+<div class=center>
+	<div *ngIf='error_msg!=null' class=error>{{error_msg}}</div>
+	<div class=warning *ngIf='book.status_cd!="C"' >New chats are disabled</div>
+	<div class=warning *ngIf='book.status_cd=="C"' >Note: Chat window will close automatically 
+			{{C.MSG_NO_ACTIVITY_COUNT_DOWN}} seconds 
+			after no activities. {{msg_no_activity_count_down}}</div>
+	<div *ngIf='warning_msg!=null' class=warning>{{warning_msg}}</div>
+	<div *ngIf='info_msg!=null' class=info>{{info_msg}}</div>
+</div>

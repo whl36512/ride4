@@ -141,7 +141,7 @@
 	</div>
 </div>
 	<app-message *ngIf='bookings_from_db[i].show_messaging_panel'
-                        [book_id]="bookings_from_db[i].book.book_id"
+                        [book]="bookings_from_db[i].book"
                         [index]="i"
                         >
 	</app-message>
