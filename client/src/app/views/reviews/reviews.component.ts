@@ -32,6 +32,7 @@ import { AppComponent } from '../../app.component';
 //import { Constants } from '../../models/constants';
 import { C } from '../../models/constants';
 import { Util 				}	from '../../models/gui.service';
+import { CryptoService 				}	from '../../models/gui.service';
 //import { StorageService } from '../../models/gui.service';
 //import { UserService } from '../../models/gui.service';
 import { Status } from '../../models/gui.service';
@@ -86,7 +87,9 @@ export class ReviewsComponent extends BaseComponent {
   	} 
 
 	ngoninit() {
-		let reviewee_usr_id = this.route.snapshot.paramMap.get('usr_id'); 
+		let encrypted_reviewee_usr_id = this.route.snapshot.paramMap.get('usr_id'); 
+		let reviewee_usr_id =	CryptoService.decrypt(encrypted_reviewee_usr_id);
+
 
 		if( Status.reviewee_from_db.usr_id ==  reviewee_usr_id) { // already have data
 			this.setup_data();

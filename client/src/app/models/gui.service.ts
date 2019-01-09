@@ -447,9 +447,11 @@ export class CryptoService {
 	private static numIterations = 10;
 	//public static password : string='password';
 	public static password : string='d043f85493366994d41';
+	public static dummy : string='AES-CTR';
+	public static mode : string='AES-CBC';
 	//private static key = forge.pkcs5.pbkdf2('password', CryptoService.salt, CryptoService.numIterations, 16);
 	private static key = forge.pkcs5.pbkdf2(CryptoService.password, CryptoService.salt, CryptoService.numIterations, 16);
-	private static iv = forge.util.hexToBytes(CryptoService.salt_hex);
+	//private static iv = forge.util.hexToBytes(CryptoService.salt_hex);
 
 	constructor(	) {
 	}
@@ -474,27 +476,32 @@ export class CryptoService {
 	}
 
 	static encrypt	(content : string) : string {
-		let cipher = forge.cipher.createCipher('AES-CBC', CryptoService.key);
-		cipher.start({iv: CryptoService.iv});
+		let cipher = forge.cipher.createCipher(CryptoService.mode, CryptoService.key);
+		let iv = forge.random.getBytesSync(16);
+
+		cipher.start({iv: iv});
 		cipher.update(forge.util.createBuffer(content));
 		cipher.finish();
 		let encrypted = cipher.output;
 		let hex = encrypted.toHex() ;
-		console.info('201808171902 CryptoService.encrypt() encrypted_hex=' + hex);
-		return hex;
+		let iv_hex = forge.util.bytesToHex(iv)
+		console.debug('201808171902 CryptoService.encrypt() encrypted_hex=' + hex);
+		return iv_hex+ '-'+ hex;
 	};
 
 	static decrypt(encrypted_hex: string): string|null
 	{
-		if (encrypted_hex== undefined || encrypted_hex== null 
-			|| encrypted_hex=='null' || encrypted_hex=="") return null ;
+		if (!encrypted_hex || encrypted_hex=='null' || encrypted_hex=="") return null ;
 		// decrypt some bytes using CBC mode
 		// (other modes include: CFB, OFB, CTR, and GCM)
-		let encrypted = forge.util.hexToBytes(encrypted_hex) ;
+
+		let hexes = encrypted_hex.split('-');
+		let iv 			= forge.util.hexToBytes(hexes[0]) ;
+		let encrypted 	= forge.util.hexToBytes(hexes[1]) ;
 		let buffer	= forge.util.createBuffer(encrypted);
 
-		let decipher = forge.cipher.createDecipher('AES-CBC', CryptoService.key);
-		decipher.start({iv: CryptoService.iv});
+		let decipher = forge.cipher.createDecipher(CryptoService.mode, CryptoService.key);
+		decipher.start({iv: iv});
 		decipher.update(buffer);
 		let result = decipher.finish(); // check 'result' for true/false
 
@@ -503,14 +510,15 @@ export class CryptoService {
 			// outputs decrypted hex //may have 'ERROR URIError: URI malformed' if password is wrong 
 			decrypted = decipher.output.toString('utf8') ; 
 
-			console.info("201808171500 CryptoService.decrypt() decrypted=" + decrypted);
 		}
 		catch (error) {
 			console.error('201812262249', 'CryptoService.decrypt ignore error=', error);
 		}
+		console.info("201808171500 CryptoService.decrypt() decrypted=" + decrypted);
 		return decrypted;
 	}
 
+/*
 	private byteToHexString (uint8arr: Uint8Array) {
 		if (!uint8arr) {
 			return '';
@@ -536,6 +544,7 @@ export class CryptoService {
 		}
 		return new Uint8Array(a);
 	}
+*/
 }
 
 export class StorageService {

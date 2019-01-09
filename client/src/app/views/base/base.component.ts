@@ -39,6 +39,7 @@ import { DotIcon				} 	from '../../models/map.service';
 import { PinIcon				} 	from '../../models/map.service';
 import { Util					} 	from '../../models/gui.service';
 import { Status					} 	from '../../models/gui.service';
+import { CryptoService			} 	from '../../models/gui.service';
 
 
 
@@ -516,7 +517,8 @@ export class BaseComponent implements OnChanges, OnInit, OnDestroy {
 	on_get_data_from_wservice(data_from_db: any) { };
 	validate_form(){}
 	show_reviews(other_usr_id: string){
-		this.router.navigate(['/reviews',  other_usr_id]);
+		let encrypted= CryptoService.encrypt(other_usr_id);	
+		this.router.navigate(['/reviews',  encrypted]);
 	}
 
 
