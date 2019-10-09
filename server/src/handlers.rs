@@ -1,6 +1,6 @@
 //use reqres :: SessionKey;
 use iron::status;
-use reqres::RideRequest;
+use super::reqres::RideRequest;
 //use reqres::RequestComponent;
 use db_postgres::db;
 //use db;
@@ -14,12 +14,12 @@ use serde_json;
 //use json;
 
 
-use tables::Usr ;
+use crate::tables::Usr ;
 //use tables::Trip ;
-use token::JwtToken;
-use token;
+use super::token::JwtToken;
+use super::token;
 //use reqres::SecurityStatus;
-use constants;
+use super::constants;
 
 type Json = serde_json::Value;
 
@@ -166,7 +166,7 @@ pub fn post_page(_: &mut Request) -> IronResult<Response> {
 
 pub fn redi(_: &mut Request) -> IronResult<Response> {
     use iron::modifiers::Redirect;
-    use iron::{status, Url};
+    use iron::Url;
 
     let url = Url::parse("http://rideshare.beegrove.com:4200").unwrap();
     Ok(Response::with((status::TemporaryRedirect, Redirect(url.clone()))))

@@ -151,11 +151,20 @@
 					<td>
 			<span *ngIf='!this.form.value.rider_ind'>Available Seats: </span>
 			<span *ngIf='this.form.value.rider_ind' >Requested Seats: </span>
-				{{this.form.value.seats}} 
 					</td>
-					<td>
+					<!--td>
 				<input type="range" formControlName="seats" value="{{form.value.seats}}"  
 					min="1" max="{{C.MAX_SEATS}}" step=1 /> 
+					</td-->
+					<td>
+  						<select matNativeControl formControlName="seats" required>
+    						<option value="1">1</option>
+    						<option value="2">2</option>
+    						<option value="3">3</option>
+    						<option value="4">4</option>
+    						<option value="5">5</option>
+    						<option value="6">6</option>
+  						</select>
 					</td>
 				</tr>
 			<tr>

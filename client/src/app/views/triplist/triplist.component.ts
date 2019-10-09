@@ -85,7 +85,7 @@ export class TriplistComponent extends BaseComponent {
 					;
 
 			let tmp_book= Util.deep_copy(t);
-			tmp_book.book= sc;
+			tmp_book.book= sc; //assign search criteria the book var to facilitate drawing
 			t.google_map_url = MapService.google_map_string(tmp_book); 
 			t.stars = Util.get_stars(t.rating);
 
@@ -93,8 +93,9 @@ export class TriplistComponent extends BaseComponent {
 			if ( !t.trip.rider_ind  && !sc.p1.lat  ) {
 				// not enough info to make a booking, i.e. rider does not provide p1 p2
 				t.enough_info = false; 
-				t.warning_msg = 'Rider: Not enough information to book. You must first use Refine Search menu to search';
+				t.warning_msg = 'Rider: your pickup and dropoff points are required for booking.</br>Please use Refine Search menu to search';
 			}
+			else if ( t.trip.usr_id == 
 			else if ( ! this.is_signed_in) 
 				t.warning_msg = 'Cannot book. Please sign in';
 			else if ( ! t.sufficient_balance && ! t.trip.rider_ind) 

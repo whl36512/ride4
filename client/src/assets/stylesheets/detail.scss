@@ -4,7 +4,7 @@ $primary-color: #06b;
 $dark-color: #06b;
 $green	:  #1d8348;
 $red	:  #943126;
-$yellow	:  #D4AC0D;
+$yellow	:  yellow ;
 $blue	:	#1a5276;
 //$green	:  #99ff99;
 //$red	:  #ff9999;
@@ -83,6 +83,12 @@ input {
 		padding-left: 0.2rem;
 		color: green;
 	}
+}
+select { 
+  	background-color: white;
+	border: 1px solid $primary-color;
+  	border-radius: 0.4rem;
+	width: 2rem;
 }
 
 .rTable {

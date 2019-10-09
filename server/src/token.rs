@@ -1,7 +1,7 @@
 use chrono::Utc;
 use jwt::{encode, decode, Header, Algorithm, Validation};
 use jwt::errors::{ErrorKind};
-use tables::Usr ;
+use super::tables::Usr ;
 
 #[derive(PartialEq)]
 #[derive(Debug)]

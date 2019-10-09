@@ -2,10 +2,11 @@ use regex::Regex;
 use iron::request::Request ;
 use std::io::Read;
 use typemap;
+//use lazy_static;
 //use secure_session::middleware::{SessionMiddleware, SessionConfig};
 //use secure_session::session::ChaCha20Poly1305SessionManager;
-use tables::Usr;
-use constants;
+use super::tables::Usr;
+use super::constants;
 //
 //use serde_json;
 //type Json = serde_json::Value;

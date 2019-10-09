@@ -2,6 +2,7 @@
 name = "server"
 version = "0.1.0"
 authors = ["whl36512 <whl36512@gmail.com>"]
+edition = "2018"
 
 [dependencies]
 router = "*"
@@ -36,11 +37,11 @@ data-encoding = "*"
 #secure-session ="*"
 typemap = "*"
 iron-cors ="*"
-unicase = "*"
+unicase = "1.4.2"
 chrono = "*"
 jsonwebtoken ="*"
 regex = "1"
-websocket = "0.21.1"
+websocket = "*"
 lazy_static ="*"
 
 

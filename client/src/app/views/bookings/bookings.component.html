@@ -88,8 +88,15 @@
 					<td>{{bookings_from_db[i].trip.trip_date}}<br/>
 						{{bookings_from_db[i].trip.trip_time}}</td>
 					<td *ngIf='! bookings_from_db[i].book' > 
-						{{booking.value.seats}}<br/>
-		<input class=zoom type="range" formControlName="seats" min="0" max="{{C.MAX_SEATS}}" step=1 />
+                       <select matNativeControl formControlName="seats" required>
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                        </select>
 					</td>
 					<td *ngIf='! bookings_from_db[i].book' > 
 						{{booking.value.price}}<br/>
@@ -150,6 +157,7 @@
                         [index]="i"
                         >
 	</app-review>
+	<p>
 	<div *ngIf='bookings_from_db[i].book'>
 		<div class='stitle'>
 			<span *ngIf=' bookings_from_db[i].is_rider' > Driver </span>
@@ -167,6 +175,7 @@
  		<span class='button clickable-text'  *ngIf='bookings_from_db[i].sm_link'>
 			<a [href]='bookings_from_db[i].sm_link' target=_blank>LinkedIn Profile</a>
 		</span>
+		<p>
 	</div>
 
 	<div *ngIf='bookings_from_db[i].is_booker'>
@@ -176,12 +185,14 @@
 			<span class='clickable-text map_clickable'>map</span>
 		</div>
 		{{bookings_from_db[i].trip.p1.display_name}}
+		<p>
 		<div class='clickable-text to' (click)='geo_mark(i)'> 
 			<span *ngIf=' bookings_from_db[i].trip.rider_ind'>Passenger Dropoff </span>
 			<span *ngIf='!bookings_from_db[i].trip.rider_ind'>Driver to </span>
 			<span class='clickable-text map_clickable'>map</span>
 		</div>
 		{{bookings_from_db[i].trip.p2.display_name}}
+		<p>
 	</div>
 	<div *ngIf='!bookings_from_db[i].is_booker && bookings_from_db[i].book'>
 		<div class='clickable-text from' (click)='geo_mark(i)'> 
@@ -190,6 +201,7 @@
 			<span class='clickable-text map_clickable'>map</span>
 		</div>
 		{{bookings_from_db[i].book.p1.display_name}}
+		<p>
 		<div *ngIf='bookings_from_db[i].book.p2.display_name'> 
 			<div class='clickable-text to' (click)='geo_mark(i)' >
 				<span *ngIf='!bookings_from_db[i].trip.rider_ind'> Passenger Dropoff </span>
@@ -197,6 +209,7 @@
 				<span class='clickable-text map_clickable'>map</span>
 			</div>
 			{{bookings_from_db[i].book.p2.display_name}}
+			<p>
 		</div>
 	</div>
 
@@ -207,15 +220,18 @@
 			<span class='clickable-text map_clickable'>map</span>
 		</div>
 		{{bookings_from_db[i].trip.p1.display_name}}
+			<p>
 		<div class='clickable-text to' (click)='geo_mark(i)'> 
 			<span *ngIf=' bookings_from_db[i].trip.rider_ind'>Passenger (me) Dropoff</span>
 			<span *ngIf='!bookings_from_db[i].trip.rider_ind'>Driver (me) to</span>
 			<span class='clickable-text map_clickable'>map</span>
 		</div>
 		{{bookings_from_db[i].trip.p2.display_name}}
+			<p>
 	</div>
 
 	<span class='button clickable-text' [innerHTML]="bookings_from_db[i].google_map_url"></span>
+	<p>
 	<div *ngIf='bookings_from_db[i].trip.description'>
 		<div class='stitle' >Description</div>
 		<div class=data [innerHTML]="bookings_from_db[i].trip.description"></div>

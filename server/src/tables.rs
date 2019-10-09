@@ -1,7 +1,7 @@
 //use rustc_serialize::json::Json;
-use constants ;
-use token::TokenOption;
-use token::JwtToken;
+use super::constants ;
+use super::token::TokenOption;
+use super::token::JwtToken;
 use serde_json ;
 
 type Json = serde_json::Value ;

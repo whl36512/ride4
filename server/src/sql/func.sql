@@ -680,7 +680,7 @@ BEGIN
 				,	'book'
 				,	b1.book_id
 				,	b1.status_cd
-				,	'Trip is '||b2.book_status_description');
+				,	'Trip is '||b2.book_status_description);
 
 	return row_to_json(b2);
 END
@@ -1014,6 +1014,7 @@ $body$
 			, case when uo.profile_ind then 'LinkedIn Profile available' 
 										else 'LinkedIn Profile Opted out' 
 				end profile_available
+			, case when u0.usr_id = t.usr_id then	true else false end is_same_user
 		from trip t
 		join usr 	uo on (uo.usr_id=t.usr_id) -- to get the other user's (driver's) headline 
 		left outer join usr um on (um.usr_id = u0.usr_id) -- to get bookings
@@ -1072,6 +1073,7 @@ $body$
 			, case when uo.profile_ind then 'LinkedIn Profile available' 
 										else 'LinkedIn Profile Opted out' 
 				end profile_available
+			, case when u0.usr_id = t.usr_id then	true else false end is_same_user
 		from trip t
 		join usr 	uo on (uo.usr_id=t.usr_id) -- to get the other user's (rider's) headline 
 		left outer join usr um on (um.usr_id = u0.usr_id) --  my usr to get bookings
@@ -1145,6 +1147,7 @@ BEGIN
 			, case when u0.balance >= -10 	then true else false end sufficient_balance
 			, coalesce ( b.seats, 0)	seats_booked	-- should always be 0
 			, t.seats				seats_to_book
+			, case when u0.usr_id = t.usr_id then	true else false end is_same_user
 		from trip t
 		join usr uo on (uo.usr_id = t.usr_id) -- to get the other user's headline and balance
 		left outer join book b on (b.trip_id=t.trip_id and b.usr_id=u0.usr_id and b.status_cd in ('P', 'C'))
@@ -1196,6 +1199,7 @@ BEGIN
 			, case when u0.balance >= -10 	then true else false end sufficient_balance
 			, coalesce ( b.seats, 0)	seats_booked
 			, case when t.rider_ind then t.seats else 0 end				seats_to_book
+			, case when u0.usr_id = t.usr_id then	true else false end is_same_user
 		from trip t
 		join usr uo on (uo.usr_id = t.usr_id) -- to get the other user's headline and balance
 		left outer join book b on (b.trip_id=t.trip_id and b.usr_id=u0.usr_id and b.status_cd in ('P', 'C'))
@@ -1544,6 +1548,7 @@ DECLARE
 		s0 funcs.criteria ;
 		u0 usr ;
 		m1 money_tran ;
+	dummy RECORD ;
 BEGIN
 	s0 := funcs.json_populate_record(NULL::funcs.criteria, tran) ;
 	select * into u0 from usr u where u.deposit_id=s0.deposit_id;
@@ -1708,6 +1713,7 @@ DECLARE
 	usr_id_other uuid;
 	m1 msg ;
 	--m2 RECORD ;
+	dummy RECORD ;
 BEGIN
 	m0 := funcs.json_populate_record(NULL::msg, in_msg) ;
 	u0 := funcs.json_populate_record(NULL::usr, in_user) ;
@@ -1831,7 +1837,7 @@ $body$
 language plpgsql;
 
 create or replace function funcs.ins_email(
-		in_usr_id 		email.usr_id%TYPE text
+		in_usr_id 		email.usr_id%TYPE 
 		, in_ref_obj	email.ref_obj%TYPE
 		, in_ref_no		email.ref_no%TYPE
 		, in_reason_cd	email.reason_cd%TYPE
